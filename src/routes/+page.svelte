@@ -18,7 +18,7 @@
 	 * @type {never[]}
 	 */
 	let fullResponse = [];
-	let PUBLIC_GOOGLE_MAPS_API_KEY = 'AIzaSyC0Qi8V6cMNhilPtnHWim0lcUOwsWKFG08';
+	let PUBLIC_GOOGLE_MAPS_API_KEY = '--YOUR_API_KEY--';
 	let countries = [
 		{ name: 'United Kingdom', region: 'GB' },
 		{ name: 'United States', region: 'US' },
