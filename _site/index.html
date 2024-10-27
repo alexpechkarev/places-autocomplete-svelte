@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="UTF-8">
+
+<!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>Places Autocomplete Svelte | This Svelte component leverages the Google Maps Places Autocomplete API to provide a user-friendly way to search for and retrieve detailed address information within your SvelteKit applications.</title>
+<meta name="generator" content="Jekyll v3.10.0" />
+<meta property="og:title" content="Places Autocomplete Svelte" />
+<meta name="author" content="Alexander Pechkarev" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="This Svelte component leverages the Google Maps Places Autocomplete API to provide a user-friendly way to search for and retrieve detailed address information within your SvelteKit applications." />
+<meta property="og:description" content="This Svelte component leverages the Google Maps Places Autocomplete API to provide a user-friendly way to search for and retrieve detailed address information within your SvelteKit applications." />
+<link rel="canonical" href="http://localhost:4000/" />
+<meta property="og:url" content="http://localhost:4000/" />
+<meta property="og:site_name" content="Places Autocomplete Svelte" />
+<meta property="og:type" content="website" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Places Autocomplete Svelte" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebSite","author":{"@type":"Person","name":"Alexander Pechkarev"},"description":"This Svelte component leverages the Google Maps Places Autocomplete API to provide a user-friendly way to search for and retrieve detailed address information within your SvelteKit applications.","headline":"Places Autocomplete Svelte","name":"Places Autocomplete Svelte","url":"http://localhost:4000/"}</script>
+<!-- End Jekyll SEO tag -->
+
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link rel="preload" href="https://fonts.googleapis.com/css?family=Open+Sans:400,700&display=swap" as="style" type="text/css" crossorigin>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#157878">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="stylesheet" href="/assets/css/style.css?v=55df846e9badf3e2d9002b61429509ff942a335b">
+    <!-- start custom head snippets, customize with your own _includes/head-custom.html file -->
+
+<!-- Setup Google Analytics -->
+
+
+
+<!-- You can set your favicon here -->
+<!-- link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" -->
+
+<!-- end custom head snippets -->
+
+  </head>
+  <body>
+    <a id="skip-to-content" href="#content">Skip to the content.</a>
+
+    <header class="page-header" role="banner">
+      <h1 class="project-name">Places Autocomplete Svelte</h1>
+      <h2 class="project-tagline">This Svelte component leverages the Google Maps Places Autocomplete API to provide a user-friendly way to search for and retrieve detailed address information within your SvelteKit applications.</h2>
+      
+        <a href="https://github.com/alexpechkarev/places-autocomplete-svelte" class="btn">View on GitHub</a>
+      
+      
+        <a href="https://github.com/alexpechkarev/places-autocomplete-svelte/zipball/gh-pages" class="btn">Download .zip</a>
+        <a href="https://github.com/alexpechkarev/places-autocomplete-svelte/tarball/gh-pages" class="btn">Download .tar.gz</a>
+      
+    </header>
+
+    <main id="content" class="main-content" role="main">
+      <h1 id="places-autocomplete-svelte">Places Autocomplete Svelte</h1>
+
+<p>This Svelte component leverages the <a href="https://developers.google.com/maps/documentation/javascript/place-autocomplete-overview">Google Maps Places Autocomplete API</a> to provide a user-friendly way to search for and retrieve detailed address information within your <a href="https://kit.svelte.dev">SvelteKit</a> applications.</p>
+
+<h2 id="features">Features:</h2>
+
+<ul>
+  <li><strong>Seamless Integration:</strong> Easily integrate the component into your SvelteKit projects.</li>
+  <li><strong>Autocomplete Suggestions:</strong> Provide users with real-time suggestions as they type, enhancing the search experience.</li>
+  <li><strong>Detailed Address Retrieval:</strong> Retrieve comprehensive address information, including street address, city, region, postal code, and country.</li>
+  <li><strong>Formatted and Unformatted Responses:</strong> Access both formatted address strings and raw address component data for flexible use cases.</li>
+  <li><strong>Country/Region Selection:</strong> Allow users to specify a region for more targeted results.</li>
+  <li><strong>Customizable:</strong> Tailor the component’s appearance and behavior using language settings and placeholder text.</li>
+</ul>
+
+<p><img src="/places-autocomplete-svelte.gif" alt="Places Autocomplete Svelte" /></p>
+
+<h2 id="requirements">Requirements</h2>
+
+<ul>
+  <li><strong>Google Maps API Key:</strong> Create an API key with the Places API (New) enabled. Refer to <a href="https://developers.google.com/maps/documentation/javascript/get-api-key">Use API Keys</a> for detailed instructions.</li>
+</ul>
+
+<h2 id="installation">Installation</h2>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>npm i places-autocomplete-svelte
+</code></pre></div></div>
+
+<h2 id="import-component">Import Component</h2>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="nx">PlaceAutocomplete</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">places-autocomplete-svelte</span><span class="dl">'</span><span class="p">;</span>
+</code></pre></div></div>
+
+<h2 id="basic-usage">Basic Usage</h2>
+
+<ol>
+  <li><strong>Provide your Google Maps API Key:</strong> Replace <code class="language-plaintext highlighter-rouge">'--YOUR_API_KEY--'</code> with your actual Google Maps API key.</li>
+  <li><strong>Bind to Address Variables:</strong> Use <code class="language-plaintext highlighter-rouge">bind:formattedAddress</code> to capture the selected address as string.</li>
+</ol>
+
+<pre><code class="language-svelte">&lt;script&gt;
+  import { PlaceAutocomplete } from 'places-autocomplete-svelte';
+
+  let formattedAddress = '';
+  let PUBLIC_GOOGLE_MAPS_API_KEY = '--YOUR_API_KEY--';
+&lt;/script&gt;
+
+&lt;PlaceAutocomplete 
+    bind:PUBLIC_GOOGLE_MAPS_API_KEY 
+    bind:formattedAddress /&gt;
+
+&lt;p&gt;Formatted Address: {formattedAddress}&lt;/p&gt; 
+</code></pre>
+
+<h2 id="specifying-countriesregions">Specifying Countries/Regions</h2>
+
+<p>Use the <code class="language-plaintext highlighter-rouge">countries</code> property to refine search by region:</p>
+
+<pre><code class="language-svelte">&lt;script&gt;
+  // ... other imports
+
+  let countries = [
+    { name: 'United Kingdom', region: 'GB' , language:'en-GB'},
+    { name: 'United States', region: 'US',language:'en-US' },
+    // ... more countries
+  ];
+&lt;/script&gt;
+
+&lt;PlaceAutocomplete 
+    bind:PUBLIC_GOOGLE_MAPS_API_KEY 
+    bind:formattedAddress 
+    bind:countries /&gt; 
+</code></pre>
+
+<ul>
+  <li>The <code class="language-plaintext highlighter-rouge">region</code> code follows the <a href="https://developers.google.com/maps/documentation/javascript/reference/autocomplete-data#AutocompleteRequest">CLDR two-character format</a>.</li>
+  <li>The <code class="language-plaintext highlighter-rouge">language</code> in which to return results. <a href="https://developers.google.com/maps/documentation/javascript/reference/autocomplete-data#AutocompleteRequest.language">See details</a></li>
+</ul>
+
+<h2 id="accessing-full-response-data">Accessing Full Response Data</h2>
+
+<p>For maximum flexibility, access the complete unformatted response from the Google Maps API:</p>
+
+<pre><code class="language-svelte">&lt;script&gt;
+  // ... other imports
+  let fullResponse = {}; 
+&lt;/script&gt;
+
+&lt;PlaceAutocomplete bind:PUBLIC_GOOGLE_MAPS_API_KEY bind:fullResponse /&gt;
+
+&lt;pre&gt;{JSON.stringify(fullResponse, null, 2)}&lt;/pre&gt;
+</code></pre>
+
+<h2 id="example">Example</h2>
+<pre><code class="language-svelte">&lt;script&gt;
+  import { PlaceAutocomplete } from 'places-autocomplete-svelte';
+
+  let PUBLIC_GOOGLE_MAPS_API_KEY = '--YOUR_API_KEY--';
+  let formattedAddress = '';
+  let fullResponse = {};
+  let formattedAddressObj = {};
+  let countries = [
+    { name: 'United Kingdom', region: 'GB' , language:'en-GB'},
+    { name: 'United States', region: 'US',language:'en-US' },
+    // ... more countries
+  ];
+&lt;/script&gt;
+
+&lt;PlaceAutocomplete 
+    bind:PUBLIC_GOOGLE_MAPS_API_KEY 
+    bind:formattedAddress
+    bind:fullResponse
+    bind:formattedAddressObj
+    bind:countries
+    placeholder="Enter your address..."&gt;
+
+</code></pre>
+<ul>
+  <li>The <code class="language-plaintext highlighter-rouge">formattedAddress</code> - selected address as string.</li>
+  <li>The <code class="language-plaintext highlighter-rouge">fullResponse</code> - the complete unformatted response from the Google Maps API.</li>
+  <li>The <code class="language-plaintext highlighter-rouge">formattedAddressObj</code> - parsed address components, containing individual elements like street number, town, and postcode.</li>
+</ul>
+
+<p>The <code class="language-plaintext highlighter-rouge">formattedAddressObj</code> mapping corresponds to the following component types:</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">formattedAddressObj.street_number</code>: longText property of the street_number</li>
+  <li><code class="language-plaintext highlighter-rouge">formattedAddressObj.street</code>: longText property of the route</li>
+  <li><code class="language-plaintext highlighter-rouge">formattedAddressObj.town</code>: longText property of the postal_town</li>
+  <li><code class="language-plaintext highlighter-rouge">formattedAddressObj.county</code>: longText property of the administrative_area_level_2</li>
+  <li><code class="language-plaintext highlighter-rouge">formattedAddressObj.country_iso2</code>: shortText property of the country</li>
+  <li><code class="language-plaintext highlighter-rouge">formattedAddressObj.postcode</code>: longText property of the postal_code</li>
+</ul>
+
+<h2 id="contributing">Contributing</h2>
+
+<p>Contributions are welcome! Please open an issue or submit a pull request on the <a href="link-to-your-repo">GitHub repository</a>.</p>
+
+<h2 id="license">License</h2>
+
+<p><a href="/LICENSE">MIT</a></p>
+
+
+      <footer class="site-footer">
+        
+          <span class="site-footer-owner"><a href="https://github.com/alexpechkarev/places-autocomplete-svelte">places-autocomplete-svelte</a> is maintained by <a href="https://github.com/alexpechkarev">alexpechkarev</a>.</span>
+        
+        <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a>.</span>
+      </footer>
+    </main>
+  </body>
+</html>

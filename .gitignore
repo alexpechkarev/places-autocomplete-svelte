@@ -21,5 +21,5 @@ Thumbs.db
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 
-
+Gemfile.lock
 api_key.txt
