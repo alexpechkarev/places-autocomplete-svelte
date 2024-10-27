@@ -1,8 +1,8 @@
-name: Node.js Package
+name: places-autocomplete-svelte
 
 on:
   release:
-    types: [created]
+    types: [published]
 
 jobs:
   build:
@@ -12,7 +12,11 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
+          registry-url: 'https://registry.npmjs.org'
       - run: npm ci
+      - run: npm publish --provenance --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
   publish-gpr:
     needs: build
