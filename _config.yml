@@ -21,7 +21,7 @@ author:
 #email: your-email@example.com
 description: >- # this means to ignore newlines until "baseurl:"
   This Svelte component leverages the Google Maps Places Autocomplete API to provide a user-friendly way to search for and retrieve detailed address information within your SvelteKit applications.
-baseurl: "" # the subpath of your site, e.g. /blog
+baseurl: "/places-autocomplete-svelte" # the subpath of your site, e.g. /blog
 url: "https://github.com/alexpechkarev/places-autocomplete-svelte" # the base hostname & protocol for your site, e.g. http://example.com
 github_username:  alexpechkarev
 show_downloads: true
