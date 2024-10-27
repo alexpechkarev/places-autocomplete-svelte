@@ -22,4 +22,5 @@ vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 
 Gemfile.lock
+Gemfile
 api_key.txt
