@@ -14,6 +14,7 @@ This Svelte component leverages the [Google Maps Places Autocomplete API](https:
 ![Places Autocomplete Svelte](places-autocomplete-svelte.gif)
 
 
+
 ## Requirements
 
 - **Google Maps API Key:** Create an API key with the Places API (New) enabled. Refer to [Use API Keys](https://developers.google.com/maps/documentation/javascript/get-api-key) for detailed instructions.
