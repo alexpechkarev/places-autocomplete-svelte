@@ -3,7 +3,6 @@
 
 	import PlaceAutocomplete from './../lib/PlaceAutocomplete.svelte';
 	import { browser } from '$app/environment';
-	//import { PUBLIC_API_KEY } from '$env/static/public';
 
 	let formattedAddress = '';
 
@@ -20,7 +19,6 @@
 	 */
 	let fullResponse = [];
 	let PUBLIC_GOOGLE_MAPS_API_KEY = '--YOUR_API_KEY--';
-	// let PUBLIC_GOOGLE_MAPS_API_KEY = PUBLIC_API_KEY;
 	let countries = [
 		{ name: 'United Kingdom', region: 'GB' },
 		{ name: 'United States', region: 'US' },
@@ -61,7 +59,6 @@
 			<span class="block sm:inline">{placesError}</span>
 		</div>
 	{/if}
-
 
 	<div class="my-2">
 		<PlaceAutocomplete
@@ -240,8 +237,8 @@
 								>
 							</code>
 						</a>
-						method retrieves detailed place information about a chosen place. This information is
-						then used to populate an optional object
+						method retrieves detailed place information about a chosen place. This information is then
+						used to populate an optional object
 						<code class="bg-gray-100 px-2 rounded-md">formattedAddressObj</code>
 						component property. Response mapped to an optional
 						<code class="bg-gray-100 px-2 rounded-md">formattedAddressObj</code>
