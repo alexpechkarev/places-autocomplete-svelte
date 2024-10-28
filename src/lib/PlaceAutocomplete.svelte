@@ -3,52 +3,68 @@
 	import * as GMaps from '@googlemaps/js-api-loader';
 	const { Loader } = GMaps;
 
+	// Props Interface
+	interface Props {
+		PUBLIC_GOOGLE_MAPS_API_KEY: string;
+		fetchFields: string[];
+		countries: { name: string; region: string }[];
+		formattedAddress: string;
+		fullResponse: { longText: string; shortText: string; types: Array<string> }[];
+		formattedAddressObj: {
+			street_number: string;
+			street: string;
+			town: string;
+			county: string;
+			country_iso2: string;
+			postcode: string;
+		};
+		onError: (error: string) => void;
+	}
+	// Bindable Props
+	let {
+		PUBLIC_GOOGLE_MAPS_API_KEY = $bindable(''),
+		/**
+		 * By default using SKU: Place Detals (Location Only) - 0.005 USD per each
+		 * @see https://developers.google.com/maps/documentation/javascript/usage-and-billing#location-placedetails
+		*/
+		fetchFields = $bindable(['formattedAddress', 'addressComponents']),
+		countries = $bindable([]),
+		formattedAddress = $bindable(''),
+		fullResponse = $bindable([]),
+		formattedAddressObj = $bindable({
+			street_number: '',
+			street: '',
+			town: '',
+			county: '',
+			country_iso2: '',
+			postcode: ''
+		}),
+		onError = $bindable((error: string) => {})
+	}: Props = $props();
 
-
-	export let PUBLIC_GOOGLE_MAPS_API_KEY: string = '';
-	export let fetchFields: string[] = ['displayName', 'formattedAddress', 'addressComponents'];
-	export let countries: { name: string; region: string }[] = [];
+	// Check if countries are available
 	let hasCountries = countries.length > 0;
-
-	export let formattedAddress: string = '';
-	export let fullResponse: { longText: string; shortText: string; types: Array<string> }[] = [];
-	export let formattedAddressObj: {
-		street_number: string;
-		street: string;
-		town: string;
-		county: string;
-		country_iso2: string;
-		postcode: string;
-	} = {
-		street_number: '',
-		street: '',
-		town: '',
-		county: '',
-		country_iso2: '',
-		postcode: ''
-	};
-	export let onError: (error: string) => void = (error: string) => {};
-
+	// Local variables
 	let inputRef: HTMLInputElement;
-	let currentSuggestion = -1;
-	let title: string = '';
-	let results: any[] = [];
+	let currentSuggestion = $state(-1);
+	let title: string = $state('');
+	let results: any[] = $state([]);
 	let token;
 	let loader: GMaps.Loader;
 	let placesApi: { [key: string]: any } = {};
 	//https://developers.google.com/maps/documentation/javascript/reference/autocomplete-data#AutocompleteRequest.includedPrimaryTypes
-	let request = {
+	let request = $state({
 		input: '',
 		language: 'en-GB',
 		region: 'GB',
 		sessionToken: ''
-	};
+	});
 
-	$: {
+	$effect(() => {
 		if (request.input == '') {
 			results = [];
 		}
-	}
+	});
 
 	/**
 	 * Reset search input and results.
@@ -104,7 +120,6 @@
 		formattedAddress: string;
 	}): Promise<void> => {
 		try {
-			
 			await place.fetchFields({
 				fields: fetchFields
 			});
@@ -147,8 +162,10 @@
 						break;
 				}
 			}
-		} catch (e) {
-			onError((e.name || 'An error occurred') + ' - ' + (e.message || 'error fetching place details'));
+		} catch (e:any) {
+			onError(
+				(e.name || 'An error occurred') + ' - ' + (e.message || 'error fetching place details')
+			);
 		}
 
 		// reset srarch input and results
@@ -165,12 +182,11 @@
 		region?: string;
 		sessionToken?: any;
 	}): Promise<{ input?: string; language?: string; region?: string; sessionToken?: any }> => {
-		try{
+		try {
 			token = new placesApi.AutocompleteSessionToken();
 			request.sessionToken = token;
 			return request;
-
-		}catch(e){
+		} catch (e:any) {
 			onError((e.name || 'An error occurred') + ' - ' + (e.message || 'error fetch token'));
 			return request;
 		}
@@ -187,14 +203,14 @@
 				version: 'weekly',
 				libraries: ['places']
 			});
-			
+
 			const { AutocompleteSessionToken, AutocompleteSuggestion } =
 				await loader.importLibrary('places');
 			placesApi.AutocompleteSessionToken = AutocompleteSessionToken;
 			placesApi.AutocompleteSuggestion = AutocompleteSuggestion;
 			token = new placesApi.AutocompleteSessionToken();
 			request.sessionToken = token;
-		} catch (e) {
+		} catch (e:any) {
 			onError(
 				(e.name || 'An error occurred') + ' - ' + (e.message || 'Error loading Google Maps API')
 			);
@@ -241,7 +257,7 @@
 						stroke-linejoin="round"><circle cx="11" cy="11" r="8" /><path d="m21 21-4.3-4.3" /></svg
 					>
 				</div>
-			
+
 				<input
 					type="text"
 					name="search"
@@ -250,7 +266,7 @@
 					placeholder="Search..."
 					aria-controls="options"
 					bind:value={request.input}
-					on:input={makeAcRequest}
+					oninput={makeAcRequest}
 				/>
 
 				{#if results.length > 0}
@@ -273,19 +289,16 @@
 						id="options"
 					>
 						{#each results as place, i}
-							<!-- svelte-ignore a11y-click-events-have-key-events -->
-							<!-- svelte-ignore a11y-no-noninteractive-tabindex -->
-							<!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
 							<li
 								class="z-50 cursor-default select-none py-2 pl-4 text-gray-900 hover:bg-indigo-500 hover:text-white"
 								class:bg-indigo-500={i === currentSuggestion}
 								class:bg-white={i !== currentSuggestion}
 								class:text-white={i === currentSuggestion}
-								id="option-{i + 1}"
-								tabindex={i + 1}
-								on:click={() => onPlaceSelected(place.to_pace)}
-							>
-								{place.text}
+								id="option-{i + 1}">
+								<!-- svelte-ignore a11y_invalid_attribute -->
+								<a href="javascript:void(0)" class="block w-full" tabindex={i + 1} onclick={() => onPlaceSelected(place.to_pace)}>
+									{place.text}
+								</a>
 							</li>
 						{/each}
 					</ul>
@@ -310,7 +323,7 @@
 			</div>
 		</div>
 
-		<div class="lg:col-span-6">
+		<div class="lg:col-span-6 mt-2">
 			<div class="text-sm font-medium leading-6 text-gray-500">{title}</div>
 		</div>
 	</div>

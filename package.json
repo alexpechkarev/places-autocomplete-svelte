@@ -56,7 +56,8 @@
 		"!dist/**/*.spec.*"
 	],
 	"publishConfig": {
-		"@alexpechkarev:registry": "https://npm.pkg.github.com"
+		"@alexpechkarev:registry": "https://npm.pkg.github.com",
+		"provenance": true
 	},
 	"peerDependencies": {
 		"svelte": "^4.0.0"

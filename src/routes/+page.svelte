@@ -4,8 +4,10 @@
 	import PlaceAutocomplete from './../lib/PlaceAutocomplete.svelte';
 	import { browser } from '$app/environment';
 
-	let formattedAddress = '';
 
+	// Full address as string
+	let formattedAddress = '';
+	// Formatted address object
 	let formattedAddressObj = {
 		street_number: '',
 		street: '',
@@ -16,9 +18,13 @@
 	};
 	/**
 	 * @type {never[]}
+	 * fullResponse - Unformatted response from Google Places API
 	 */
 	let fullResponse = [];
+	// Google Maps API key
 	let PUBLIC_GOOGLE_MAPS_API_KEY = '--YOUR_API_KEY--';
+
+	// Countries - optional, if not provided defaults to GB
 	let countries = [
 		{ name: 'United Kingdom', region: 'GB' },
 		{ name: 'United States', region: 'US' },
@@ -27,27 +33,22 @@
 		{ name: 'Russia', region: 'RU' },
 		{ name: 'Japan', region: 'JP' }
 	];
+	// Error message
+	let placesError = '';
+	// Error handler function
+	let onError = (error) => {
+		placesError = error;
+	};
 
+	// Display response in tabs
 	const tabs = [
 		{ name: 'Formatted Resposne', id: 1 },
 		{ name: 'Unformatted Response', id: 2 },
 		{ name: 'Formatted Address', id: 3 }
 	];
 	let selectedTab = tabs.find((tab) => tab.id === 1).id;
-
-	let placesError = '';
-	// Error handler
-	let onError = (error) => {
-		console.error(error);
-		placesError = error;
-	};
 </script>
 
-<svelte:head>
-	{#if browser}
-		<!-- <script src="https://cdn.tailwindcss.com"></script> -->
-	{/if}
-</svelte:head>
 
 <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
 	{#if placesError}
@@ -63,12 +64,13 @@
 	<div class="my-2">
 		<PlaceAutocomplete
 			{onError}
+			bind:PUBLIC_GOOGLE_MAPS_API_KEY
 			bind:formattedAddress
 			bind:formattedAddressObj
 			bind:fullResponse
-			bind:PUBLIC_GOOGLE_MAPS_API_KEY
 			bind:countries
 		/>
+
 
 		<img src="google_on_white_hdpi.png" alt="powered by Google" class="-mt-4" />
 	</div>
@@ -237,18 +239,10 @@
 								>
 							</code>
 						</a>
-						method retrieves detailed place information about a chosen place. This information is then
-						used to populate an optional object
-						<code class="bg-gray-100 px-2 rounded-md">formattedAddressObj</code>
-						component property. Response mapped to an optional
-						<code class="bg-gray-100 px-2 rounded-md">formattedAddressObj</code>
-						based on address component types. By using
-						<code class="bg-gray-100 px-2 rounded-md">formattedAddressObj</code>. This object parses
-						the address components from the Places API response, making it easier to work with
-						individual details like street number, town, and postcode. By using
-						<code class="bg-gray-100 px-2 rounded-md">formattedAddressObj</code>, you can directly
-						access specific address components without needing to manipulate the raw response from
-						the Places API. This simplifies address handling in your application.
+						method fetches additional place details (like phone number, website, opening hours, etc.)
+						for the selected address. You can then use the
+						<code class="bg-gray-100 px-2 rounded-md">formattedAddressObj</code> property to conveniently
+						access individual address components.
 					</p>
 					<ul
 						role="list"
@@ -262,13 +256,8 @@
 									<p class="text-sm text-blue-800">formattedAddressObj.street_number</p>
 								</div>
 							</div>
-							<div class="flex items-center justify-between gap-x-4">
-								<p class="text-sm leading-6 text-gray-900">
-									<span
-										class="inline-flex items-center rounded-md bg-blue-100 px-2 py-1 text-xs font-medium text-blue-700"
-										>longText</span
-									> property of
-								</p>
+							<div class="flex items-center justify-between gap-x-4 lg:hidden">
+								<p class="text-sm leading-6 text-gray-900">-</p>
 							</div>
 							<div class="flex shrink-0 items-center gap-x-4">
 								<div class="flex flex-col items-end">
@@ -285,12 +274,7 @@
 								</div>
 							</div>
 							<div class="flex items-center justify-between gap-x-4">
-								<p class="text-sm leading-6 text-gray-900">
-									<span
-										class="inline-flex items-center rounded-md bg-blue-100 px-2 py-1 text-xs font-medium text-blue-700"
-										>longText</span
-									> property of
-								</p>
+								<p class="text-sm leading-6 text-gray-900 lg:hidden">-</p>
 							</div>
 							<div class="flex shrink-0 items-center gap-x-4">
 								<div class="flex flex-col items-end">
@@ -307,12 +291,7 @@
 								</div>
 							</div>
 							<div class="flex items-center justify-between gap-x-4">
-								<p class="text-sm leading-6 text-gray-900">
-									<span
-										class="inline-flex items-center rounded-md bg-blue-100 px-2 py-1 text-xs font-medium text-blue-700"
-										>longText</span
-									> property of
-								</p>
+								<p class="text-sm leading-6 text-gray-900 lg:hidden">-</p>
 							</div>
 							<div class="flex shrink-0 items-center gap-x-4">
 								<div class="flex flex-col items-end">
@@ -326,16 +305,11 @@
 						>
 							<div class="flex min-w-0 gap-x-4">
 								<div class="min-w-0 flex-auto">
-									<p class="text-sm text-blue-800">formattedAddressObjss.county</p>
+									<p class="text-sm text-blue-800">formattedAddressObj.county</p>
 								</div>
 							</div>
-							<div class="flex items-center justify-between gap-x-4">
-								<p class="text-sm leading-6 text-gray-900">
-									<span
-										class="inline-flex items-center rounded-md bg-blue-100 px-2 py-1 text-xs font-medium text-blue-700"
-										>longText</span
-									> property of
-								</p>
+							<div class="flex items-center justify-between gap-x-4 sm:hidden">
+								<p class="text-sm leading-6 text-gray-900 lg:hidden">-</p>
 							</div>
 							<div class="flex shrink-0 items-center gap-x-4">
 								<div class="flex flex-col items-end">
@@ -353,12 +327,7 @@
 								</div>
 							</div>
 							<div class="flex items-center justify-between gap-x-4">
-								<p class="text-sm leading-6 text-gray-900">
-									<span
-										class="inline-flex items-center rounded-md bg-blue-100 px-2 py-1 text-xs font-medium text-blue-700"
-										>shortText</span
-									> property of
-								</p>
+								<p class="text-sm leading-6 text-gray-900 lg:hidden">-</p>
 							</div>
 							<div class="flex shrink-0 items-center gap-x-4">
 								<div class="flex flex-col items-end">
@@ -376,12 +345,7 @@
 								</div>
 							</div>
 							<div class="flex items-center justify-between gap-x-4">
-								<p class="text-sm leading-6 text-gray-900">
-									<span
-										class="inline-flex items-center rounded-md bg-blue-100 px-2 py-1 text-xs font-medium text-blue-700"
-										>longText</span
-									> property of
-								</p>
+								<p class="text-sm leading-6 text-gray-900 lg:hidden">-</p>
 							</div>
 							<div class="flex shrink-0 items-center gap-x-4">
 								<div class="flex flex-col items-end">
