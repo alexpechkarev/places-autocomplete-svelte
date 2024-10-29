@@ -29,11 +29,6 @@ npm i places-autocomplete-svelte
 npm i places-autocomplete-svelte@1.0.1
 ```
 
-## Import Component
-
-```javascript
-import PlaceAutocomplete from 'places-autocomplete-svelte';
-```
 
 ## Basic Usage
 
