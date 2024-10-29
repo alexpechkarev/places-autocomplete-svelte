@@ -13,7 +13,6 @@ This Svelte component leverages the [Google Maps Places Autocomplete API](https:
 
 ![Places Autocomplete Svelte](places-autocomplete-svelte.gif)
 
-
 ## Requirements
 
 - **Google Maps API Key:** Create an API key with the Places API (New) enabled. Refer to [Use API Keys](https://developers.google.com/maps/documentation/javascript/get-api-key) for detailed instructions.
@@ -43,19 +42,16 @@ import PlaceAutocomplete from 'places-autocomplete-svelte';
 
 ```svelte
 <script>
-  import { PlaceAutocomplete } from 'places-autocomplete-svelte';
+	import { PlaceAutocomplete } from 'places-autocomplete-svelte';
 
-  let formattedAddress = '';
-  let PUBLIC_GOOGLE_MAPS_API_KEY = '--YOUR_API_KEY--';
+	let formattedAddress = '';
+	let PUBLIC_GOOGLE_MAPS_API_KEY = '--YOUR_API_KEY--';
 </script>
 
-<PlaceAutocomplete 
-    bind:PUBLIC_GOOGLE_MAPS_API_KEY 
-    bind:formattedAddress />
+<PlaceAutocomplete bind:PUBLIC_GOOGLE_MAPS_API_KEY bind:formattedAddress />
 
-<p>Formatted Address: {formattedAddress}</p> 
+<p>Formatted Address: {formattedAddress}</p>
 ```
-
 
 ## Specifying Countries/Regions
 
@@ -63,19 +59,16 @@ Use the `countries` property to refine search by region:
 
 ```svelte
 <script>
-  // ... other imports
+	// ... other imports
 
-  let countries = [
-    { name: 'United Kingdom', region: 'GB' , language:'en-GB'},
-    { name: 'United States', region: 'US',language:'en-US' },
-    // ... more countries
-  ];
+	let countries = [
+		{ name: 'United Kingdom', region: 'GB', language: 'en-GB' },
+		{ name: 'United States', region: 'US', language: 'en-US' }
+		// ... more countries
+	];
 </script>
 
-<PlaceAutocomplete 
-    bind:PUBLIC_GOOGLE_MAPS_API_KEY 
-    bind:formattedAddress 
-    bind:countries /> 
+<PlaceAutocomplete bind:PUBLIC_GOOGLE_MAPS_API_KEY bind:formattedAddress bind:countries />
 ```
 
 - The `region` code follows the [CLDR two-character format](https://developers.google.com/maps/documentation/javascript/reference/autocomplete-data#AutocompleteRequest).
@@ -87,8 +80,8 @@ For maximum flexibility, access the complete unformatted response from the Googl
 
 ```svelte
 <script>
-  // ... other imports
-  let fullResponse = {}; 
+	// ... other imports
+	let fullResponse = {};
 </script>
 
 <PlaceAutocomplete bind:PUBLIC_GOOGLE_MAPS_API_KEY bind:fullResponse />
@@ -97,6 +90,7 @@ For maximum flexibility, access the complete unformatted response from the Googl
 ```
 
 ## Example
+
 ```svelte
 <script>
   import { PlaceAutocomplete } from 'places-autocomplete-svelte';
@@ -112,8 +106,8 @@ For maximum flexibility, access the complete unformatted response from the Googl
   ];
 </script>
 
-<PlaceAutocomplete 
-    bind:PUBLIC_GOOGLE_MAPS_API_KEY 
+<PlaceAutocomplete
+    bind:PUBLIC_GOOGLE_MAPS_API_KEY
     bind:formattedAddress
     bind:fullResponse
     bind:formattedAddressObj
@@ -121,6 +115,7 @@ For maximum flexibility, access the complete unformatted response from the Googl
     placeholder="Enter your address...">
 
 ```
+
 - The `formattedAddress` - selected address as string.
 - The `fullResponse` - the complete unformatted response from the Google Maps API.
 - The `formattedAddressObj` - parsed address components, containing individual elements like street number, town, and postcode.
@@ -134,40 +129,33 @@ The `formattedAddressObj` mapping corresponds to the following component types:
 - `formattedAddressObj.country_iso2`: shortText property of the country
 - `formattedAddressObj.postcode`: longText property of the postal_code
 
-
-
 ## Error Handling
 
 The component will throw an error if:
-  - The Google Maps API key is invalid or missing.
-  - There are network issues connecting to the Google Maps service.
+
+- The Google Maps API key is invalid or missing.
+- There are network issues connecting to the Google Maps service.
 
 Handle these errors gracefully in your application:
 
 ```svelte
 <script>
-  // ... other imports
+	// ... other imports
 
- // Error handler
-    let pacError = '';
-	let onError = (error:string) => {
+	// Error handler
+	let pacError = '';
+	let onError = (error: string) => {
 		console.error(error);
-        pacError = error;
+		pacError = error;
 	};
 </script>
 
 <PlaceAutocomplete bind:PUBLIC_GOOGLE_MAPS_API_KEY {onError} />
 
 {#if pacError}
-  <p class="error">{pacError}</p>
+	<p class="error">{pacError}</p>
 {/if}
 ```
-
-
-
-
-
-
 
 ## Contributing
 
@@ -176,5 +164,3 @@ Contributions are welcome! Please open an issue or submit a pull request on the 
 ## License
 
 [MIT](LICENSE)
-
-

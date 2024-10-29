@@ -26,7 +26,7 @@
 		/**
 		 * By default using SKU: Place Detals (Location Only) - 0.005 USD per each
 		 * @see https://developers.google.com/maps/documentation/javascript/usage-and-billing#location-placedetails
-		*/
+		 */
 		fetchFields = $bindable(['formattedAddress', 'addressComponents']),
 		countries = $bindable([]),
 		formattedAddress = $bindable(''),
@@ -104,7 +104,7 @@
 					text: suggestion.placePrediction.text.toString()
 				});
 			}
-		} catch (e) {
+		} catch (e: any) {
 			onError((e.name || 'An error occurred') + ' - ' + (e.message || 'see console for details.'));
 		}
 	};
@@ -162,7 +162,7 @@
 						break;
 				}
 			}
-		} catch (e:any) {
+		} catch (e: any) {
 			onError(
 				(e.name || 'An error occurred') + ' - ' + (e.message || 'error fetching place details')
 			);
@@ -186,7 +186,7 @@
 			token = new placesApi.AutocompleteSessionToken();
 			request.sessionToken = token;
 			return request;
-		} catch (e:any) {
+		} catch (e: any) {
 			onError((e.name || 'An error occurred') + ' - ' + (e.message || 'error fetch token'));
 			return request;
 		}
@@ -210,7 +210,7 @@
 			placesApi.AutocompleteSuggestion = AutocompleteSuggestion;
 			token = new placesApi.AutocompleteSessionToken();
 			request.sessionToken = token;
-		} catch (e:any) {
+		} catch (e: any) {
 			onError(
 				(e.name || 'An error occurred') + ' - ' + (e.message || 'Error loading Google Maps API')
 			);
@@ -294,9 +294,15 @@
 								class:bg-indigo-500={i === currentSuggestion}
 								class:bg-white={i !== currentSuggestion}
 								class:text-white={i === currentSuggestion}
-								id="option-{i + 1}">
+								id="option-{i + 1}"
+							>
 								<!-- svelte-ignore a11y_invalid_attribute -->
-								<a href="javascript:void(0)" class="block w-full" tabindex={i + 1} onclick={() => onPlaceSelected(place.to_pace)}>
+								<a
+									href="javascript:void(0)"
+									class="block w-full"
+									tabindex={i + 1}
+									onclick={() => onPlaceSelected(place.to_pace)}
+								>
 									{place.text}
 								</a>
 							</li>

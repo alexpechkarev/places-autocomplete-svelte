@@ -4,7 +4,6 @@
 	import PlaceAutocomplete from './../lib/PlaceAutocomplete.svelte';
 	import { browser } from '$app/environment';
 
-
 	// Full address as string
 	let formattedAddress = '';
 	// Formatted address object
@@ -49,7 +48,6 @@
 	let selectedTab = tabs.find((tab) => tab.id === 1).id;
 </script>
 
-
 <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
 	{#if placesError}
 		<div
@@ -70,7 +68,6 @@
 			bind:fullResponse
 			bind:countries
 		/>
-
 
 		<img src="google_on_white_hdpi.png" alt="powered by Google" class="-mt-4" />
 	</div>
