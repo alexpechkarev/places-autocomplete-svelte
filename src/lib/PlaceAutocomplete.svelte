@@ -6,18 +6,13 @@
 	// Props Interface
 	interface Props {
 		PUBLIC_GOOGLE_MAPS_API_KEY: string;
-		fetchFields: string[];
+		fetchFields?: string[];
 		countries: { name: string; region: string }[];
-		formattedAddress: string;
-		fullResponse: { longText: string; shortText: string; types: Array<string> }[];
-		formattedAddressObj: {
-			street_number: string;
-			street: string;
-			town: string;
-			county: string;
-			country_iso2: string;
-			postcode: string;
-		};
+		placeholder?: string;
+		language?: string;
+		region?: string;
+		autocomplete?: AutoFill;
+		onResponse: (e: Event) => void;
 		onError: (error: string) => void;
 	}
 	// Bindable Props
@@ -29,16 +24,11 @@
 		 */
 		fetchFields = $bindable(['formattedAddress', 'addressComponents']),
 		countries = $bindable([]),
-		formattedAddress = $bindable(''),
-		fullResponse = $bindable([]),
-		formattedAddressObj = $bindable({
-			street_number: '',
-			street: '',
-			town: '',
-			county: '',
-			country_iso2: '',
-			postcode: ''
-		}),
+		placeholder = $bindable('Search...'),
+		language = $bindable('en-GB'),
+		region = $bindable('GB'),
+		autocomplete = $bindable('off'),
+		onResponse = $bindable((e: Event) => {}),
 		onError = $bindable((error: string) => {})
 	}: Props = $props();
 
@@ -55,8 +45,8 @@
 	//https://developers.google.com/maps/documentation/javascript/reference/autocomplete-data#AutocompleteRequest.includedPrimaryTypes
 	let request = $state({
 		input: '',
-		language: 'en-GB',
-		region: 'GB',
+		language: language,
+		region: region,
 		sessionToken: ''
 	});
 
@@ -92,6 +82,7 @@
 		}
 
 		request.input = target.value;
+		
 		try {
 			const { suggestions } =
 				await placesApi.AutocompleteSuggestion.fetchAutocompleteSuggestions(request);
@@ -124,44 +115,7 @@
 				fields: fetchFields
 			});
 			let placeData = place.toJSON();
-			formattedAddressObj = {
-				street_number: '',
-				street: '',
-				town: '',
-				county: '',
-				country_iso2: '',
-				postcode: ''
-			};
-
-			title = 'Selected address: ' + placeData.formattedAddress;
-			formattedAddress = placeData.formattedAddress;
-			fullResponse = placeData.addressComponents;
-
-			for (const component of placeData.addressComponents) {
-				switch (component.types[0]) {
-					case 'street_number':
-					case 'point_of_interest':
-					case 'establishment':
-						formattedAddressObj.street_number = component.longText;
-						break;
-					case 'route':
-					case 'premise':
-						formattedAddressObj.street = component.longText;
-						break;
-					case 'postal_town':
-						formattedAddressObj.town = component.longText;
-						break;
-					case 'administrative_area_level_2':
-						formattedAddressObj.county = component.longText;
-						break;
-					case 'country':
-						formattedAddressObj.country_iso2 = component.shortText;
-						break;
-					case 'postal_code':
-						formattedAddressObj.postcode = component.longText;
-						break;
-				}
-			}
+			onResponse(placeData);
 		} catch (e: any) {
 			onError(
 				(e.name || 'An error occurred') + ' - ' + (e.message || 'error fetching place details')
@@ -263,7 +217,8 @@
 					name="search"
 					bind:this={inputRef}
 					class="border-1 w-full rounded-md border-0 shadow-sm bg-gray-100 px-4 py-2.5 pl-10 pr-20 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 sm:text-sm"
-					placeholder="Search..."
+					placeholder={placeholder}
+					autocomplete={autocomplete}
 					aria-controls="options"
 					bind:value={request.input}
 					oninput={makeAcRequest}
@@ -329,9 +284,7 @@
 			</div>
 		</div>
 
-		<div class="lg:col-span-6 mt-2">
-			<div class="text-sm font-medium leading-6 text-gray-500">{title}</div>
-		</div>
+
 	</div>
 </section>
 <style>
