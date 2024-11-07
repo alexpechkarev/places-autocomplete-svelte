@@ -121,7 +121,15 @@ Handle these errors gracefully in your application:
 	const autocompete = 'off';
 </script>
 
-<PlaceAutocomplete {onError} {onResponse} {PUBLIC_GOOGLE_MAPS_API_KEY} bind:countries {placeholder} {language} {region} {autocomplete}/>
+<PlaceAutocomplete 
+	{onError} 
+	{onResponse} 
+	{PUBLIC_GOOGLE_MAPS_API_KEY} 
+	bind:countries 
+	{placeholder} 
+	{language} 
+	{region} 
+	{autocomplete}/>
 
 ```
 

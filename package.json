@@ -15,10 +15,10 @@
 		"address",
 		"address-input",
 		"input",
-		"search", 
+		"search",
 		"new api"
 	],
-	"homepage": "https://github.com/alexpechkarev",
+	"homepage": "https://places-autocomplete-demo.pages.dev",
 	"repository": {
 		"type": "git",
 		"url": "git+https://github.com/alexpechkarev/places-autocomplete-svelte.git"

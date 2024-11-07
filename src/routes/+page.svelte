@@ -21,7 +21,9 @@
 	 */
 	let fullResponse = $state([]);
 	// Google Maps API key
-	const PUBLIC_GOOGLE_MAPS_API_KEY = '___YOUR_API_KEY___';
+	//const PUBLIC_GOOGLE_MAPS_API_KEY = '___YOUR_API_KEY___';
+	const PUBLIC_GOOGLE_MAPS_API_KEY = import.meta.env.VITE_PUBLIC_GOOGLE_MAPS_API_KEY;
+
 
 	// Countries - optional, if not provided defaults to GB
 	let countries = $state([
@@ -90,6 +92,16 @@
 	const language = 'en-GB';
 	const region = 'GB';
 
+	const requestParams = {
+		// types: ['(cities)'],
+		// componentRestrictions: { country: 'us' },
+		// fields: ['address_components', 'geometry', 'icon', 'name'],
+		// strictBounds: false,
+		// types: ['geocode'],
+		// types: ['address'],
+		// types: ['establishment'],
+	}
+
 </script>
 
 <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -104,9 +116,21 @@
 	{/if}
 
 	<div class="my-2">
-		<PlaceAutocomplete {onError} {onResponse} {PUBLIC_GOOGLE_MAPS_API_KEY} bind:countries {placeholder} {language} {region}/>
+		<PlaceAutocomplete 
+		{onError} 
+		{onResponse} 
+		{PUBLIC_GOOGLE_MAPS_API_KEY} 
+		bind:countries 
+		{placeholder} 
+		{language} 
+		{region}
+		{requestParams}
+		/>
 
-		<img src="google_on_white_hdpi.png" alt="powered by Google" class="-mt-4" />
+		<div class="flex flex-wrap items-end">
+			<div class="text-gray-500">powered by</div> 
+			<img src="google_on_white_hdpi.png" alt="powered by Google" class="h-6 ml-1" />
+		</div>
 	</div>
 
 
