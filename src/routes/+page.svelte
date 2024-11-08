@@ -21,8 +21,8 @@
 	 */
 	let fullResponse = $state([]);
 	// Google Maps API key
-	//const PUBLIC_GOOGLE_MAPS_API_KEY = '___YOUR_API_KEY___';
-	const PUBLIC_GOOGLE_MAPS_API_KEY = import.meta.env.VITE_PUBLIC_GOOGLE_MAPS_API_KEY;
+	const PUBLIC_GOOGLE_MAPS_API_KEY = '___YOUR_API_KEY___';
+	//const PUBLIC_GOOGLE_MAPS_API_KEY = import.meta.env.VITE_PUBLIC_GOOGLE_MAPS_API_KEY;
 
 
 	// Countries - optional, if not provided defaults to GB
@@ -92,15 +92,7 @@
 	const language = 'en-GB';
 	const region = 'GB';
 
-	const requestParams = {
-		// types: ['(cities)'],
-		// componentRestrictions: { country: 'us' },
-		// fields: ['address_components', 'geometry', 'icon', 'name'],
-		// strictBounds: false,
-		// types: ['geocode'],
-		// types: ['address'],
-		// types: ['establishment'],
-	}
+	const requestParams = {}
 
 </script>
 

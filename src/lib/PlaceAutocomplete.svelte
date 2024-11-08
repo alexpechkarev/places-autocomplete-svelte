@@ -1,45 +1,31 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import * as GMaps from '@googlemaps/js-api-loader';
+	import type { Props } from './interfaces.js';
+	import {
+		validateRequestParams,
+		requestParamsDefault,
+		validateLocationBias,
+		validateLocationRestriction
+	} from './helpers.js';
 	const { Loader } = GMaps;
 
-	// Props Interface
-	interface Props {
-		PUBLIC_GOOGLE_MAPS_API_KEY: string;
-		fetchFields?: string[];
-		countries: { name: string; region: string }[];
-		placeholder?: string;
-		language?: string;
-		region?: string;
-		autocomplete?: AutoFill;
-		requestParams: {
-			input: string;
-			language?: string;
-			region?: string;
-			sessionToken?: string;
-		};
-		onResponse: (e: Event) => void;
-		onError: (error: string) => void;
-	}
-	// Bindable Props
 	let {
-		PUBLIC_GOOGLE_MAPS_API_KEY,
 		/**
 		 * By default using SKU: Place Detals (Location Only) - 0.005 USD per each
 		 * @see https://developers.google.com/maps/documentation/javascript/usage-and-billing#location-placedetails
 		 */
+		PUBLIC_GOOGLE_MAPS_API_KEY,
 		fetchFields = $bindable(['formattedAddress', 'addressComponents']),
 		countries = $bindable([]),
-		placeholder = $bindable('Search...'),
-		language = $bindable('en-GB'),
-		region = $bindable('GB'),
-		autocomplete = $bindable('off'),
+		placeholder = 'Search...',
+		language = 'en-GB',
+		region = 'GB',
+		autocomplete = 'off',
 		onResponse = $bindable((e: Event) => {}),
 		onError = $bindable((error: string) => {}),
-		requestParams,
+		requestParams
 	}: Props = $props();
-
-	console.log(requestParams);
 
 	// Check if countries are available
 	let hasCountries = countries.length > 0;
@@ -51,49 +37,14 @@
 	let token;
 	let loader: GMaps.Loader;
 	let placesApi: { [key: string]: any } = {};
-	//https://developers.google.com/maps/documentation/javascript/reference/autocomplete-data#AutocompleteRequest.includedPrimaryTypes
-	let request = $state(Object.assign(
-		{
-			/**
-			 * @type string required
-			 * The text string on which to search.
-			*/
-			input: '', 
-			/**
-			 * @type string optional
-			 * The language in which to return results. Will default to the browser's language preference.
-			 * 
-			*/
-			language: language,
-			/**
-			 * @type string optional
-			 * The region code, specified as a CLDR two-character region code. T
-			 * his affects address formatting, result ranking, and may influence what results are returned. 
-			 * This does not restrict results to the specified region.
-			*/
-			region: region,
-			/**
-			 * @type Array<string>
-			 * A Place is only returned if its primary type is included in this list. 
-			 * Up to 5 values can be specified. 
-			 * If no types are specified, all Place types are returned.
-			 * https://developers.google.com/maps/documentation/javascript/place-types
-			 * 
-			 * 'postal_code','premise','street_address','route'
-			 * FY83DD 72
-			*/
-			includedPrimaryTypes: ['postal_code','premise','street_address','route'],
-			/**
-			 * @type Array<string> optional
-			 * Only include results in the specified regions, specified as up to 15 CLDR two-character region codes. 
-			 * An empty set will not restrict the results. 
-			 * If both locationRestriction and includedRegionCodes are set, the results will be located in the area of intersection.
-			*/
-			includedRegionCodes: ['GB'],
-			sessionToken: '',
-		}, 
-		requestParams)
-	);
+	//https://developers.google.com/maps/documentation/javascript/reference/autocomplete-data
+	// validate request params
+	// merge requestParams with requestParamsDefault
+	let rp = Object.assign(requestParamsDefault, validateRequestParams(requestParams));
+	rp = Object.assign(validateLocationBias(rp), validateLocationRestriction(rp));
+	let request = $state(rp);
+
+	//$inspect(request);
 
 	$effect(() => {
 		if (request.input == '') {
@@ -108,7 +59,7 @@
 		currentSuggestion = -1;
 		request.input = '';
 		results = [];
-		refreshToken(request);
+		setSessionToken();
 	};
 
 	/**
@@ -125,17 +76,25 @@
 			results = [];
 			return;
 		}
+		/**
+		 * Prevent making request if the inputOffset is greater than the length of the input
+		 * The input lenght should be greater than the inputOffset before making a request and displaying suggestions
+		 */
+		if (request.inputOffset && request.inputOffset >= target.value.length) {
+			return;
+		}
 
+		// set request input
 		request.input = target.value;
-		console.log(request);
-		
+
+		// attempt to get autocomplete suggestions
 		try {
 			const { suggestions } =
 				await placesApi.AutocompleteSuggestion.fetchAutocompleteSuggestions(request);
 			results = [];
 			// iterate suggestions and add results to an array
 			for (const suggestion of suggestions) {
-				// add suggexstions to results
+				// add suggestions to results
 				results.push({
 					to_pace: suggestion.placePrediction.toPlace(),
 					text: suggestion.placePrediction.text.toString()
@@ -173,30 +132,24 @@
 	};
 
 	/**
-	 * Helper function to refresh the session token.
-	 * @param request
+	 * Helper function to set the session token.
 	 */
-	const refreshToken = async (request: {
-		input?: string;
-		language?: string;
-		region?: string;
-		sessionToken?: any;
-	}): Promise<{ input?: string; language?: string; region?: string; sessionToken?: any }> => {
+	const setSessionToken = () => {
 		try {
-			token = new placesApi.AutocompleteSessionToken();
-			request.sessionToken = token;
-			return request;
+			request.sessionToken = new placesApi.AutocompleteSessionToken();
 		} catch (e: any) {
 			onError((e.name || 'An error occurred') + ' - ' + (e.message || 'error fetch token'));
-			return request;
-		}
+		}		
 	};
+
 	/**
 	 * Initialize the Google Maps JavaScript API Loader.
 	 */
 	onMount(async (): Promise<void> => {
+		// focus on the input
 		inputRef.focus();
 
+		// load the Google Maps API
 		try {
 			loader = new Loader({
 				apiKey: PUBLIC_GOOGLE_MAPS_API_KEY,
@@ -208,8 +161,7 @@
 				await loader.importLibrary('places');
 			placesApi.AutocompleteSessionToken = AutocompleteSessionToken;
 			placesApi.AutocompleteSuggestion = AutocompleteSuggestion;
-			token = new placesApi.AutocompleteSessionToken();
-			request.sessionToken = token;
+			setSessionToken();
 		} catch (e: any) {
 			onError(
 				(e.name || 'An error occurred') + ' - ' + (e.message || 'Error loading Google Maps API')
