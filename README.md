@@ -64,8 +64,8 @@ Use optional `countries` property to refine search by region:
 	// ... other imports
 
 	let countries = [
-		{ name: 'United Kingdom', region: 'GB', language: 'en-GB' },
-		{ name: 'United States', region: 'US', language: 'en-US' }
+		{ name: 'United Kingdom', region: 'GB'},
+		{ name: 'United States', region: 'US' }
 		// ... more countries
 	];
 </script>
@@ -73,8 +73,7 @@ Use optional `countries` property to refine search by region:
 <PlaceAutocomplete {onResponse} {PUBLIC_GOOGLE_MAPS_API_KEY} bind:countries/>
 ```
 
-- The `region` code follows the [CLDR two-character format](https://developers.google.com/maps/documentation/javascript/reference/autocomplete-data#AutocompleteRequest).
-- The `language` in which to return results. [See details](https://developers.google.com/maps/documentation/javascript/reference/autocomplete-data#AutocompleteRequest.language)
+- The `region` code follows the [CLDR two-character format](https://developers.google.com/maps/documentation/javascript/reference/autocomplete-data#AutocompleteRequest). The selected country region overwrites the `region` value in `requestParams`
 
 
 ## Error Handling
@@ -95,10 +94,13 @@ Handle these errors gracefully in your application:
 	let onError = (error: string) => {
 		console.error(error);
 		pacError = error;
-	};
+};
 </script>
 
-<PlaceAutocomplete {onError} {onResponse} {PUBLIC_GOOGLE_MAPS_API_KEY} />
+<PlaceAutocomplete 
+{onResponse} 
+{onError} 
+{PUBLIC_GOOGLE_MAPS_API_KEY} />
 
 {#if pacError}
 	<p class="error">{pacError}</p>
@@ -107,18 +109,37 @@ Handle these errors gracefully in your application:
 
 ## Customization
 
-- Placeholder: Use the placeholder property to customize the input field's placeholder text.
-- Language: Use the language property to set the language of the autocomplete results.
-- Region: Use the region property to bias the results toward a particular region. If the countries array is provided the region will be used from the selected country.
-- Autocomplete: Use to disable the input autocomplete. 
+- `placeholder`: Use the placeholder property to customize the input field's placeholder text.
+- `autocomplete`: Use to disable the HTML <input> autocomplete attribute. 
+- `requestParams` (autocomplete request):
+	- `language`: Use the language property to set the language of the autocomplete results.
+	- `region`: Use the region property to bias the results toward a particular region. If the countries array is provided the region will be used from the selected country.
 
 ```svelte
 <script>
 	// ... other imports
 	const placeholder = 'Search...';
-	const language = 'en-GB';
-	const region = 'GB';
+	/**
+	 * @type string optional
+	 * The <input> HTML autocomplete attribute.
+	 * if ommited defaults to 'off'
+	 * */ 
 	const autocompete = 'off';
+	const requestParams = {
+		/**
+		 * @type string optional
+		 * The language in which to return results. 
+		 * If ommited defaults to the browser's language preference.
+		 */
+		language : 'en-GB',
+		/**
+		 * @type string optional
+		 * The region code, specified as a CLDR two-character region code. 
+		 * This affects address formatting, result ranking, and may influence what results are returned. 
+		 * This does not restrict results to the specified region.
+		 */
+		region : 'GB',
+	}
 </script>
 
 <PlaceAutocomplete 
@@ -127,11 +148,12 @@ Handle these errors gracefully in your application:
 	{PUBLIC_GOOGLE_MAPS_API_KEY} 
 	bind:countries 
 	{placeholder} 
-	{language} 
-	{region} 
-	{autocomplete}/>
+	{autocompete}/>
 
 ```
+
+- The `region` code follows the [CLDR two-character format](https://developers.google.com/maps/documentation/javascript/reference/autocomplete-data#AutocompleteRequest). The selected country region overwrites the `region` value in `requestParams`
+- The `language` in which to return results. [See details](https://developers.google.com/maps/documentation/javascript/reference/autocomplete-data#AutocompleteRequest.language)
 
 ## Contributing
 

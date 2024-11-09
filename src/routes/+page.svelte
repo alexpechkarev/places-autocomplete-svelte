@@ -21,8 +21,7 @@
 	 */
 	let fullResponse = $state([]);
 	// Google Maps API key
-	const PUBLIC_GOOGLE_MAPS_API_KEY = '___YOUR_API_KEY___';
-	//const PUBLIC_GOOGLE_MAPS_API_KEY = import.meta.env.VITE_PUBLIC_GOOGLE_MAPS_API_KEY;
+	const PUBLIC_GOOGLE_MAPS_API_KEY = import.meta.env.VITE_PUBLIC_GOOGLE_MAPS_API_KEY;
 
 
 	// Countries - optional, if not provided defaults to GB
@@ -89,10 +88,13 @@
 	];
 	let selectedTab = $state(tabs.find((tab) => tab.id === 1).id);
 	const placeholder = 'Search...';
-	const language = 'en-GB';
-	const region = 'GB';
 
-	const requestParams = {}
+	const requestParams = {
+		// The language in which to return results. Will default to the browser's language preference.
+		language : 'en-GB',
+		// The region code, specified as a CLDR two-character region code. This affects address formatting, result ranking, and may influence what results are returned. This does not restrict results to the specified region.
+		region : 'GB',
+	}
 
 </script>
 
@@ -114,8 +116,6 @@
 		{PUBLIC_GOOGLE_MAPS_API_KEY} 
 		bind:countries 
 		{placeholder} 
-		{language} 
-		{region}
 		{requestParams}
 		/>
 

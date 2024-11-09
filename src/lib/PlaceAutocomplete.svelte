@@ -5,8 +5,6 @@
 	import {
 		validateRequestParams,
 		requestParamsDefault,
-		validateLocationBias,
-		validateLocationRestriction
 	} from './helpers.js';
 	const { Loader } = GMaps;
 
@@ -19,9 +17,7 @@
 		fetchFields = $bindable(['formattedAddress', 'addressComponents']),
 		countries = $bindable([]),
 		placeholder = 'Search...',
-		language = 'en-GB',
-		region = 'GB',
-		autocomplete = 'off',
+		autocompete = 'off',
 		onResponse = $bindable((e: Event) => {}),
 		onError = $bindable((error: string) => {}),
 		requestParams
@@ -34,17 +30,13 @@
 	let currentSuggestion = $state(-1);
 	let title: string = $state('');
 	let results: any[] = $state([]);
-	let token;
 	let loader: GMaps.Loader;
 	let placesApi: { [key: string]: any } = {};
 	//https://developers.google.com/maps/documentation/javascript/reference/autocomplete-data
-	// validate request params
-	// merge requestParams with requestParamsDefault
-	let rp = Object.assign(requestParamsDefault, validateRequestParams(requestParams));
-	rp = Object.assign(validateLocationBias(rp), validateLocationRestriction(rp));
-	let request = $state(rp);
+	// validate and merge requestParams with requestParamsDefault
+	let request = $state(validateRequestParams(Object.assign(requestParamsDefault, requestParams)));
 
-	//$inspect(request);
+	$inspect(request);
 
 	$effect(() => {
 		if (request.input == '') {
@@ -216,7 +208,7 @@
 					bind:this={inputRef}
 					class="border-1 w-full rounded-md border-0 shadow-sm bg-gray-100 px-4 py-2.5 pl-10 pr-20 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 sm:text-sm"
 					{placeholder}
-					{autocomplete}
+					autocomplete={autocompete}
 					aria-controls="options"
 					bind:value={request.input}
 					oninput={makeAcRequest}

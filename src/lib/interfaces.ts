@@ -27,7 +27,8 @@ export interface Props {
     placeholder?: string;
     language?: string;
     region?: string;
-    autocomplete?: AutoFill;
+    // The <input> HTML autocomplete attribute
+    autocompete?: AutoFill;
     requestParams: RequestParams;
     onResponse: (e: Event) => void;
     onError: (error: string) => void;
