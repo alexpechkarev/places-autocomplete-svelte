@@ -2,7 +2,6 @@
 
 This Svelte component leverages the [Google Maps Places Autocomplete API](https://developers.google.com/maps/documentation/javascript/place-autocomplete-overview) to provide a user-friendly way to search for and retrieve detailed address information within your [SvelteKit](https://kit.svelte.dev) applications.
 
-Preview this package [Demo](https://places-autocomplete-demo.pages.dev/)
 
 ## Features:
 
