@@ -2,16 +2,19 @@
 
 This Svelte component leverages the [Google Maps Places Autocomplete API](https://developers.google.com/maps/documentation/javascript/place-autocomplete-overview) to provide a user-friendly way to search for and retrieve detailed address information within your [SvelteKit](https://kit.svelte.dev) applications.
 
-Preview this package [Demo](https://places-autocomplete-demo.pages.dev/)
 
 ## Features:
 
 - **Seamless Integration:** Easily integrate the component into your SvelteKit projects.
-- **Autocomplete Suggestions:** Provide users with real-time suggestions as they type, enhancing the search experience.
+- **Autocomplete Suggestions:** Provides real-time address suggestions as the user types.
 - **Detailed Address Retrieval:** Retrieve comprehensive address information, including street address, city, region, postal code, and country.
-- **Country/Region Selection:** Allow users to specify a region for more targeted results.
-- **Customizable:** Tailor the component's appearance and behavior using language settings, placeholder text.
+- **Country/Region Filtering:**  Refine search results by specifying countries or regions.
+- **Customizable:** Tailor the component's appearance (placeholder, language) and data retrieved (`fetchFields`).
 - **Accessible:** Supports keyboard navigation for selecting suggestions.
+
+## Demo
+
+See a live demo of the component in action: [Demo](https://places-autocomplete-demo.pages.dev/)
 
 ![Places Autocomplete Svelte](places-autocomplete-svelte.gif)
 
@@ -55,36 +58,95 @@ npm i places-autocomplete-svelte@1.0.1
 <p>Response Object: {JSON.stringify(fullResponse, null, 2)}</p>
 ```
 
-## Countries/Regions
 
-Use optional `countries` property to refine search by region:
+
+## Customization
+
+- `countries`: Use countries property to refine search by region
+- `placeholder`: Use the placeholder property to customize the input field's placeholder text.
+- `autocomplete`: Use to disable the HTML `<input>` autocomplete attribute. 
+- `requestParams` (autocomplete request):
+	- `language`: Use the language property to set the language of the autocomplete results.
+	- `region`: Use the region property to bias the results toward a particular region. If the countries array is provided the region will be used from the selected country.
+- `fetchFields`: Use to control the Place response 
 
 ```svelte
 <script>
 	// ... other imports
 
+	/**
+	 * @type array optional
+	 */
 	let countries = [
-		{ name: 'United Kingdom', region: 'GB', language: 'en-GB' },
-		{ name: 'United States', region: 'US', language: 'en-US' }
+		{ name: 'United Kingdom', region: 'GB'},
+		{ name: 'United States', region: 'US' }
 		// ... more countries
 	];
+	/**
+	 * @type string optional
+	 */
+	const placeholder = 'Search...';
+	/**
+	 * @type string optional
+	 * The <input> HTML autocomplete attribute.
+	 * if ommited defaults to 'off'
+	 * */ 
+	const autocompete = 'off';
+	/**
+	 * @type object optional
+	 * List of accepted AutocompleteRequest properties
+	 */
+	const requestParams = {
+		/**
+		 * @type string optional
+		 */
+		language : 'en-GB',
+		/**
+		 * @type string optional
+		 */
+		region : 'GB',
+	}
+
+	/**
+	 * @type array optional
+	 */
+	const fetchFields = ['formattedAddress', 'addressComponents'];
 </script>
 
-<PlaceAutocomplete {onResponse} {PUBLIC_GOOGLE_MAPS_API_KEY} bind:countries/>
+<PlaceAutocomplete 
+	{onError} 
+	{onResponse} 
+	{PUBLIC_GOOGLE_MAPS_API_KEY} 
+	bind:countries 
+	{placeholder} 
+	{autocompete}
+	{fetchFields}/>
+
 ```
 
-- The `region` code follows the [CLDR two-character format](https://developers.google.com/maps/documentation/javascript/reference/autocomplete-data#AutocompleteRequest).
-- The `language` in which to return results. [See details](https://developers.google.com/maps/documentation/javascript/reference/autocomplete-data#AutocompleteRequest.language)
+- `region` code follows the [CLDR two-character format](https://developers.google.com/maps/documentation/javascript/reference/autocomplete-data#AutocompleteRequest). The selected country region overwrites the `region` value in `requestParams`
+- `language` in which to return results. If ommited defaults to the browser's language preference. [See details](https://developers.google.com/maps/documentation/javascript/reference/autocomplete-data#AutocompleteRequest.language)
+- `requestParams` list of accepted [AutocompleteRequest properties](https://developers.google.com/maps/documentation/javascript/reference/autocomplete-data#AutocompleteRequest)
+- `fetchFields` the [types](https://developers.google.com/maps/documentation/javascript/place-class-data-fields) of Place data to return when requesting place details. If omitted defaults to `['formattedAddress', 'addressComponents']`
+	 
+
+## Component Properties
+| Property                 | Type                                       | Description                                                                                                                                                               | Required | Default Value                               |
+|--------------------------|--------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------|-----------------------------------------------|
+| `PUBLIC_GOOGLE_MAPS_API_KEY` | `String`                                     | Your Google Maps Places API Key.                                                                                                                                         | Yes       |                                               |
+| `onResponse`              | `CustomEvent` | Dispatched when a place is selected, containing the place details.                                                                                                     | Yes       |                                               |
+| `onError`                 | `CustomEvent`                      | Dispatched when an error occurs.                                                                                                                                        | No        |                                               |
+| `countries`              | `Array` | Array of countries/regions to filter results.                                                                                                                            | No        | `[]`                                       |
+| `placeholder`            | `String`                                     | Placeholder text for the input field.                                                                                                                                        | No        | `"Search..."`                             |
+| `autocomplete`           | `string`                                     | HTML `autocomplete` attribute for the input field. Set to "off" to disable browser autocomplete.                                                                        | No        | `"off"`                                    |
+| `requestParams`          | `Object`   | Object for additional request parameters (e.g., `types`, `bounds`). See [AutocompleteRequest](https://developers.google.com/maps/documentation/javascript/reference/autocomplete-data#AutocompleteRequest). | No        | `{}`                                       |
+| `fetchFields`            | `Array`                                | Array of place data fields to return. See [Supported Fields](https://developers.google.com/maps/documentation/javascript/reference/places-service#PlaceResult)                | No        | `['formattedAddress', 'addressComponents']` |
 
 
 ## Error Handling
 
-The component will throw an error if:
+The `onError` event will be dispatched if there is an issue with the Google Maps API or the autocomplete request. 
 
-- The Google Maps API key is invalid or missing.
-- There are network issues connecting to the Google Maps service.
-
-Handle these errors gracefully in your application:
 
 ```svelte
 <script>
@@ -95,34 +157,17 @@ Handle these errors gracefully in your application:
 	let onError = (error: string) => {
 		console.error(error);
 		pacError = error;
-	};
+};
 </script>
 
-<PlaceAutocomplete {onError} {onResponse} {PUBLIC_GOOGLE_MAPS_API_KEY} />
+<PlaceAutocomplete 
+{onResponse} 
+{onError} 
+{PUBLIC_GOOGLE_MAPS_API_KEY} />
 
 {#if pacError}
 	<p class="error">{pacError}</p>
 {/if}
-```
-
-## Customization
-
-- Placeholder: Use the placeholder property to customize the input field's placeholder text.
-- Language: Use the language property to set the language of the autocomplete results.
-- Region: Use the region property to bias the results toward a particular region. If the countries array is provided the region will be used from the selected country.
-- Autocomplete: Use to disable the input autocomplete. 
-
-```svelte
-<script>
-	// ... other imports
-	const placeholder = 'Search...';
-	const language = 'en-GB';
-	const region = 'GB';
-	const autocompete = 'off';
-</script>
-
-<PlaceAutocomplete {onError} {onResponse} {PUBLIC_GOOGLE_MAPS_API_KEY} bind:countries {placeholder} {language} {region} {autocomplete}/>
-
 ```
 
 ## Contributing
@@ -132,3 +177,5 @@ Contributions are welcome! Please open an issue or submit a pull request on the 
 ## License
 
 [MIT](LICENSE)
+
+
