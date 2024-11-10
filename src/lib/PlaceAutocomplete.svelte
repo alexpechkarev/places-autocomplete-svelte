@@ -36,7 +36,6 @@
 	// validate and merge requestParams with requestParamsDefault
 	let request = $state(validateRequestParams(Object.assign(requestParamsDefault, requestParams)));
 
-	$inspect(request);
 
 	$effect(() => {
 		if (request.input == '') {

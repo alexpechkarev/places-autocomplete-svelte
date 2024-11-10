@@ -12,9 +12,17 @@ export interface RequestParams {
         // LatLng|LatLngLiteral|LatLngBounds|LatLngBoundsLiteral|Circle|CircleLiteral|string
         locationBias?: unknown|string;
         // LocationRestriction 
-        locationRestriction?: unknown|string;
+        locationRestriction?: {
+            west: number;
+            south: number;
+            east: number;
+            north: number;
+        };
         // LatLng|LatLngLiteral 
-        origin?: unknown|string;
+        origin?: {
+            lat: number;
+            lng: number;
+        };
         region?: string;
         sessionToken?: string;
 }

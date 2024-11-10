@@ -3,7 +3,6 @@
 	import PlaceAutocomplete from '$lib/PlaceAutocomplete.svelte';
 	import { browser } from '$app/environment';
 
-
 	// Full address as string
 	let formattedAddress = $state('');
 	// Formatted address object
@@ -22,7 +21,6 @@
 	let fullResponse = $state([]);
 	// Google Maps API key
 	const PUBLIC_GOOGLE_MAPS_API_KEY = import.meta.env.VITE_PUBLIC_GOOGLE_MAPS_API_KEY;
-
 
 	// Countries - optional, if not provided defaults to GB
 	let countries = $state([
@@ -83,19 +81,18 @@
 	// Display response in tabs
 	const tabs = [
 		{ name: 'Response', id: 1 },
-		{ name: 'Formatted Resposne', id: 2 },
-
+		{ name: 'Formatted Resposne', id: 2 }
 	];
 	let selectedTab = $state(tabs.find((tab) => tab.id === 1).id);
 	const placeholder = 'Search...';
 
 	const requestParams = {
 		// The language in which to return results. Will default to the browser's language preference.
-		language : 'en-GB',
+		language: 'en-GB',
 		// The region code, specified as a CLDR two-character region code. This affects address formatting, result ranking, and may influence what results are returned. This does not restrict results to the specified region.
-		region : 'GB',
-	}
-
+		region: 'GB',
+	};
+	const fetchFields = ['formattedAddress', 'addressComponents'];
 </script>
 
 <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -110,21 +107,21 @@
 	{/if}
 
 	<div class="my-2">
-		<PlaceAutocomplete 
-		{onError} 
-		{onResponse} 
-		{PUBLIC_GOOGLE_MAPS_API_KEY} 
-		bind:countries 
-		{placeholder} 
-		{requestParams}
+		<PlaceAutocomplete
+			{onError}
+			{onResponse}
+			{PUBLIC_GOOGLE_MAPS_API_KEY}
+			bind:countries
+			{placeholder}
+			{requestParams}
+			{fetchFields}
 		/>
 
 		<div class="flex flex-wrap items-end">
-			<div class="text-gray-500">powered by</div> 
+			<div class="text-gray-500">powered by</div>
 			<img src="google_on_white_hdpi.png" alt="powered by Google" class="h-6 ml-1" />
 		</div>
 	</div>
-
 
 	{#if Object.values(formattedAddressObj).filter((value) => value).length > 0}
 		<h1 class="text-base font-semibold leading-6 text-gray-900 mt-10">Response</h1>
@@ -222,7 +219,7 @@
 		<!-- Formatted response -->
 		{#if selectedTab === 2}
 			<div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-10">
-				<div >
+				<div>
 					<div class="sm:flex sm:items-center">
 						<div class="sm:flex-auto">
 							<h1 class="text-base font-semibold leading-6 text-gray-900">
@@ -230,7 +227,6 @@
 							</h1>
 						</div>
 					</div>
-
 				</div>
 				<div class="flex justify-end">
 					<button
@@ -247,8 +243,7 @@
 						class="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
 						>Clear</button
 					>
-				</div>					
-
+				</div>
 
 				<!-- Street Number -->
 				<div class="mt-2">
@@ -323,13 +318,8 @@
 						{/each}
 					</select>
 				</div>
-
-	
-
-			
 			</div>
 		{/if}
-
 	{/if}
 
 	<footer class="bg-white">

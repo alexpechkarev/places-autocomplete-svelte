@@ -58,7 +58,21 @@ export const requestParamsDefault: RequestParams = {
      * If neither are set, the results will be biased by IP address, meaning the IP address will 
      * be mapped to an imprecise location and used as a biasing signal.
      */
-    locationRestriction: null,
+    locationRestriction: {
+        west: 0,
+        south: 0,
+        east: 0,
+        north: 0
+    },
+
+    /**
+     * @type LatLng|LatLngLiteral optional
+     * The point around which you wish to retrieve place information.
+     */
+    origin: {
+        lat: 0,
+        lng: 0
+    },
 
     /**
      * @type string optional
@@ -182,11 +196,20 @@ export const validateRequestParams = (requestParams: RequestParams) => {
     }
 
     /**
-     * If locationBias is null, remove it
+     * If locationRestriction is not set, remove it
      */
-    if (requestParams.locationRestriction === null) {
+    if (requestParams.locationRestriction?.east === 0
+        && requestParams.locationRestriction?.north === 0
+        && requestParams.locationRestriction?.south === 0
+        && requestParams.locationRestriction?.west === 0
+    ) {
         delete requestParams.locationRestriction;
     }    
+
+    // If origin is not set, remove it
+    if(requestParams.origin?.lat === 0 && requestParams.origin?.lng === 0) {
+        delete requestParams.origin;
+    }
 
     // If region is not a string, remove it
     if (typeof requestParams.region !== 'string') {
