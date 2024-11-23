@@ -33,8 +33,8 @@ export interface Props {
     fetchFields?: string[];
     countries: { name: string; region: string }[];
     placeholder?: string;
-    language?: string;
-    region?: string;
+    // language?: string;
+    // region?: string;
     // The <input> HTML autocomplete attribute
     autocompete?: AutoFill;
     requestParams: RequestParams;

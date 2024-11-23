@@ -187,7 +187,7 @@
 			<label class="mt-1 text-sm leading-6 text-gray-600" for="search"
 				>Start typing your address</label
 			>
-			<div class="relative z-50 transform rounded-xl mt-4">
+			<div class="relative z-10 transform rounded-xl mt-4">
 				<div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
 					<svg
 						xmlns="http://www.w3.org/2000/svg"
