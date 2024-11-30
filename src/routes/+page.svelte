@@ -95,6 +95,13 @@
 	const fetchFields = ['formattedAddress', 'addressComponents'];
 </script>
 
+
+<svelte:head>
+	<title>Places Autocomplete Svelte - Google Maps Autocomplete Component for SvelteKit</title> 
+	<meta name="description" content="This Svelte component leverages the Google Maps Places Autocomplete API to provide a user-friendly way to search for and retrieve detailed address information within your SvelteKit applications." />
+</svelte:head>
+
+
 <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
 	{#if placesError}
 		<div
@@ -119,7 +126,7 @@
 
 		<div class="flex flex-wrap items-end">
 			<div class="text-gray-500">powered by</div>
-			<img src="google_on_white_hdpi.png" alt="powered by Google" class="h-6 ml-1" />
+			<img src="google_on_white_hdpi.png" width="79" height="24" alt="powered by Google" class="h-6 ml-1" />
 		</div>
 	</div>
 

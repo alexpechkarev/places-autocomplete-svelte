@@ -179,7 +179,7 @@
 	}
 </script>
 
-<svelte:window on:keydown={onKeyDown} />
+<svelte:window onkeydown={onKeyDown} />
 
 <section class="my-10">
 	<div class="grid grid-cols-1 lg:grid-cols-6 gap-x-4">
@@ -209,6 +209,11 @@
 					{placeholder}
 					autocomplete={autocompete}
 					aria-controls="options"
+					aria-autocomplete="list"
+					aria-owns="options"
+					aria-labelledby="search"
+					aria-label="Search"
+					aria-haspopup="listbox"
 					bind:value={request.input}
 					oninput={makeAcRequest}
 				/>

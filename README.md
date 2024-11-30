@@ -116,10 +116,12 @@ const fetchFields = ['formattedAddress', 'addressComponents'];
 	{onError} 
 	{onResponse} 
 	{PUBLIC_GOOGLE_MAPS_API_KEY} 
-	bind:countries 
+	{requestParams}
 	{placeholder} 
 	{autocompete}
-	{fetchFields}/>
+	{fetchFields}
+	bind:countries
+/>
 
 ```
 
@@ -144,13 +146,13 @@ The `onError` event will be dispatched if there is an issue with the Google Maps
 
 ```svelte
 <script>
-	// ... other imports
+// ... other imports
 
-	// Error handler
-	let pacError = '';
-	let onError = (error: string) => {
-		console.error(error);
-		pacError = error;
+// Error handler
+let pacError = '';
+let onError = (error: string) => {
+	console.error(error);
+	pacError = error;
 };
 </script>
 
