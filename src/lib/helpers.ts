@@ -109,6 +109,7 @@ export const requestParamsDefault: RequestParams = {
  */
 export const validateRequestParams = (requestParams: RequestParams) => {
 
+    
 
     // https://developers.google.com/maps/documentation/javascript/reference/autocomplete-data
     /**
@@ -130,7 +131,8 @@ export const validateRequestParams = (requestParams: RequestParams) => {
             delete (requestParams as never)[key];
         }
     }
-
+    // merge requestParams with requestParamsDefault
+    requestParams = Object.assign(requestParamsDefault, requestParams);
 
     // Reset sessionToken to empty string if passed to the component
     if (requestParams.sessionToken) {
@@ -219,6 +221,7 @@ export const validateRequestParams = (requestParams: RequestParams) => {
 
 
     //console.log('requestParams:', Object.keys(requestParams));
+
 
     return requestParams;
 };

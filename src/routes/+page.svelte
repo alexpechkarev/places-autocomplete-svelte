@@ -3,6 +3,11 @@
 	import PlaceAutocomplete from '$lib/PlaceAutocomplete.svelte';
 	import { browser } from '$app/environment';
 
+	let unique = $state({}); // every {} is unique, {} === {} evaluates to false
+	let handleChange = (e) => {
+		unique = {};
+	};
+
 	// Full address as string
 	let formattedAddress = $state('');
 	// Formatted address object
@@ -31,6 +36,12 @@
 		{ name: 'Russia', region: 'RU' },
 		{ name: 'Japan', region: 'JP' }
 	]);
+	let selectedCountry = $state('GB');
+	// Update region on country change
+	let onCountryChange = (e) => {
+		requestParams.region = e.target.value;
+		handleChange(e);
+	};
 	// Error message
 	let placesError = $state('');
 	// Error handler function
@@ -90,17 +101,39 @@
 		// The language in which to return results. Will default to the browser's language preference.
 		language: 'en-GB',
 		// The region code, specified as a CLDR two-character region code. This affects address formatting, result ranking, and may influence what results are returned. This does not restrict results to the specified region.
-		region: 'GB',
+		region: 'GB'
 	};
 	const fetchFields = ['formattedAddress', 'addressComponents'];
+
+	// Input Clases
+	let classes = {
+		section: '',
+		container: 'relative z-10 transform rounded-xl mt-4',
+		icon_container: 'pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3',
+		icon: '<svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8" /><path d="m21 21-4.3-4.3" /></svg>',
+		input:
+			'border-1 w-full rounded-md border-0 shadow-sm bg-gray-100 px-4 py-2.5 pl-10 pr-20 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 sm:text-sm',
+		kbd_container: 'absolute inset-y-0 right-0 flex py-1.5 pr-1.5',
+		kbd_escape:
+			'inline-flex items-center rounded border border-gray-300 px-1 font-sans text-xs text-gray-500 w-8 mr-1',
+		kbd_up:
+			'inline-flex items-center justify-center rounded border border-gray-300 px-1 font-sans text-xs text-gray-500 w-6',
+		kbd_down:
+			'inline-flex items-center rounded border border-gray-400 px-1 font-sans text-xs text-gray-500 justify-center w-6',
+		ul: 'absolute z-50 -mb-2 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm',
+		li: 'z-50 cursor-default select-none py-2 pl-4 text-gray-900 hover:bg-indigo-500 hover:text-white',
+		li_current: 'bg-indigo-500 text-white',
+		li_a: 'block w-full'
+	};
 </script>
 
-
 <svelte:head>
-	<title>Places Autocomplete Svelte - Google Maps Autocomplete Component for SvelteKit</title> 
-	<meta name="description" content="This Svelte component leverages the Google Maps Places Autocomplete API to provide a user-friendly way to search for and retrieve detailed address information within your SvelteKit applications." />
+	<title>Places Autocomplete Svelte - Google Maps Autocomplete Component for SvelteKit</title>
+	<meta
+		name="description"
+		content="This Svelte component leverages the Google Maps Places Autocomplete API to provide a user-friendly way to search for and retrieve detailed address information within your SvelteKit applications."
+	/>
 </svelte:head>
-
 
 <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
 	{#if placesError}
@@ -113,20 +146,54 @@
 		</div>
 	{/if}
 
-	<div class="my-2">
-		<PlaceAutocomplete
-			{onError}
-			{onResponse}
-			{PUBLIC_GOOGLE_MAPS_API_KEY}
-			bind:countries
-			{placeholder}
-			{requestParams}
-			{fetchFields}
-		/>
+	<div class="my-12">
+		<div class="grid grid-cols-1 lg:grid-cols-6 gap-x-4 mb-10">
+			<div class:lg:col-span-4={countries.length} class:lg:col-span-6={!countries.length}>
+				<label class="mt-1 text-sm leading-6 text-gray-600" for="search"
+					>Start typing your address</label
+				>
+				{#key unique}
+					<PlaceAutocomplete
+						{onError}
+						{onResponse}
+						{PUBLIC_GOOGLE_MAPS_API_KEY}
+						{placeholder}
+						{requestParams}
+						{fetchFields}
+						{classes}
+					/>
+				{/key}
+			</div>
 
+			<div class:lg:col-span-2={countries.length} class:hidden={!countries.length}>
+				<label class="mt-1 text-sm leading-6 text-gray-600" for="search">Address country</label>
+				<div class="flex items-center mt-4">
+					<label for="country" class="sr-only">Country</label>
+					<select
+						id="country"
+						name="country"
+						class="h-10 w-full rounded-md border-0 bg-transparent py-0 pl-2 pr-7 text-gray-500 focus:ring-2 ring-1 ring-inset ring-gray-300 focus:ring-inset focus:ring-indigo-600 sm:text-sm"
+						bind:value={selectedCountry}
+						onchange={onCountryChange}
+					>
+						{#each countries as country}
+							<option value={country.region}>{country.name}</option>
+						{/each}
+					</select>
+				</div>
+			</div>
+		</div>
+
+		<!-- Powered by Google  -->
 		<div class="flex flex-wrap items-end">
 			<div class="text-gray-500">powered by</div>
-			<img src="google_on_white_hdpi.png" width="79" height="24" alt="powered by Google" class="h-6 ml-1" />
+			<img
+				src="google_on_white_hdpi.png"
+				width="79"
+				height="24"
+				alt="powered by Google"
+				class="h-6 ml-1"
+			/>
 		</div>
 	</div>
 

@@ -27,12 +27,29 @@ export interface RequestParams {
         sessionToken?: string;
 }
 
+export interface ComponentClasses{
+    section?: string;
+    container?: string;
+    icon_container?: string;
+    icon?: string;
+    input?: string;
+    kbd_container?: string;
+    kbd_escape?: string;
+    kbd_up?: string;
+    kbd_down?: string;
+    ul?: string;
+    li?: string;
+    li_current?: string;
+    li_a?: string;
+}
+
 
 export interface Props {
     PUBLIC_GOOGLE_MAPS_API_KEY: string;
     fetchFields?: string[];
     countries: { name: string; region: string }[];
     placeholder?: string;
+    classes?: ComponentClasses;
     // language?: string;
     // region?: string;
     // The <input> HTML autocomplete attribute
