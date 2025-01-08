@@ -47,7 +47,7 @@ export interface ComponentClasses{
 export interface Props {
     PUBLIC_GOOGLE_MAPS_API_KEY: string;
     fetchFields?: string[];
-    countries: { name: string; region: string }[];
+    //countries: { name: string; region: string }[];
     placeholder?: string;
     classes?: ComponentClasses;
     // language?: string;

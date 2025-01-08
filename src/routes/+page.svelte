@@ -40,6 +40,7 @@
 	// Update region on country change
 	let onCountryChange = (e) => {
 		requestParams.region = e.target.value;
+		requestParams.includedRegionCodes = [e.target.value];
 		handleChange(e);
 	};
 	// Error message
