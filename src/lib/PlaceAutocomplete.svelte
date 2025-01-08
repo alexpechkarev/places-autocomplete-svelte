@@ -101,7 +101,6 @@
 
 		// set request input
 		request.input = target.value;
-		console.log(request);
 
 		// attempt to get autocomplete suggestions
 		try {

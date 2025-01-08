@@ -107,7 +107,7 @@ export const requestParamsDefault: RequestParams = {
  * Validate and cast request parameters
  * @param requestParams 
  */
-export const validateRequestParams = (requestParams: RequestParams) => {
+export const validateRequestParams = (requestParams: RequestParams|undefined) => {
 
     
 
@@ -119,6 +119,9 @@ export const validateRequestParams = (requestParams: RequestParams) => {
         requestParams = {
             input: String(''),
             sessionToken: String(''),
+            includedRegionCodes: ['GB'],
+            language: 'en-GB',
+            region: 'GB',
         };
 
         return requestParams;

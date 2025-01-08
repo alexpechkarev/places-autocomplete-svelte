@@ -4,7 +4,7 @@
  * https://developers.google.com/maps/documentation/javascript/reference/autocomplete-data
  */
 export interface RequestParams {
-        input: string;
+        input?: string;
         includedPrimaryTypes?: string[];
         includedRegionCodes?: string[];
         inputOffset?: number;
@@ -54,7 +54,7 @@ export interface Props {
     // region?: string;
     // The <input> HTML autocomplete attribute
     autocompete?: AutoFill;
-    requestParams: RequestParams;
+    requestParams?: RequestParams;
     onResponse: (e: Event) => void;
     onError: (error: string) => void;
 }
