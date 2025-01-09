@@ -47,13 +47,10 @@ export interface ComponentClasses{
 export interface Props {
     PUBLIC_GOOGLE_MAPS_API_KEY: string;
     fetchFields?: string[];
-    //countries: { name: string; region: string }[];
     placeholder?: string;
-    classes?: ComponentClasses;
-    // language?: string;
-    // region?: string;
-    // The <input> HTML autocomplete attribute
+    autofocus?: boolean;
     autocompete?: AutoFill;
+    classes?: ComponentClasses;
     requestParams?: RequestParams;
     onResponse: (e: Event) => void;
     onError: (error: string) => void;

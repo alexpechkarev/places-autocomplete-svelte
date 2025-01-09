@@ -14,6 +14,7 @@
 		fetchFields = $bindable(['formattedAddress', 'addressComponents']),
 		placeholder = 'Search...',
 		autocompete = 'off',
+		autofocus = false,
 		classes = {
 			section: '',
 			container: 'relative z-10 transform rounded-xl mt-4',
@@ -161,8 +162,10 @@
 	 * Initialize the Google Maps JavaScript API Loader.
 	 */
 	onMount(async (): Promise<void> => {
-		// focus on the input
-		inputRef.focus();
+		if(autofocus) {
+			// focus on the input
+			inputRef.focus();
+		}
 
 		// load the Google Maps API
 		try {

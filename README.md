@@ -82,9 +82,16 @@ const placeholder = 'Search...';
 /**
  * @type string optional
  * The <input> HTML autocomplete attribute.
- * if ommited defaults to 'off'
+ * default: 'off'
  * */ 
 const autocompete = 'off';
+
+/**
+ * @type boolean optional
+ * Boolean attribute indicating that an element should be focused on page load.
+ * default: false
+ * */ 
+const autofocus = false;
 /**
  * @type object optional
  * AutocompleteRequest properties
@@ -137,6 +144,7 @@ const fetchFields = ['formattedAddress', 'addressComponents'];
 	{requestParams}
 	{placeholder} 
 	{autocompete}
+	{autofocus}
 	{fetchFields}
 	{classes}
 />
@@ -151,7 +159,8 @@ const fetchFields = ['formattedAddress', 'addressComponents'];
 | `onResponse`              | `CustomEvent` | Dispatched when a place is selected, containing the place details.                                                                                                     | Yes       |                                               |
 | `onError`                 | `CustomEvent`                      | Dispatched when an error occurs.                                                                                                                                        | No        |                                               |
 | `placeholder`            | `String`                                     | Placeholder text for the input field.                                                                                                                                        | No        | `"Search..."`                             |
-| `autocomplete`           | `string`                                     | HTML `autocomplete` attribute for the input field. Set to "off" to disable browser autocomplete.                                                                        | No        | `"off"`                                    |
+| `autocomplete`           | `string`                                     | HTML `autocomplete` attribute for the input field. Set to "off" to disable browser autocomplete. 
+| `autofocus`           | `boolean`                                     | The attribute indicating that an element should be focused on page load.                                                                        | No        | `false`                                    |
 | `requestParams`          | `Object`   | Object for additional request parameters (e.g., `types`, `bounds`). See [AutocompleteRequest](https://developers.google.com/maps/documentation/javascript/reference/autocomplete-data#AutocompleteRequest). | No        | `{}`                                       |
 | `fetchFields`            | `Array`                                | Array of place data fields to return. See [Supported Fields](https://developers.google.com/maps/documentation/javascript/reference/places-service#PlaceResult)                | No        | `['formattedAddress', 'addressComponents']` |
 | `classes`              | `Object` |  Object to override default Tailwind CSS classes applied to the component's elements (input, list, etc.). See the "Basic Usage" section for structure and default class names.   | No | *Default Tailwind classes* |

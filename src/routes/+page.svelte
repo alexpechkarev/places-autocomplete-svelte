@@ -106,6 +106,9 @@
 	};
 	const fetchFields = ['formattedAddress', 'addressComponents'];
 
+	// Focus on component input
+	const autofocus = false;
+
 	// Input Clases
 	let classes = {
 		section: '',
@@ -159,6 +162,7 @@
 						{onResponse}
 						{PUBLIC_GOOGLE_MAPS_API_KEY}
 						{placeholder}
+						{autofocus}
 						{requestParams}
 						{fetchFields}
 						{classes}
