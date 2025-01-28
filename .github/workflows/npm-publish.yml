@@ -3,11 +3,13 @@
 
 name: Publish Package to npmjs
 
+
 on:
   release:
     types: [published]
 jobs:
   build:
+    if: ${{github.repository == 'alexpechkarev/places-autocomplete-svelte'}}
     runs-on: ubuntu-latest
     permissions:
       contents: read

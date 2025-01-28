@@ -115,7 +115,7 @@ export const validateRequestParams = (requestParams: RequestParams|undefined) =>
     /**
      * If requestParams is not an object, set it to an empty object
     */
-    if (typeof requestParams !== 'object') {
+    if (typeof requestParams !== 'object' || Object.keys(requestParams).length === 0) {
         requestParams = {
             input: String(''),
             sessionToken: String(''),

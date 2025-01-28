@@ -36,7 +36,7 @@
 		},
 		onResponse = $bindable((e: Event) => {}),
 		onError = $bindable((error: string) => {}),
-		requestParams
+		requestParams = {}
 	}: Props = $props();
 
 	// set classes as state

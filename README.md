@@ -1,29 +1,34 @@
 # Places (New) Autocomplete Svelte
 
-This Svelte component leverages the [Google Maps Places (New) Autocomplete API](https://developers.google.com/maps/documentation/javascript/place-autocomplete-overview) to provide a user-friendly way to search for and retrieve detailed address information within your [SvelteKit](https://kit.svelte.dev) applications. Default styling is provided using [Tailwind CSS](https://tailwindcss.com/), but you can fully customize the appearance with your own styles.
+This Svelte component provides a user-friendly way to search for and retrieve detailed address information within your [SvelteKit](https://kit.svelte.dev) applications, leveraging the power of the [Google Maps Places (New) Autocomplete API](https://developers.google.com/maps/documentation/javascript/place-autocomplete-overview).  It comes with default styling using [Tailwind CSS](https://tailwindcss.com/), which you can fully customize.
 
 
 
-## Features:
+## Features
 
-- **Seamless Integration:** Easily integrate the component into your SvelteKit projects.
-- **Autocomplete Suggestions:** Provides real-time address suggestions as the user types.
-- **Detailed Address Retrieval:** Retrieve comprehensive address information, including street address, city, region, postal code, and country.
-- **Country/Region Filtering:**  Refine search results by specifying countries or regions.
-- **Customizable Appearance:** Tailor the component's look and feel with custom CSS classes, overriding the default Tailwind CSS styles.
-- **Flexible Data Retrieval:** Control the retrieved data using the `fetchFields` property.
-- **Accessible:** Supports keyboard navigation for selecting suggestions.
+- **Seamless SvelteKit Integration:** Easily add the component to your SvelteKit projects.
+- **Real-time Autocomplete Suggestions:**  As the user types, address suggestions appear dynamically.
+- **Comprehensive Address Details:** Retrieve detailed information, including street address, city, state/province, postal code, country, and more.
+- **Country/Region Filtering:** Narrow down search results by specifying target countries or regions.
+- **Customizable Styles:** Tailor the component's appearance to match your application's design by overriding the default Tailwind CSS classes.
+- **Flexible Data Control:** Choose the specific data fields you want to retrieve using the `fetchFields` property.
+- **Keyboard Navigation & Accessibility:**  Use keyboard navigation for selecting suggestions, ensuring accessibility for all users.
 
 
 ## Demo
 
-See a live demo of the component in action: [Demo](https://places-autocomplete-demo.pages.dev/)
+See a live demo of the component in action: [Basic Example](https://places-autocomplete-demo.pages.dev/)
+
+[Reactive parameters](https://places-autocomplete-demo.pages.dev/examples/reactive-parameters) - change the search criteria based on user input, like filtering by country or change results language.
+
+[Customise request parameters](https://places-autocomplete-demo.pages.dev/examples/customise-request-parameters) - construct a `requestParams` object and control various aspects of the search, including language, region, and more.
+
 
 ![Places Autocomplete Svelte](places-autocomplete-svelte.gif)
 
 ## Requirements
 
-- **Google Maps API Key:** Create an API key with the Places API (New) enabled. Refer to [Use API Keys](https://developers.google.com/maps/documentation/javascript/get-api-key) for detailed instructions.
+- **Google Maps API Key** with the Places API (New) enabled. Refer to [Use API Keys](https://developers.google.com/maps/documentation/javascript/get-api-key) for detailed instructions.
 
 ## Installation Svelte 5
 
@@ -40,14 +45,16 @@ npm i places-autocomplete-svelte@1.0.1
 
 ## Basic Usage
 
-1. **Provide your Google Maps API Key:** Replace `'___YOUR_API_KEY___'` with your actual Google Maps API key.
-2. **Handle the Response:** Use the `onResponse` callback to receive the selected place details.
+1. Replace `'___YOUR_API_KEY___'` with your actual **Google Maps API Key**.
+2. Use the `onResponse` callback to **handle the response**.
 
 ```svelte
 <script>
 import { PlaceAutocomplete } from 'places-autocomplete-svelte';
 
+//Recommended: Store your key securely as an environment variable
 const PUBLIC_GOOGLE_MAPS_API_KEY = '___YOUR_API_KEY___';
+
 
 let fullResponse = $state('')
 let onResponse = (response) => {
@@ -61,15 +68,26 @@ let onResponse = (response) => {
 ```
 
 
+## Component Properties
+| Property                 | Type                                       | Description                                                                                                                                                               | Required | Default Value                               |
+|--------------------------|--------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------|-----------------------------------------------|
+| `PUBLIC_GOOGLE_MAPS_API_KEY` | `String`                                     | Your Google Maps Places API Key.                                                                                                                                         | Yes       |                                               |
+| `onResponse`              | `CustomEvent` | Dispatched when a place is selected, containing the place details.                                                                                                     | Yes       |                                               |
+| `onError`                 | `CustomEvent`                      | Dispatched when an error occurs.                                                                                                                                        | No        |                                               |
+| `placeholder`            | `String`                                     | Placeholder text for the input field.                                                                                                                                        | No        | `"Search..."`                             |
+| `autocomplete`           | `string`                                     | HTML `autocomplete` attribute for the input field. Set to "off" to disable browser autocomplete. 
+| `autofocus`           | `boolean`                                     | The attribute indicating that an element should be focused on page load.                                                                        | No        | `false`                                    |
+| `requestParams`          | `Object`   | Object for additional request parameters (e.g., `types`, `bounds`). See [AutocompleteRequest](https://developers.google.com/maps/documentation/javascript/reference/autocomplete-data#AutocompleteRequest). | No        | `{}`                                       |
+| `fetchFields`            | `Array`                                | Array of place data fields to return. See [Supported Fields](https://developers.google.com/maps/documentation/javascript/reference/places-service#PlaceResult)                | No        | `['formattedAddress', 'addressComponents']` |
+| `classes`              | `Object` |  Object to override default Tailwind CSS classes applied to the component's elements (input, list, etc.). See the "Basic Usage" section for structure and default class names.   | No | *Default Tailwind classes* |
 
 ## Customization
-- `placeholder`: Use the placeholder property to customize the input field's placeholder text.
-- `autocomplete`: Use to disable the HTML `<input>` autocomplete attribute. 
-- `requestParams` (optional [AutocompleteRequest properties](https://developers.google.com/maps/documentation/javascript/reference/autocomplete-data#AutocompleteRequest) ):
-	- `language`: in which to return results. If ommited defaults to `en-GB`. [See details](https://developers.google.com/maps/documentation/javascript/reference/autocomplete-data#AutocompleteRequest.language)
-	- `region`: the [CLDR two-character format](https://developers.google.com/maps/documentation/javascript/reference/autocomplete-data#AutocompleteRequest). Defaults to `GB`. If the countries array is provided the coutries region overwrites the `region` value in `requestParams`.
-- `fetchFields`: Use to control the Place response. See [types](https://developers.google.com/maps/documentation/javascript/place-class-data-fields) for details. If omitted defaults to `['formattedAddress', 'addressComponents']`
-- `classes`: Customize the styling by providing an object with your CSS classes. This overrides the default Tailwind CSS classes. See the example in the "Basic Usage" section for the structure of the classes object and default class names.
+### Styling
+Customize the component's appearance by providing an object to the classes property. This object should contain key-value pairs, where the keys correspond to the component's elements and the values are your custom CSS class names. See [styling](https://places-autocomplete-demo.pages.dev/examples/styling) for details.
+
+
+### Request Parameters (requestParams)
+Fine-tune the autocomplete search with the requestParams property. This property accepts an object corresponding to the AutocompleteRequest object in the Google Maps API documentation. See this [request parameters](https://places-autocomplete-demo.pages.dev/component/request-parameters) for more details. Here are some common examples:
 
 ```svelte
 <script>
@@ -152,23 +170,11 @@ const fetchFields = ['formattedAddress', 'addressComponents'];
 ```
 
 
-## Component Properties
-| Property                 | Type                                       | Description                                                                                                                                                               | Required | Default Value                               |
-|--------------------------|--------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------|-----------------------------------------------|
-| `PUBLIC_GOOGLE_MAPS_API_KEY` | `String`                                     | Your Google Maps Places API Key.                                                                                                                                         | Yes       |                                               |
-| `onResponse`              | `CustomEvent` | Dispatched when a place is selected, containing the place details.                                                                                                     | Yes       |                                               |
-| `onError`                 | `CustomEvent`                      | Dispatched when an error occurs.                                                                                                                                        | No        |                                               |
-| `placeholder`            | `String`                                     | Placeholder text for the input field.                                                                                                                                        | No        | `"Search..."`                             |
-| `autocomplete`           | `string`                                     | HTML `autocomplete` attribute for the input field. Set to "off" to disable browser autocomplete. 
-| `autofocus`           | `boolean`                                     | The attribute indicating that an element should be focused on page load.                                                                        | No        | `false`                                    |
-| `requestParams`          | `Object`   | Object for additional request parameters (e.g., `types`, `bounds`). See [AutocompleteRequest](https://developers.google.com/maps/documentation/javascript/reference/autocomplete-data#AutocompleteRequest). | No        | `{}`                                       |
-| `fetchFields`            | `Array`                                | Array of place data fields to return. See [Supported Fields](https://developers.google.com/maps/documentation/javascript/reference/places-service#PlaceResult)                | No        | `['formattedAddress', 'addressComponents']` |
-| `classes`              | `Object` |  Object to override default Tailwind CSS classes applied to the component's elements (input, list, etc.). See the "Basic Usage" section for structure and default class names.   | No | *Default Tailwind classes* |
 
 
 ## Error Handling
 
-The `onError` event will be dispatched if there is an issue with the Google Maps API or the autocomplete request. 
+Use the `onError` event handler to gracefully manage any errors that may occur during the autocomplete process:
 
 
 ```svelte
@@ -195,7 +201,7 @@ let onError = (error: string) => {
 
 ## Contributing
 
-Contributions are welcome! Please open an issue or submit a pull request on the [GitHub repository](https://github.com/alexpechkarev/places-autocomplete-svelte/).
+Contributions are welcome! Please open an issue or submit a pull request on the [GitHub](https://github.com/alexpechkarev/places-autocomplete-svelte/).
 
 ## License
 

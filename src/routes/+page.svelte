@@ -151,8 +151,10 @@
 	{/if}
 
 	<div class="my-12">
+
+
 		<div class="grid grid-cols-1 lg:grid-cols-6 gap-x-4 mb-10">
-			<div class:lg:col-span-4={countries.length} class:lg:col-span-6={!countries.length}>
+			<div class={[countries.length && 'lg:col-span-4', !countries.length && 'lg:col-span-6']}>
 				<label class="mt-1 text-sm leading-6 text-gray-600" for="search"
 					>Start typing your address</label
 				>
@@ -170,7 +172,7 @@
 				{/key}
 			</div>
 
-			<div class:lg:col-span-2={countries.length} class:hidden={!countries.length}>
+			<div class={[countries.length && 'lg:col-span-2 mt-10 lg:mt-0', !countries.length && 'hidden']}>
 				<label class="mt-1 text-sm leading-6 text-gray-600" for="search">Address country</label>
 				<div class="flex items-center mt-4">
 					<label for="country" class="sr-only">Country</label>
