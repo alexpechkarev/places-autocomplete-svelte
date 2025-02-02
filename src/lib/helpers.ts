@@ -1,4 +1,4 @@
-import type { RequestParams } from './interfaces.js';
+import type { RequestParams, ComponentOptions, ComponentClasses } from './interfaces.js';
 
 export const requestParamsDefault: RequestParams = {
     /**
@@ -107,9 +107,9 @@ export const requestParamsDefault: RequestParams = {
  * Validate and cast request parameters
  * @param requestParams 
  */
-export const validateRequestParams = (requestParams: RequestParams|undefined) => {
+export const validateRequestParams = (requestParams: RequestParams | undefined) => {
 
-    
+
 
     // https://developers.google.com/maps/documentation/javascript/reference/autocomplete-data
     /**
@@ -209,10 +209,10 @@ export const validateRequestParams = (requestParams: RequestParams|undefined) =>
         && requestParams.locationRestriction?.west === 0
     ) {
         delete requestParams.locationRestriction;
-    }    
+    }
 
     // If origin is not set, remove it
-    if(requestParams.origin?.lat === 0 && requestParams.origin?.lng === 0) {
+    if (requestParams.origin?.lat === 0 && requestParams.origin?.lng === 0) {
         delete requestParams.origin;
     }
 
@@ -227,4 +227,75 @@ export const validateRequestParams = (requestParams: RequestParams|undefined) =>
 
 
     return requestParams;
+};
+
+/**
+ * Default component classes
+ */
+export const componentClasses: ComponentClasses = {
+
+    section: '',
+    container: 'relative z-10 transform rounded-xl mt-4',
+    icon_container: 'pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3',
+    icon: '<svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8" /><path d="m21 21-4.3-4.3" /></svg>',
+    input:
+        'border-1 w-full rounded-md border-0 shadow-sm bg-gray-100 px-4 py-2.5 pl-10 pr-20 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 sm:text-sm',
+    kbd_container: 'absolute inset-y-0 right-0 flex py-1.5 pr-1.5',
+    kbd_escape:
+        'inline-flex items-center rounded border border-gray-300 px-1 font-sans text-xs text-gray-500 w-8 mr-1',
+    kbd_up:
+        'inline-flex items-center justify-center rounded border border-gray-300 px-1 font-sans text-xs text-gray-500 w-6',
+    kbd_down:
+        'inline-flex items-center rounded border border-gray-400 px-1 font-sans text-xs text-gray-500 justify-center w-6',
+    ul: 'absolute z-50 -mb-2 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm divide-y divide-gray-100',
+    li: 'z-50 cursor-default select-none py-2 px-2 lg:px-4 text-gray-900 hover:bg-indigo-500 hover:text-white',
+    li_current: 'bg-indigo-500 text-white',
+    li_a: 'block w-full',
+}
+
+
+export const componentOptions: ComponentOptions = {
+    autofocus: false,
+    autocomplete: 'off',
+    classes: componentClasses,
+    placeholder: '',
+    show_distance: false
+};
+
+/**
+ * Validate and cast component options
+ * @param options 
+ */
+export const validateOptions = (options: ComponentOptions | undefined): ComponentOptions => {
+
+    // If options is not an object, set it to an empty object
+    if (typeof options !== 'object' || Object.keys(options).length === 0) {
+        options = {
+            autofocus: false,
+            autocomplete: 'off',
+            classes: componentClasses,
+            placeholder: 'Start typing...',
+            show_distance: false
+        };
+
+        return options;
+    }
+
+    // Find the missing options properties
+    for (const key in componentOptions) {
+        if (!(key in options)) { 
+            (options as any)[key] = componentOptions[key];
+            
+        }
+    }
+
+    // Find the missing classes properties
+    for (const key in componentClasses) {
+        if (!(key in options.classes)) {
+            options.classes[key] = componentClasses[key];
+        }
+    }
+
+
+    return options;
 };

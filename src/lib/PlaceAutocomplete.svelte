@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import * as GMaps from '@googlemaps/js-api-loader';
-	import type { Props } from './interfaces.js';
-	import { validateRequestParams } from './helpers.js';
+	import type { ComponentOptions, Props } from './interfaces.js';
+	import { validateOptions, validateRequestParams } from './helpers.js';
 	const { Loader } = GMaps;
 
 	let {
@@ -12,42 +12,38 @@
 		 */
 		PUBLIC_GOOGLE_MAPS_API_KEY,
 		fetchFields = $bindable(['formattedAddress', 'addressComponents']),
-		placeholder = 'Search...',
-		autocompete = 'off',
-		autofocus = false,
-		classes = {
-			section: '',
-			container: 'relative z-10 transform rounded-xl mt-4',
-			icon_container: 'pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3',
-			icon: '<svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8" /><path d="m21 21-4.3-4.3" /></svg>',
-			input:
-				'border-1 w-full rounded-md border-0 shadow-sm bg-gray-100 px-4 py-2.5 pl-10 pr-20 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 sm:text-sm',
-			kbd_container: 'absolute inset-y-0 right-0 flex py-1.5 pr-1.5',
-			kbd_escape:
-				'inline-flex items-center rounded border border-gray-300 px-1 font-sans text-xs text-gray-500 w-8 mr-1',
-			kbd_up:
-				'inline-flex items-center justify-center rounded border border-gray-300 px-1 font-sans text-xs text-gray-500 w-6',
-			kbd_down:
-				'inline-flex items-center rounded border border-gray-400 px-1 font-sans text-xs text-gray-500 justify-center w-6',
-			ul: 'absolute z-50 -mb-2 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm',
-			li: 'z-50 cursor-default select-none py-2 pl-4 text-gray-900 hover:bg-indigo-500 hover:text-white',
-			li_current: 'bg-indigo-500 text-white',
-			li_a: 'block w-full'
-		},
+		options,
 		onResponse = $bindable((e: Event) => {}),
 		onError = $bindable((error: string) => {}),
 		requestParams = {}
 	}: Props = $props();
 
+	// validate options
+	options = validateOptions(options);
+
 	// set classes as state
-	let cl = $state(classes);
+	let cl = $state(options.classes);
 
-    // reset keyboard classes
-    const resetKbdClasses = () => {
-        cl.kbd_down = classes.kbd_down;
-        cl.kbd_up = classes.kbd_up;
-    }	
+	// format meters to km and meters
+	const formatMeters = function (meters: number): string|null {
+		if(typeof meters !== 'number') {
+			return null;
+		}
+		const km = Math.floor(meters / 1000);
+		const remainingMeters = meters % 1000;
+		let formattedString = '';
+		if (km > 0) {
+			formattedString += km + 'km ';
+		}
+		formattedString += remainingMeters + 'm';
+		return formattedString;
+	};
 
+	// reset keyboard classes
+	const resetKbdClasses = () => {
+		cl.kbd_down = options.classes.kbd_down;
+		cl.kbd_up = options.classes.kbd_up;
+	};
 
 	// Local variables
 	let inputRef: HTMLInputElement;
@@ -55,12 +51,14 @@
 	let results: any[] = $state([]);
 	let loader: GMaps.Loader;
 	let placesApi: { [key: string]: any } = {};
+
+
 	//https://developers.google.com/maps/documentation/javascript/reference/autocomplete-data
 	// validate and merge requestParams with requestParamsDefault
 	//let request = $state(validateRequestParams(Object.assign(requestParamsDefault, requestParams)));
 	requestParams = validateRequestParams(requestParams);
 	let request = $state(requestParams);
-
+	//$inspect(request);
 	// clear result when input is empty
 	$effect(() => {
 		if (request.input == '') {
@@ -108,12 +106,15 @@
 			const { suggestions } =
 				await placesApi.AutocompleteSuggestion.fetchAutocompleteSuggestions(request);
 			results = [];
+			const formatter = new Intl.NumberFormat('en');
 			// iterate suggestions and add results to an array
 			for (const suggestion of suggestions) {
+				
 				// add suggestions to results
 				results.push({
 					to_pace: suggestion.placePrediction.toPlace(),
-					text: suggestion.placePrediction.text.toString()
+					text: suggestion.placePrediction.text.toString(),
+					distance: formatMeters(suggestion.placePrediction.distanceMeters)
 				});
 			}
 		} catch (e: any) {
@@ -162,7 +163,7 @@
 	 * Initialize the Google Maps JavaScript API Loader.
 	 */
 	onMount(async (): Promise<void> => {
-		if(autofocus) {
+		if (options.autofocus) {
 			// focus on the input
 			inputRef.focus();
 		}
@@ -193,11 +194,11 @@
 		if (e.key === 'ArrowDown') {
 			currentSuggestion = Math.min(currentSuggestion + 1, results.length - 1);
 			resetKbdClasses();
-            cl.kbd_down += ' bg-indigo-500 text-white';
+			cl.kbd_down += ' bg-indigo-500 text-white';
 		} else if (e.key === 'ArrowUp') {
 			currentSuggestion = Math.max(currentSuggestion - 1, 0);
 			resetKbdClasses();
-            cl.kbd_up += ' bg-indigo-500 text-white';
+			cl.kbd_up += ' bg-indigo-500 text-white';
 		} else if (e.key === 'Enter') {
 			e.preventDefault();
 			if (currentSuggestion >= 0) {
@@ -209,28 +210,29 @@
 		}
 
 		setTimeout(() => {
-            resetKbdClasses();
-        }, 300);
+			resetKbdClasses();
+		}, 300);
 	}
 </script>
 
 <svelte:window onkeydown={onKeyDown} />
 
-<section class="{classes?.section}">
-	<div class="{classes.container}">
-		{#if classes.icon}
-		<div class="{classes.icon_container}">
-            {@html classes.icon}
-		</div>
-        {/if}
+<section class={options.classes?.section}>
+	<div class={options.classes.container}>
+		{#if options.classes.icon}
+			<div class={options.classes.icon_container}>
+				{@html options.classes.icon}
+			</div>
+		{/if}
+
 
 		<input
 			type="text"
 			name="search"
 			bind:this={inputRef}
-			class="{classes.input}"
-			{placeholder}
-			autocomplete={autocompete}
+			class={options.classes.input}
+			placeholder={options.placeholder}
+			autocomplete={options.autocomplete}
 			aria-controls="options"
 			aria-autocomplete="list"
 			aria-owns="options"
@@ -242,37 +244,43 @@
 		/>
 
 		{#if results.length > 0}
-		<div class="{classes.kbd_container}">
-			<kbd
-				class="{classes.kbd_escape}"
-				>Esc</kbd
-			>
-			<kbd
-				class="{cl.kbd_up}"
-				>&uArr;</kbd
-			>
-			<kbd
-				class="{cl.kbd_down}"  
-				>&dArr;</kbd
-			>
-		</div>
-			<ul
-				class="{classes.ul}"
-				id="options"
-			>
+			<div class={options.classes.kbd_container}>
+				<kbd class={options.classes.kbd_escape}>Esc</kbd>
+				<kbd class={cl.kbd_up}>&uArr;</kbd>
+				<kbd class={cl.kbd_down}>&dArr;</kbd>
+			</div>
+
+			<ul class={options.classes.ul} id="options">
 				{#each results as place, i}
 					<li
-						class={[ classes.li, i === currentSuggestion && classes.li_current ]}
+						class={[options.classes.li, i === currentSuggestion && options.classes.li_current]}
 						id="option-{i + 1}"
 					>
 						<!-- svelte-ignore a11y_invalid_attribute -->
 						<a
 							href="javascript:void(0)"
-							class="{classes?.li_a}"
+							class={[options.classes?.li_a, 'flex justify-between']}
 							tabindex={i + 1}
 							onclick={() => onPlaceSelected(place.to_pace)}
 						>
-							{place.text}
+							<div class="flex min-w-0 gap-x-4">
+								<!-- <img
+									class="size-12 flex-none rounded-full bg-gray-50"
+									src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
+									alt=""
+								/> -->
+								<div class="min-w-0 flex-auto">
+									<p class={[i === currentSuggestion && options.classes.li_current,'text-sm/6 font-semibold text-gray-900']}>{place.text}</p>
+									<!-- <p class="mt-1 truncate text-xs/5 text-gray-500">leslie.alexander@example.com</p> -->
+								</div>
+							</div>
+							{#if options.show_distance && place.distance}
+								<div class="shrink-0 flex flex-col items-end min-w-16">
+									<p class={[i === currentSuggestion && options.classes.li_current,'mt-1 text-xs/5 text-gray-500']}>
+										{place.distance}
+									</p>
+								</div>
+							{/if}
 						</a>
 					</li>
 				{/each}

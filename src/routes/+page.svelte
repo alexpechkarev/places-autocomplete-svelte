@@ -96,39 +96,30 @@
 		{ name: 'Formatted Resposne', id: 2 }
 	];
 	let selectedTab = $state(tabs.find((tab) => tab.id === 1).id);
-	const placeholder = 'Search...';
+
 
 	const requestParams = {
 		// The language in which to return results. Will default to the browser's language preference.
 		language: 'en-GB',
 		// The region code, specified as a CLDR two-character region code. This affects address formatting, result ranking, and may influence what results are returned. This does not restrict results to the specified region.
-		region: 'GB'
+		region: 'GB',
+		// includedPrimaryTypes: ['restaurant', 'food'],
+		origin: {
+			lat: 53.76538654312942,
+			lng: -3.0181503295898438
+		}
 	};
 	const fetchFields = ['formattedAddress', 'addressComponents'];
 
-	// Focus on component input
-	const autofocus = false;
 
-	// Input Clases
-	let classes = {
-		section: '',
-		container: 'relative z-10 transform rounded-xl mt-4',
-		icon_container: 'pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3',
-		icon: '<svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8" /><path d="m21 21-4.3-4.3" /></svg>',
-		input:
-			'border-1 w-full rounded-md border-0 shadow-sm bg-gray-100 px-4 py-2.5 pl-10 pr-20 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 sm:text-sm',
-		kbd_container: 'absolute inset-y-0 right-0 flex py-1.5 pr-1.5',
-		kbd_escape:
-			'inline-flex items-center rounded border border-gray-300 px-1 font-sans text-xs text-gray-500 w-8 mr-1',
-		kbd_up:
-			'inline-flex items-center justify-center rounded border border-gray-300 px-1 font-sans text-xs text-gray-500 w-6',
-		kbd_down:
-			'inline-flex items-center rounded border border-gray-400 px-1 font-sans text-xs text-gray-500 justify-center w-6',
-		ul: 'absolute z-50 -mb-2 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm',
-		li: 'z-50 cursor-default select-none py-2 pl-4 text-gray-900 hover:bg-indigo-500 hover:text-white',
-		li_current: 'bg-indigo-500 text-white',
-		li_a: 'block w-full'
+	// Options
+	const options = {
+		autofocus: false,
+		//autocomplete: 'off',
+		placeholder: 'Start typing your address',
+		show_distance: true,
 	};
+
 </script>
 
 <svelte:head>
@@ -151,8 +142,6 @@
 	{/if}
 
 	<div class="my-12">
-
-
 		<div class="grid grid-cols-1 lg:grid-cols-6 gap-x-4 mb-10">
 			<div class={[countries.length && 'lg:col-span-4', !countries.length && 'lg:col-span-6']}>
 				<label class="mt-1 text-sm leading-6 text-gray-600" for="search"
@@ -163,16 +152,16 @@
 						{onError}
 						{onResponse}
 						{PUBLIC_GOOGLE_MAPS_API_KEY}
-						{placeholder}
-						{autofocus}
 						{requestParams}
 						{fetchFields}
-						{classes}
+						{options}
 					/>
 				{/key}
 			</div>
 
-			<div class={[countries.length && 'lg:col-span-2 mt-10 lg:mt-0', !countries.length && 'hidden']}>
+			<div
+				class={[countries.length && 'lg:col-span-2 mt-10 lg:mt-0', !countries.length && 'hidden']}
+			>
 				<label class="mt-1 text-sm leading-6 text-gray-600" for="search">Address country</label>
 				<div class="flex items-center mt-4">
 					<label for="country" class="sr-only">Country</label>
