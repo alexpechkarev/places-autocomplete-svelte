@@ -48,7 +48,10 @@ export const requestParamsDefault: RequestParams = {
      * If neither are set, the results will be biased by IP address, meaning the IP address 
      * will be mapped to an imprecise location and used as a biasing signal.
      */
-    locationBias: null,
+    locationBias: {
+        lat: 0,
+        lng: 0
+    },
 
     /**
      * @param LocationRestriction optional
@@ -110,6 +113,7 @@ export const requestParamsDefault: RequestParams = {
 export const validateRequestParams = (requestParams: RequestParams | undefined) => {
 
 
+    
 
     // https://developers.google.com/maps/documentation/javascript/reference/autocomplete-data
     /**
@@ -135,7 +139,9 @@ export const validateRequestParams = (requestParams: RequestParams | undefined) 
         }
     }
     // merge requestParams with requestParamsDefault
-    requestParams = Object.assign(requestParamsDefault, requestParams);
+    //requestParams = Object.assign(requestParamsDefault, requestParams);
+    
+
 
     // Reset sessionToken to empty string if passed to the component
     if (requestParams.sessionToken) {
@@ -169,7 +175,7 @@ export const validateRequestParams = (requestParams: RequestParams | undefined) 
      * If requestParams.includedRegionCodes is an array and has more than 15 items, slice it to 15
      */
     if (!Array.isArray(requestParams.includedRegionCodes)
-        || (Array.isArray(requestParams.includedPrimaryTypes) && requestParams.includedPrimaryTypes.length === 0)) {
+        || (Array.isArray(requestParams.includedRegionCodes) && requestParams.includedRegionCodes.length === 0)) {
 
         delete requestParams.includedRegionCodes;
 
@@ -195,7 +201,11 @@ export const validateRequestParams = (requestParams: RequestParams | undefined) 
     }
 
     // If locationBias is not a string, remove it
-    if (typeof requestParams.locationBias !== 'string') {
+    if (typeof requestParams.locationBias !== 'undefined'
+        && (!Object.keys(requestParams.locationBias).includes('lat') || !Object.keys(requestParams.locationBias).includes('lng'))
+    
+        || requestParams.locationBias?.lat === 0
+        || requestParams.locationBias?.lng === 0) {
 
         delete requestParams.locationBias;
     }
@@ -203,16 +213,25 @@ export const validateRequestParams = (requestParams: RequestParams | undefined) 
     /**
      * If locationRestriction is not set, remove it
      */
-    if (requestParams.locationRestriction?.east === 0
-        && requestParams.locationRestriction?.north === 0
-        && requestParams.locationRestriction?.south === 0
-        && requestParams.locationRestriction?.west === 0
+    if (typeof requestParams.locationRestriction !== 'undefined'
+        && (!Object.keys(requestParams.locationRestriction).includes('east')
+            || !Object.keys(requestParams.locationRestriction).includes('north')
+            || !Object.keys(requestParams.locationRestriction).includes('south')
+            || !Object.keys(requestParams.locationRestriction).includes('west'))
+
+        || requestParams.locationRestriction?.east === 0
+        || requestParams.locationRestriction?.north === 0
+        || requestParams.locationRestriction?.south === 0
+        || requestParams.locationRestriction?.west === 0
     ) {
         delete requestParams.locationRestriction;
     }
 
     // If origin is not set, remove it
-    if (requestParams.origin?.lat === 0 && requestParams.origin?.lng === 0) {
+    if (typeof requestParams.origin !== 'undefined'
+        && (!Object.keys(requestParams.origin).includes('lat') || !Object.keys(requestParams.origin).includes('lng'))
+    || requestParams.origin?.lat === 0 || requestParams.origin?.lng === 0) {
+
         delete requestParams.origin;
     }
 
@@ -223,7 +242,8 @@ export const validateRequestParams = (requestParams: RequestParams | undefined) 
     }
 
 
-    //console.log('requestParams:', Object.keys(requestParams));
+    // console.log('requestParams:', Object.keys(requestParams));
+    // console.log('requestParams:', requestParams);
 
 
     return requestParams;
@@ -283,9 +303,9 @@ export const validateOptions = (options: ComponentOptions | undefined): Componen
 
     // Find the missing options properties
     for (const key in componentOptions) {
-        if (!(key in options)) { 
+        if (!(key in options)) {
             (options as any)[key] = componentOptions[key];
-            
+
         }
     }
 

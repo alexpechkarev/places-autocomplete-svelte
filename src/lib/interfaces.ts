@@ -10,7 +10,10 @@ export interface RequestParams {
         inputOffset?: number;
         language?: string;
         // LatLng|LatLngLiteral|LatLngBounds|LatLngBoundsLiteral|Circle|CircleLiteral|string
-        locationBias?: unknown|string;
+        locationBias?: {
+            lat: number;
+            lng: number;
+        }
         // LocationRestriction 
         locationRestriction?: {
             west: number;

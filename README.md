@@ -1,6 +1,6 @@
 # Places (New) Autocomplete Svelte
 
-This Svelte component provides a user-friendly way to search for and retrieve detailed address information within your [SvelteKit](https://kit.svelte.dev) applications, leveraging the power of the [Google Maps Places (New) Autocomplete API](https://developers.google.com/maps/documentation/javascript/place-autocomplete-overview).  It comes with default styling using [Tailwind CSS](https://tailwindcss.com/), which you can fully customize.
+This Svelte component provides a user-friendly way to search for and retrieve detailed address information within your [SvelteKit](https://kit.svelte.dev) applications, leveraging the power of the [Google Maps Places (New) Autocomplete API](https://developers.google.com/maps/documentation/javascript/place-autocomplete-overview).  It comes with default styling using [Tailwind CSS](https://tailwindcss.com/), which you can fully customise.
 
 
 
@@ -90,10 +90,10 @@ let onResponse = (response) => {
 | `placeholder` | `String`   | Placeholder text for the input field.                                                                                                                      | `"Search..."` |
 | `autocomplete`| `string`  | HTML `autocomplete` attribute for the input field. Set to `"off"` to disable browser autocomplete.                                                          | `"off"`      |
 | `show_distance`| `boolean` | If `true`, and if an `origin` is specified in `requestParams`, displays the distance to each suggestion. The distance is calculated as a geodesic in meters. | `false`       |
-| `classes`     | `Object`   | Object to override default Tailwind CSS classes.structure.                                                | See [styling](https://places-autocomplete-demo.pages.dev/examples/styling)    |
+| `classes`     | `Object`   | Object to override default Tailwind CSS classes.                                                | See [styling](https://places-autocomplete-demo.pages.dev/examples/styling)    |
 
 ### Styling
-Customize the component's appearance by providing an object to the classes property. This object should contain key-value pairs, where the keys correspond to the component's elements and the values are your custom CSS class names. See [styling](https://places-autocomplete-demo.pages.dev/examples/styling) for details.
+Customise the component's appearance by providing an object to the classes property. This object should contain key-value pairs, where the keys correspond to the component's elements and the values are your custom CSS class names. See [styling](https://places-autocomplete-demo.pages.dev/examples/styling) for details.
 
 
 ### Request Parameters (requestParams)
@@ -103,12 +103,6 @@ Fine-tune the autocomplete search with the requestParams property. This property
 <script>
 // ... other imports
 
-/**
- * @type boolean optional
- * Boolean attribute indicating that an element should be focused on page load.
- * default: false
- * */ 
-const autofocus = false;
 /**
  * @type object optional
  * AutocompleteRequest properties
@@ -128,12 +122,12 @@ const requestParams = {
  * @type object optional
  * Options
  */
-	const options = {
-		autofocus: false,
-		autocompete: 'off',
-		placeholder: 'Start typing your address',
-		show_distance: true,
-	};
+const options = {
+	autofocus: false,
+	autocompete: 'off',
+	placeholder: 'Start typing your address',
+	show_distance: true,
+};
 
 /**
  * @type array optional
