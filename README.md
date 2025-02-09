@@ -24,7 +24,12 @@ See a live demo of the component in action: [Basic Example](https://places-autoc
 [Customise request parameters](https://places-autocomplete-demo.pages.dev/examples/customise-request-parameters) - construct a `requestParams` object and control various aspects of the search, including language, region, and more.
 
 
-![Places Autocomplete Svelte](places-autocomplete-svelte.gif)
+<video  width="660" height="764" controls autoplay loop muted>
+<source src="https://github.com/user-attachments/assets/c2913d06-05d2-4b93-afba-379209d9ddc9" type="video/mp4">
+<source src="places-autocomplete-svelte.png" type="image/png">
+</video>
+
+
 
 ## Requirements
 
@@ -186,3 +191,6 @@ Contributions are welcome! Please open an issue or submit a pull request on the 
 ## License
 
 [MIT](LICENSE)
+
+etihad
+221b
