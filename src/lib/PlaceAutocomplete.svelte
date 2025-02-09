@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import * as GMaps from '@googlemaps/js-api-loader';
-	import type { ComponentOptions, Props } from './interfaces.js';
-	import { validateOptions, validateRequestParams } from './helpers.js';
+	import type {Props } from './interfaces.js';
+	import { validateOptions, validateRequestParams, formatDistance } from './helpers.js';
 	const { Loader } = GMaps;
 
 	let {
@@ -20,24 +20,11 @@
 
 	// validate options
 	options = validateOptions(options);
+	//console.log(options);
 
 	// set classes as state
 	let cl = $state(options.classes);
 
-	// format meters to km and meters
-	const formatMeters = function (meters: number): string|null {
-		if(typeof meters !== 'number') {
-			return null;
-		}
-		const km = Math.floor(meters / 1000);
-		const remainingMeters = meters % 1000;
-		let formattedString = '';
-		if (km > 0) {
-			formattedString += km + 'km ';
-		}
-		formattedString += remainingMeters + 'm';
-		return formattedString;
-	};
 
 	// reset keyboard classes
 	const resetKbdClasses = () => {
@@ -54,8 +41,7 @@
 
 
 	//https://developers.google.com/maps/documentation/javascript/reference/autocomplete-data
-	// validate and merge requestParams with requestParamsDefault
-	//let request = $state(validateRequestParams(Object.assign(requestParamsDefault, requestParams)));
+	// validate requestParams
 	requestParams = validateRequestParams(requestParams);
 	let request = $state(requestParams);
 	//$inspect(request);
@@ -114,7 +100,7 @@
 				results.push({
 					to_pace: suggestion.placePrediction.toPlace(),
 					text: suggestion.placePrediction.text.toString(),
-					distance: formatMeters(suggestion.placePrediction.distanceMeters)
+					distance: formatDistance(suggestion.placePrediction.distanceMeters, options.distance_units ?? 'km'),
 				});
 			}
 		} catch (e: any) {
@@ -274,7 +260,7 @@
 									<!-- <p class="mt-1 truncate text-xs/5 text-gray-500">leslie.alexander@example.com</p> -->
 								</div>
 							</div>
-							{#if options.show_distance && place.distance}
+							{#if options.distance && place.distance}
 								<div class="shrink-0 flex flex-col items-end min-w-16">
 									<p class={[i === currentSuggestion && options.classes.li_current,'mt-1 text-xs/5 text-gray-500']}>
 										{place.distance}

@@ -89,7 +89,8 @@ let onResponse = (response) => {
 | `autofocus`    | `boolean` | If `true`, the input field will be focused automatically when the component mounts.                                                                        | `false`       |
 | `placeholder` | `String`   | Placeholder text for the input field.                                                                                                                      | `"Search..."` |
 | `autocomplete`| `string`  | HTML `autocomplete` attribute for the input field. Set to `"off"` to disable browser autocomplete.                                                          | `"off"`      |
-| `show_distance`| `boolean` | If `true`, and if an `origin` is specified in `requestParams`, displays the distance to each suggestion. The distance is calculated as a geodesic in meters. | `false`       |
+| `distance`| `boolean` | If `true`, and if an `origin` is specified in `requestParams`, displays the distance to each suggestion. The distance is calculated as a geodesic in meters. | `false`       |
+| `distance_units`| `km` or `miles` | Specified the distance units. | `km`       |
 | `classes`     | `Object`   | Object to override default Tailwind CSS classes.                                                | See [styling](https://places-autocomplete-demo.pages.dev/examples/styling)    |
 
 ### Styling
@@ -126,7 +127,8 @@ const options = {
 	autofocus: false,
 	autocompete: 'off',
 	placeholder: 'Start typing your address',
-	show_distance: true,
+	distance: true,
+	distance_units: 'km' // or miles
 };
 
 /**

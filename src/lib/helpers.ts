@@ -1,5 +1,8 @@
-import type { RequestParams, ComponentOptions, ComponentClasses } from './interfaces.js';
+import type { RequestParams, ComponentOptions, ComponentClasses, AutoFill,DistanceUnits } from './interfaces.js';
 
+/**
+ * Default request parameters
+ */
 export const requestParamsDefault: RequestParams = {
     /**
      * @type string required
@@ -107,146 +110,116 @@ export const requestParamsDefault: RequestParams = {
 };
 
 /**
+ * Check if a variable is a valid LatLng object
+ * @param latLng 
+ */
+function isValidLatLngLiteral(latLng: { lat: number; lng: number; } | undefined) {
+    return latLng && typeof latLng === 'object' && 'lat' in latLng && 'lng' in latLng &&
+        typeof latLng.lat === 'number' && typeof latLng.lng === 'number';
+}
+/**
+ * Check if a variable is a valid LatLngBounds object
+ * @param bounds 
+ * @returns 
+ */
+function isValidLatLngBoundsLiteral(bounds: { north: number; south: number; east: number; west: number; } | undefined) {
+    return bounds && typeof bounds === 'object' && 'north' in bounds && 'south' in bounds && 'east' in bounds && 'west' in bounds &&
+        typeof bounds.north === 'number' && typeof bounds.south === 'number' && typeof bounds.east === 'number' && typeof bounds.west === 'number';
+}
+
+/**
  * Validate and cast request parameters
  * @param requestParams 
  */
 export const validateRequestParams = (requestParams: RequestParams | undefined) => {
 
 
-    
-
     // https://developers.google.com/maps/documentation/javascript/reference/autocomplete-data
     /**
-     * If requestParams is not an object, set it to an empty object
+     * create a new object to store validated parameters
     */
-    if (typeof requestParams !== 'object' || Object.keys(requestParams).length === 0) {
-        requestParams = {
-            input: String(''),
-            sessionToken: String(''),
-            includedRegionCodes: ['GB'],
-            language: 'en-GB',
-            region: 'GB',
-        };
-
-        return requestParams;
-    }
+    const validatedParams: RequestParams = {
+        input: String(''),
+        sessionToken: String(''),
+        includedRegionCodes: ['GB'],
+        language: 'en-GB',
+        region: 'GB',
+    };
 
 
-    // Remove any keys that are not in requestParamsDefault
+
+    // iterate over requestParams
     for (const key in requestParams) {
-        if (!(key in requestParamsDefault)) {
-            delete (requestParams as never)[key];
+        // Check if key is in requestParamsDefault
+        if (key in requestParamsDefault) {
+            // Validate and sanitize
+            switch (key) {
+
+                case 'input':
+                    validatedParams.input = String(requestParams.input);
+                    break;
+
+                case 'includedPrimaryTypes':
+                    if (Array.isArray(requestParams.includedPrimaryTypes) && requestParams.includedPrimaryTypes.length > 0) {
+                        validatedParams.includedPrimaryTypes = requestParams.includedPrimaryTypes.slice(0, 5).map(String);
+                    }
+                    break;
+
+                case 'includedRegionCodes':
+                    if (Array.isArray(requestParams.includedRegionCodes) && requestParams.includedRegionCodes.length > 0) {
+                        validatedParams.includedRegionCodes = requestParams.includedRegionCodes.slice(0, 15).map(String);
+                    }
+                    break;
+
+                case 'inputOffset':
+                    {
+                        const offset = Number(requestParams.inputOffset);
+                        if (!isNaN(offset) && offset >= 0) {  // Allow 0 for offset
+                            validatedParams.inputOffset = offset;
+                        }
+                        break;
+                    }
+
+                case 'language':
+                    validatedParams.language = String(requestParams.language);
+                    break;
+
+                case 'locationBias':
+                    if (isValidLatLngLiteral(requestParams.locationBias)) {
+                        validatedParams.locationBias = requestParams.locationBias;
+                    }
+                    break;
+
+                case 'locationRestriction':
+                    if (isValidLatLngBoundsLiteral(requestParams.locationRestriction)) {
+                        validatedParams.locationRestriction = requestParams.locationRestriction;
+                    }
+                    break;
+
+                case 'origin':
+                    if (isValidLatLngLiteral(requestParams.origin)) {
+                        validatedParams.origin = requestParams.origin;
+                    }
+                    break;
+
+                case 'region':
+                    validatedParams.region = String(requestParams.region);
+                    break;
+
+                case 'sessionToken': // Session token should be generated on the client-side
+                    break; // Ignore any provided sessionToken                    
+            }
         }
-    }
-    // merge requestParams with requestParamsDefault
-    //requestParams = Object.assign(requestParamsDefault, requestParams);
-    
-
-
-    // Reset sessionToken to empty string if passed to the component
-    if (requestParams.sessionToken) {
-        requestParams.sessionToken = String('');
-    }
-
-    /**
-     * If requestParams.input is not a string, set it to an empty string
-     */
-    if (typeof requestParams.input !== 'string') {
-        requestParams.input = String('');
-    }
-
-    /**
-     * If requestParams.includedPrimaryTypes is not an array or is an empty array, remove it
-     * If requestParams.includedPrimaryTypes is an array and has more than 5 items, slice it to 5
-     */
-    if (!Array.isArray(requestParams.includedPrimaryTypes)
-        || (Array.isArray(requestParams.includedPrimaryTypes) && requestParams.includedPrimaryTypes.length === 0)) {
-
-        delete requestParams.includedPrimaryTypes;
-
-    } else if (Array.isArray(requestParams.includedPrimaryTypes) && requestParams.includedPrimaryTypes.length > 5) {
-
-        requestParams.includedPrimaryTypes = requestParams.includedPrimaryTypes.slice(0, 5);
 
     }
 
-    /**
-     * If requestParams.includedRegionCodes is not an array or is an empty array, remove it
-     * If requestParams.includedRegionCodes is an array and has more than 15 items, slice it to 15
-     */
-    if (!Array.isArray(requestParams.includedRegionCodes)
-        || (Array.isArray(requestParams.includedRegionCodes) && requestParams.includedRegionCodes.length === 0)) {
-
-        delete requestParams.includedRegionCodes;
-
-    } else if (Array.isArray(requestParams.includedRegionCodes) && requestParams.includedRegionCodes.length > 15) {
-
-        requestParams.includedRegionCodes = requestParams.includedRegionCodes.slice(0, 15);
-
-    }
-
-    /**
-     * If requestParams.inputOffset is not a number or is less than 1, remove it
-     */
-    if (typeof requestParams.inputOffset !== 'number'
-        || (typeof requestParams.inputOffset === 'number' && requestParams.inputOffset < 1)
-    ) {
-        delete requestParams.inputOffset;
-    }
-
-    // If language is not a string, remove it
-    if (typeof requestParams.language !== 'string') {
-
-        delete requestParams.language;
-    }
-
-    // If locationBias is not a string, remove it
-    if (typeof requestParams.locationBias !== 'undefined'
-        && (!Object.keys(requestParams.locationBias).includes('lat') || !Object.keys(requestParams.locationBias).includes('lng'))
-    
-        || requestParams.locationBias?.lat === 0
-        || requestParams.locationBias?.lng === 0) {
-
-        delete requestParams.locationBias;
-    }
-
-    /**
-     * If locationRestriction is not set, remove it
-     */
-    if (typeof requestParams.locationRestriction !== 'undefined'
-        && (!Object.keys(requestParams.locationRestriction).includes('east')
-            || !Object.keys(requestParams.locationRestriction).includes('north')
-            || !Object.keys(requestParams.locationRestriction).includes('south')
-            || !Object.keys(requestParams.locationRestriction).includes('west'))
-
-        || requestParams.locationRestriction?.east === 0
-        || requestParams.locationRestriction?.north === 0
-        || requestParams.locationRestriction?.south === 0
-        || requestParams.locationRestriction?.west === 0
-    ) {
-        delete requestParams.locationRestriction;
-    }
-
-    // If origin is not set, remove it
-    if (typeof requestParams.origin !== 'undefined'
-        && (!Object.keys(requestParams.origin).includes('lat') || !Object.keys(requestParams.origin).includes('lng'))
-    || requestParams.origin?.lat === 0 || requestParams.origin?.lng === 0) {
-
-        delete requestParams.origin;
-    }
-
-    // If region is not a string, remove it
-    if (typeof requestParams.region !== 'string') {
-
-        delete requestParams.region;
-    }
 
 
-    // console.log('requestParams:', Object.keys(requestParams));
-    // console.log('requestParams:', requestParams);
+    //console.log('validatedParams:', Object.keys(validatedParams));
+    //console.log('validatedParams:', validatedParams);
 
 
-    return requestParams;
+    return validatedParams;
 };
 
 /**
@@ -273,14 +246,19 @@ export const componentClasses: ComponentClasses = {
     li_a: 'block w-full',
 }
 
-
+/**
+ * Default component options
+ */
 export const componentOptions: ComponentOptions = {
     autofocus: false,
     autocomplete: 'off',
+    placeholder: 'Start typing your address',
+    distance: true,
+    distance_units: 'km',
     classes: componentClasses,
-    placeholder: '',
-    show_distance: false
-};
+}
+
+
 
 /**
  * Validate and cast component options
@@ -288,34 +266,49 @@ export const componentOptions: ComponentOptions = {
  */
 export const validateOptions = (options: ComponentOptions | undefined): ComponentOptions => {
 
-    // If options is not an object, set it to an empty object
-    if (typeof options !== 'object' || Object.keys(options).length === 0) {
-        options = {
-            autofocus: false,
-            autocomplete: 'off',
-            classes: componentClasses,
-            placeholder: 'Start typing...',
-            show_distance: false
-        };
+    const validatedOptions: ComponentOptions = { ...componentOptions };
 
-        return options;
-    }
-
-    // Find the missing options properties
-    for (const key in componentOptions) {
-        if (!(key in options)) {
-            (options as any)[key] = componentOptions[key];
-
+    if (options && typeof options === 'object') {
+        for (const key in validatedOptions) {
+            if (key in options) {
+                switch (key) {
+                    case 'autofocus':
+                        validatedOptions.autofocus = Boolean(options.autofocus);
+                        break;
+                    case 'autocomplete':
+                        validatedOptions.autocomplete = String(options.autocomplete) as AutoFill;
+                        break;
+                    case 'placeholder':
+                        validatedOptions.placeholder = String(options.placeholder);
+                        break;
+                    case 'distance':
+                        validatedOptions.distance = Boolean(options.distance);
+                        break;
+                    case 'distance_units':
+                        validatedOptions.distance_units = String(options.distance_units) as DistanceUnits;
+                        break;
+                    case 'classes':
+                        if (options.classes && typeof options.classes === 'object') {
+                            validatedOptions.classes = { ...componentOptions.classes, ...options.classes }
+                        }
+                        break;
+                }
+            }
         }
     }
 
-    // Find the missing classes properties
-    for (const key in componentClasses) {
-        if (!(key in options.classes)) {
-            options.classes[key] = componentClasses[key];
-        }
-    }
+    return validatedOptions;
 
-
-    return options;
 };
+
+
+export const formatDistance = function (distance: number, units: DistanceUnits): string | null {
+    if (typeof distance !== 'number') {
+        return null;
+    }
+    if (units === 'km') {
+        return `${(distance / 1000).toFixed(2)} km`;
+    } else {
+        return `${(distance / 1609.34).toFixed(2)} miles`;
+    }
+}
