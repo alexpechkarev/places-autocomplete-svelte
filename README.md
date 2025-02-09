@@ -189,6 +189,3 @@ Contributions are welcome! Please open an issue or submit a pull request on the 
 ## License
 
 [MIT](LICENSE)
-
-etihad
-221b
