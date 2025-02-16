@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import * as GMaps from '@googlemaps/js-api-loader';
-	import type {Props } from './interfaces.js';
+	import type { Props } from './interfaces.js';
 	import { validateOptions, validateRequestParams, formatDistance } from './helpers.js';
 	const { Loader } = GMaps;
 
@@ -25,7 +25,6 @@
 	// set classes as state
 	let cl = $state(options.classes);
 
-
 	// reset keyboard classes
 	const resetKbdClasses = () => {
 		cl.kbd_down = options.classes.kbd_down;
@@ -38,7 +37,6 @@
 	let results: any[] = $state([]);
 	let loader: GMaps.Loader;
 	let placesApi: { [key: string]: any } = {};
-
 
 	//https://developers.google.com/maps/documentation/javascript/reference/autocomplete-data
 	// validate requestParams
@@ -92,15 +90,17 @@
 			const { suggestions } =
 				await placesApi.AutocompleteSuggestion.fetchAutocompleteSuggestions(request);
 			results = [];
-			const formatter = new Intl.NumberFormat('en');
+			//const formatter = new Intl.NumberFormat('en');
 			// iterate suggestions and add results to an array
 			for (const suggestion of suggestions) {
-				
 				// add suggestions to results
 				results.push({
-					to_pace: suggestion.placePrediction.toPlace(),
+					place: suggestion.placePrediction.toPlace(),
 					text: suggestion.placePrediction.text.toString(),
-					distance: formatDistance(suggestion.placePrediction.distanceMeters, options.distance_units ?? 'km'),
+					distance: formatDistance(
+						suggestion.placePrediction.distanceMeters,
+						options.distance_units ?? 'km'
+					)
 				});
 			}
 		} catch (e: any) {
@@ -164,8 +164,13 @@
 
 			const { AutocompleteSessionToken, AutocompleteSuggestion } =
 				await loader.importLibrary('places');
+
 			placesApi.AutocompleteSessionToken = AutocompleteSessionToken;
 			placesApi.AutocompleteSuggestion = AutocompleteSuggestion;
+
+			// const {Geocoder} = await loader.importLibrary("geocoding");
+			// placesApi.Geocoder = new Geocoder();
+
 			setSessionToken();
 		} catch (e: any) {
 			onError(
@@ -188,7 +193,7 @@
 		} else if (e.key === 'Enter') {
 			e.preventDefault();
 			if (currentSuggestion >= 0) {
-				onPlaceSelected(results[currentSuggestion].to_pace);
+				onPlaceSelected(results[currentSuggestion].place);
 			}
 		} else if (e.key === 'Escape') {
 			// reset srarch input and results
@@ -210,7 +215,6 @@
 				{@html options.classes.icon}
 			</div>
 		{/if}
-
 
 		<input
 			type="text"
@@ -237,7 +241,7 @@
 			</div>
 
 			<ul class={options.classes.ul} id="options">
-				{#each results as place, i}
+				{#each results as p, i}
 					<li
 						class={[options.classes.li, i === currentSuggestion && options.classes.li_current]}
 						id="option-{i + 1}"
@@ -245,25 +249,39 @@
 						<!-- svelte-ignore a11y_invalid_attribute -->
 						<a
 							href="javascript:void(0)"
-							class={[options.classes?.li_a, 'flex justify-between']}
+							class={[
+								options.classes?.li_a,
+								i === currentSuggestion && options.classes.li_a_current
+							]}
 							tabindex={i + 1}
-							onclick={() => onPlaceSelected(place.to_pace)}
+							onclick={() => onPlaceSelected(p.place)}
 						>
-							<div class="flex min-w-0 gap-x-4">
-								<!-- <img
-									class="size-12 flex-none rounded-full bg-gray-50"
-									src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
-									alt=""
-								/> -->
-								<div class="min-w-0 flex-auto">
-									<p class={[i === currentSuggestion && options.classes.li_current,'text-sm/6 font-semibold text-gray-900']}>{place.text}</p>
-									<!-- <p class="mt-1 truncate text-xs/5 text-gray-500">leslie.alexander@example.com</p> -->
+							<div class={[options.classes.li_div_container]}>
+								<div
+									class={[
+										options.classes.li_div_one,
+										i === currentSuggestion && options.classes.li_div_current
+									]}
+								>
+									<p
+										class={[
+											i === currentSuggestion && options.classes.li_current,
+											options.classes.li_div_one_p
+										]}
+									>
+										{p.text}
+									</p>
 								</div>
 							</div>
-							{#if options.distance && place.distance}
-								<div class="shrink-0 flex flex-col items-end min-w-16">
-									<p class={[i === currentSuggestion && options.classes.li_current,'mt-1 text-xs/5 text-gray-500']}>
-										{place.distance}
+							{#if options.distance && p.distance}
+								<div class={[options.classes.li_div_two]}>
+									<p
+										class={[
+											i === currentSuggestion && options.classes.li_current,
+											options.classes.li_div_two_p
+										]}
+									>
+										{p.distance}
 									</p>
 								</div>
 							{/if}

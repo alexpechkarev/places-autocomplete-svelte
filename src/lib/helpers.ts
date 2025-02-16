@@ -240,10 +240,17 @@ export const componentClasses: ComponentClasses = {
         'inline-flex items-center justify-center rounded border border-gray-300 px-1 font-sans text-xs text-gray-500 w-6',
     kbd_down:
         'inline-flex items-center rounded border border-gray-400 px-1 font-sans text-xs text-gray-500 justify-center w-6',
+    kbd_active: 'bg-indigo-500 text-white',
     ul: 'absolute z-50 -mb-2 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm divide-y divide-gray-100',
     li: 'z-50 cursor-default select-none py-2 px-2 lg:px-4 text-gray-900 hover:bg-indigo-500 hover:text-white',
-    li_current: 'bg-indigo-500 text-white',
-    li_a: 'block w-full',
+    li_current: 'bg-indigo-500',
+    li_a: 'block w-full flex justify-between',
+    li_a_current: 'text-white',
+    li_div_container: 'flex min-w-0 gap-x-4',
+    li_div_one: 'min-w-0 flex-auto',
+    li_div_one_p: 'text-sm/6 font-semibold',
+    li_div_two: 'shrink-0 flex flex-col items-end min-w-16',
+    li_div_two_p: 'mt-1 text-xs/5'
 }
 
 /**
