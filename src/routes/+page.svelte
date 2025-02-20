@@ -103,13 +103,16 @@
 		language: 'en-GB',
 		// The region code, specified as a CLDR two-character region code. This affects address formatting, result ranking, and may influence what results are returned. This does not restrict results to the specified region.
 		region: 'GB',
-		// includedPrimaryTypes: ['restaurant', 'food'],
+		//includedPrimaryTypes: ['restaurant', 'food'],
 		origin: {
 			lat: 53.76538654312942,
 			lng: -3.0181503295898438
 		}
 	};
-	const fetchFields = ['formattedAddress', 'addressComponents'];
+	//  geometry, icon, name, permanentlyClosed, photo, placeId, url, utcOffset, vicinity, openingHours, icon, name
+
+	// 'formattedAddress', 'addressComponents', 'accessibilityOptions', 'allowsDogs', 'businessStatus','hasCurbsidePickup', 'hasDelivery','hasDineIn','displayName','displayNameLanguageCode','editorialSummary','evChargeOptions'
+	const fetchFields = ['formattedAddress', 'addressComponents', 'name'];
 
 
 	// Options

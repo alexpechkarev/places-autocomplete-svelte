@@ -1,4 +1,4 @@
-import type { RequestParams, ComponentOptions, ComponentClasses, AutoFill,DistanceUnits } from './interfaces.js';
+import type { RequestParams, ComponentOptions, ComponentClasses, AutoFill, DistanceUnits } from './interfaces.js';
 
 /**
  * Default request parameters
@@ -108,6 +108,72 @@ export const requestParamsDefault: RequestParams = {
     sessionToken: ''
 
 };
+
+/**
+ * Default fetch fields values
+ * https://developers.google.com/maps/documentation/javascript/place-class-data-fields
+ * 
+ * unsupported field values
+ * geometry, icon, name, permanentlyClosed, photo, placeId, url, utcOffset, vicinity, openingHours, icon, name
+ */
+export const defaultFetchFields: Array<string> = [
+    'formattedAddress', 
+    'addressComponents', 
+    'accessibilityOptions', 
+    'allowsDogs', 
+    'businessStatus', 
+    'hasCurbsidePickup', 
+    'hasDelivery', 
+    'hasDineIn', 
+    'displayName', 
+    'displayNameLanguageCode', 
+    'editorialSummary', 
+    'evChargeOptions', 
+    'adrFormatAddress', 
+    'fuelOptions', 
+    'isGoodForChildren', 
+    'isGoodForGroups', 
+    'isGoodForWatchingSports',
+    'svgIconMaskURI',
+    'iconBackgroundColor',
+    'internationalPhoneNumber',
+    'hasLiveMusic',
+    'location',
+    'hasMenuForChildren',
+    'regularOpeningHours',
+    'hasOutdoorSeating',
+    'parkingOptions',
+    'paymentOptions',
+    'photos',
+    'nationalPhoneNumber',
+    'id',
+    'plusCode',
+    'priceLevel',
+    'primaryType',
+    'primaryTypeDisplayName',
+    'primaryTypeDisplayNameLanguageCode',
+    'rating',
+    'userRatingCount',
+    'isReservable',
+    'hasRestroom',
+    'reviews',
+    'servesBeer',
+    'servesBreakfast',
+    'servesBrunch',
+    'servesCocktails',
+    'servesCoffee',
+    'servesDessert',
+    'servesDinner',
+    'servesLunch',
+    'servesVegetarianFood',
+    'servesWine',
+    'hasTakeout',
+    'types',
+    'websiteURI',
+    'utcOffsetMinutes',
+    'viewport',
+    'websiteURI'
+];
 
 /**
  * Check if a variable is a valid LatLng object
@@ -223,6 +289,50 @@ export const validateRequestParams = (requestParams: RequestParams | undefined) 
 };
 
 /**
+ * Validate fetchFields array parameters
+ * @param fetchFields
+ */
+export const validateFetchFields = (fetchFields: Array<string> | undefined) => {
+
+
+    //https://developers.google.com/maps/documentation/javascript/place-class-data-fields
+    /**
+     * create a new object to store validated parameters
+    */
+    const validatedFetchFields: Array<string> = [];
+      
+    if(typeof fetchFields === 'undefined' || fetchFields.length === 0) {
+        return [
+            'formattedAddress', 
+            'addressComponents'
+        ];
+    }
+
+    // iterate over requestParams
+    for (const key of fetchFields) {
+        // Check if key is in requestParamsDefault
+        if (defaultFetchFields.includes(key)) {
+            validatedFetchFields.push(key);   
+        }
+    }
+
+    if(validateFetchFields.length === 0) {
+        return [
+            'formattedAddress',
+            'addressComponents'
+        ];
+    }
+
+
+    //console.log('validatedParams:', Object.keys(validatedParams));
+    //console.log('validatedParams:', validatedParams);
+
+
+    return validatedFetchFields;
+};
+
+
+/**
  * Default component classes
  */
 export const componentClasses: ComponentClasses = {
@@ -308,7 +418,12 @@ export const validateOptions = (options: ComponentOptions | undefined): Componen
 
 };
 
-
+/**
+ * Display distance in km or miles
+ * @param distance 
+ * @param units 
+ * @returns 
+ */
 export const formatDistance = function (distance: number, units: DistanceUnits): string | null {
     if (typeof distance !== 'number') {
         return null;

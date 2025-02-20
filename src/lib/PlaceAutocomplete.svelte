@@ -2,7 +2,7 @@
 	import { onMount } from 'svelte';
 	import * as GMaps from '@googlemaps/js-api-loader';
 	import type { Props } from './interfaces.js';
-	import { validateOptions, validateRequestParams, formatDistance } from './helpers.js';
+	import { validateOptions, validateRequestParams, formatDistance, validateFetchFields } from './helpers.js';
 	const { Loader } = GMaps;
 
 	let {
@@ -11,7 +11,8 @@
 		 * @see https://developers.google.com/maps/documentation/javascript/usage-and-billing#location-placedetails
 		 */
 		PUBLIC_GOOGLE_MAPS_API_KEY,
-		fetchFields = $bindable(['formattedAddress', 'addressComponents']),
+		//fetchFields = $bindable(['formattedAddress', 'addressComponents']),
+		fetchFields,
 		options,
 		onResponse = $bindable((e: Event) => {}),
 		onError = $bindable((error: string) => {}),
@@ -21,6 +22,10 @@
 	// validate options
 	options = validateOptions(options);
 	//console.log(options);
+
+	// validate fetchFields
+	fetchFields = validateFetchFields(fetchFields);
+	//console.log(fetchFields);
 
 	// set classes as state
 	let cl = $state(options.classes);
@@ -112,13 +117,10 @@
      //https://developers-dot-devsite-v2-prod.appspot.com/maps/documentation/javascript/reference/autocomplete-data#AutocompleteSuggestion
      * @param place
      */
-	const onPlaceSelected = async (place: {
-		[x: string]: any;
-		fetchFields: (arg0: { fields: string[] }) => any;
-		addressComponents: any;
-		formattedAddress: string;
-	}): Promise<void> => {
+	const onPlaceSelected = async (place: { fetchFields: (arg0: { fields: string[]; }) => any; toJSON: () => any; }): Promise<void> => {
 		try {
+			// console.log(place);
+			// console.log(fetchFields);
 			await place.fetchFields({
 				fields: fetchFields
 			});
