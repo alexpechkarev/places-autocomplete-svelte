@@ -3,6 +3,11 @@
 This Svelte component provides a user-friendly way to search for and retrieve detailed address information within your [SvelteKit](https://kit.svelte.dev) applications, leveraging the power of the [Google Maps Places (New) Autocomplete API](https://developers.google.com/maps/documentation/javascript/place-autocomplete-overview).  It comes with default styling using [Tailwind CSS](https://tailwindcss.com/), which you can fully customise.
 
 
+## Places (New) Autocomplete – JavaScript Integration
+
+Simply include a single script tag and handle the response in your JavaScript code.
+[View Details](https://pacservice.pages.dev/) 
+
 
 ## Features
 
@@ -29,6 +34,10 @@ See a live demo of the component in action: [Basic Example](https://places-autoc
 
 
 
+
+
+
+
 ## Requirements
 
 - **Google Maps API Key** with the Places API (New) enabled. Refer to [Use API Keys](https://developers.google.com/maps/documentation/javascript/get-api-key) for detailed instructions.
@@ -39,11 +48,7 @@ See a live demo of the component in action: [Basic Example](https://places-autoc
 npm i places-autocomplete-svelte
 ```
 
-## Installation Svelte 4
 
-```bash
-npm i places-autocomplete-svelte@1.0.1
-```
 
 
 ## Basic Usage
@@ -79,7 +84,7 @@ let onResponse = (response) => {
 | `onResponse`              | `CustomEvent`    | Dispatched when a place is selected, containing the place details in `event.detail`.                                                                                                                                              | Yes       |                                               |
 | `onError`                 | `CustomEvent`    | Dispatched when an error occurs, with the error message in `event.detail`.                                                                                                                                                 | No        |                                               |
 | `requestParams`          | `Object`        | Object for additional request parameters (e.g., `types`, `bounds`, `origin`, `region`, `language`). See [AutocompleteRequest](https://developers.google.com/maps/documentation/javascript/reference/autocomplete-data#AutocompleteRequest). | No        | `{}`                                       |
-| `fetchFields`            | `Array`         | Array of place data fields to return. See [Supported Fields](https://developers.google.com/maps/documentation/javascript/place-class-data-fields) documentation for a comprehensive list of available fields. Note that the Places Autocomplete service does not support the following fields, even if they are available in the Place Details API: `geometry`, `icon`, `name`, `permanentlyClosed`, `photo`, `placeId`, `url`, `utcOffset`, `vicinity`, `openingHours`, `icon`, and `name`. If you need these fields, you must make a separate call to the Place Details API using the returned `place_id`.                                                            | No        | `['formattedAddress', 'addressComponents']` |
+| `fetchFields`            | `Array`         | Array of place data fields to return. See [Supported Fields](https://developers.google.com/maps/documentation/javascript/place-class-data-fields) documentation for a comprehensive list of available fields. Note that the Places Autocomplete service does not support the following fields, even if they are available in the Place Details API: `geometry`, `icon`, `name`, `permanentlyClosed`, `photo`, `placeId`, `url`, `utcOffset`, `vicinity`, `openingHours`, `icon`, and `name`. If you need these fields, make a separate call to the Place Details API using the returned `place_id`.                                                            | No        | `['formattedAddress', 'addressComponents']` |
 | `options`                | `Object`        |  Options for customizing the component's behavior and appearance. See "Customization" below.                                                                                                                               | No        | See default values in "Customization"       |
 
 
