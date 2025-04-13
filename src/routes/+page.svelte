@@ -1,17 +1,65 @@
-<script>
-	// @ts-nocheck
+<script lang="ts">
+	import type { ComponentOptions, FormattedAddress, PlaceResult } from '$lib/interfaces.js';
 	import PlaceAutocomplete from '$lib/PlaceAutocomplete.svelte';
-	import { browser } from '$app/environment';
+
+
+	// interface PlaceResult {
+	// 	formattedAddress: string;
+	// 	addressComponents: {
+	// 		longText: string;
+	// 		shortText: string;
+	// 		types: string[];
+	// 	}[];
+	// }
+    // interface FormattedAddress {
+    //     street_number: string;
+    //     street: string;
+    //     town: string;
+    //     county: string;
+    //     country_iso2: string;
+    //     postcode: string;
+    // }	
 
 	let unique = $state({}); // every {} is unique, {} === {} evaluates to false
-	let handleChange = (e) => {
+	let handleChange = (e: Event | null) => {
 		unique = {};
 	};
+
+	// Request parameters
+	const requestParams = {
+		// The language in which to return results. Will default to the browser's language preference.
+		language: 'en-GB',
+		// The region code, specified as a CLDR two-character region code. This affects address formatting, result ranking, and may influence what results are returned. This does not restrict results to the specified region.
+		region: 'GB',
+		// The location around which to retrieve place information. This will bias results to the specified area, but will not restrict results to this area.
+		includedRegionCodes: ['GB'],
+		//includedPrimaryTypes: ['restaurant', 'food'],
+		origin: {
+			lat: 53.76538654312942,
+			lng: -3.0181503295898438
+		}
+	};
+	//  geometry, icon, name, permanentlyClosed, photo, placeId, url, utcOffset, vicinity, openingHours, icon, name
+
+	// 'formattedAddress', 'addressComponents', 'accessibilityOptions', 'allowsDogs', 'businessStatus','hasCurbsidePickup', 'hasDelivery','hasDineIn','displayName','displayNameLanguageCode','editorialSummary','evChargeOptions'
+	const fetchFields = ['formattedAddress', 'addressComponents', 'name'];
+
+
+	// Options
+	const options: ComponentOptions = {
+		placeholder: 'Start typing your address',
+		distance: true,
+		distance_units: 'km',
+		//  label: 'Address',
+		// classes:{
+		// 	icon: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-right-from-line-icon lucide-arrow-right-from-line"><path d="M3 5v14"/><path d="M21 12H7"/><path d="m15 18 6-6-6-6"/></svg>',
+		// }
+	};	
 
 	// Full address as string
 	let formattedAddress = $state('');
 	// Formatted address object
-	let formattedAddressObj = $state({
+	let formattedAddressObj:FormattedAddress = $state({
 		street_number: '',
 		street: '',
 		town: '',
@@ -20,10 +68,10 @@
 		postcode: ''
 	});
 	/**
-	 * @type {never[]}
+	 * @type {PlaceResult | null}
 	 * fullResponse - Unformatted response from Google Places API
 	 */
-	let fullResponse = $state([]);
+	let fullResponse: PlaceResult | null = $state(null);
 	// Google Maps API key
 	const PUBLIC_GOOGLE_MAPS_API_KEY = import.meta.env.VITE_PUBLIC_GOOGLE_MAPS_API_KEY;
 
@@ -37,23 +85,34 @@
 		{ name: 'Japan', region: 'JP' }
 	]);
 	let selectedCountry = $state('GB');
+
 	// Update region on country change
-	let onCountryChange = (e) => {
-		requestParams.region = e.target.value;
-		requestParams.includedRegionCodes = [e.target.value];
+	let onCountryChange = (e: Event & { currentTarget: HTMLSelectElement }) => {
+		const target = e.currentTarget;
+		requestParams.region = target.value;
+		requestParams.includedRegionCodes = [target.value];
 		handleChange(e);
 	};
 	// Error message
 	let placesError = $state('');
 	// Error handler function
-	let onError = (error) => {
+	let onError = (error:string) => {
 		placesError = error;
 	};
 
-	let onResponse = (response) => {
-		formattedAddress = response.formattedAddress;
-		fullResponse = response;
+	// Handle response from Google Places API
+	let onResponse = (response:PlaceResult) => {
 
+		if (!response.addressComponents || response.addressComponents.length === 0) {
+			// Handle the case where addressComponents is empty or undefined
+			onError('No address components found in the response.');
+			return;
+		}
+		
+		formattedAddress = response.formattedAddress ?? '';
+		fullResponse = response;
+        
+		// Reset formattedAddressObj before populating
 		formattedAddressObj = {
 			street_number: '',
 			street: '',
@@ -70,13 +129,17 @@
 				case 'establishment':
 					formattedAddressObj.street_number = component.longText;
 					break;
-				case 'route':
+					// Street name
+				case 'route': 
 				case 'premise':
 					formattedAddressObj.street = component.longText;
 					break;
+					// Often the town/city
 				case 'postal_town':
+				case 'locality':
 					formattedAddressObj.town = component.longText;
 					break;
+				// Typically county in UK/US						
 				case 'administrative_area_level_2':
 					formattedAddressObj.county = component.longText;
 					break;
@@ -88,6 +151,9 @@
 					break;
 			}
 		}
+
+		// Trigger UI update if needed, e.g., by reassigning unique
+		handleChange(null); // Or pass a relevant event/data
 	};
 
 	// Display response in tabs
@@ -95,32 +161,10 @@
 		{ name: 'Response', id: 1 },
 		{ name: 'Formatted Resposne', id: 2 }
 	];
-	let selectedTab = $state(tabs.find((tab) => tab.id === 1).id);
+	let selectedTab = $state(tabs.find((tab) => tab.id === 1)?.id ?? tabs[0].id);
 
 
-	const requestParams = {
-		// The language in which to return results. Will default to the browser's language preference.
-		language: 'en-GB',
-		// The region code, specified as a CLDR two-character region code. This affects address formatting, result ranking, and may influence what results are returned. This does not restrict results to the specified region.
-		region: 'GB',
-		//includedPrimaryTypes: ['restaurant', 'food'],
-		origin: {
-			lat: 53.76538654312942,
-			lng: -3.0181503295898438
-		}
-	};
-	//  geometry, icon, name, permanentlyClosed, photo, placeId, url, utcOffset, vicinity, openingHours, icon, name
 
-	// 'formattedAddress', 'addressComponents', 'accessibilityOptions', 'allowsDogs', 'businessStatus','hasCurbsidePickup', 'hasDelivery','hasDineIn','displayName','displayNameLanguageCode','editorialSummary','evChargeOptions'
-	const fetchFields = ['formattedAddress', 'addressComponents', 'name'];
-
-
-	// Options
-	const options = {
-		placeholder: 'Start typing your address',
-		distance: true,
-		distance_units: 'km',
-	};
 
 </script>
 

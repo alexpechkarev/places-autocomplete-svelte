@@ -42,19 +42,38 @@ export type DistanceUnits = "km" | "miles";
 export interface ComponentOptions {
     autofocus?: boolean;
     autocomplete?: AutoFill;
-    classes: ComponentClasses;
+    classes?: ComponentClasses;
     placeholder?: string;
     distance?: boolean;
     distance_units?: DistanceUnits;
+    label?: string;
+    debounce?: number;
    
 }
 
+export interface PlaceResult {
+    formattedAddress: string;
+    addressComponents: {
+        longText: string;
+        shortText: string;
+        types: string[];
+    }[];
+}
+
+export interface FormattedAddress {
+    street_number: string;
+    street: string;
+    town: string;
+    county: string;
+    country_iso2: string;
+    postcode: string;
+}
 
 export interface Props {
     PUBLIC_GOOGLE_MAPS_API_KEY: string;
     options?:ComponentOptions;
     fetchFields?: string[];
     requestParams?: RequestParams;
-    onResponse: (e: Event) => void;
+    onResponse: (response: PlaceResult) => void;
     onError: (error: string) => void;
 }

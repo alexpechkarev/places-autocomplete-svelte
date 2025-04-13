@@ -1,6 +1,12 @@
 # Places (New) Autocomplete Svelte
 
-This Svelte component provides a user-friendly way to search for and retrieve detailed address information within your [SvelteKit](https://kit.svelte.dev) applications, leveraging the power of the [Google Maps Places (New) Autocomplete API](https://developers.google.com/maps/documentation/javascript/place-autocomplete-overview).  It comes with default styling using [Tailwind CSS](https://tailwindcss.com/), which you can fully customise.
+[![npm version](https://badge.fury.io/js/places-autocomplete-svelte.svg)](https://badge.fury.io/js/places-autocomplete-svelte)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
+A flexible and customizable [Svelte](https://kit.svelte.dev) component leveraging the [Google Maps Places (New) Autocomplete API](https://developers.google.com/maps/documentation/javascript/place-autocomplete-overview) to provide a user-friendly way to search for and retrieve detailed address information within your [SvelteKit](https://kit.svelte.dev) applications.
+
+This component handles API loading, session tokens, fetching suggestions, and requesting place details, allowing you to focus on integrating the results into your application. Includes features like debounced input, highlighting of matched suggestions, extensive customization via CSS classes, and full TypeScript support.
+
 
 
 ## Places (New) Autocomplete – JavaScript Integration
@@ -11,13 +17,16 @@ Simply include a single script tag and handle the response in your JavaScript co
 
 ## Features
 
-- **Seamless SvelteKit Integration:** Easily add the component to your SvelteKit projects.
-- **Real-time Autocomplete Suggestions:**  As the user types, address suggestions appear dynamically.
-- **Comprehensive Address Details:** Retrieve detailed information, including street address, city, state/province, postal code, country, and more.
-- **Country/Region Filtering:** Narrow down search results by specifying target countries or regions.
-- **Customizable Styles:** Tailor the component's appearance to match your application's design by overriding the default Tailwind CSS classes.
-- **Flexible Data Control:** Choose the specific data fields you want to retrieve using the `fetchFields` property.
-- **Keyboard Navigation & Accessibility:**  Use keyboard navigation for selecting suggestions, ensuring accessibility for all users.
+*   Integrates with the modern **Google Places (New) Autocomplete API**.
+*   Automatically handles **session tokens** for cost management per Google's guidelines.
+*   **Debounced Input:** Limits API calls while the user is typing (configurable).
+*   **Suggestion Highlighting:** Automatically highlights the portion of text matching the user's input in the suggestions list.
+*   **Customizable Styling:** Easily override default styles or apply your own using the `options.classes` prop. Built with [Tailwind CSS](https://tailwindcss.com/) utility classes by default.
+*   **TypeScript Support:** Fully written in TypeScript with included type definitions.
+*   **Event Handling:** Provides `onResponse` and `onError` callbacks.
+*   **Configurable:** Control API parameters (`requestParams`), requested data fields (`fetchFields`), and component behavior/appearance (`options`).
+*   **Prop Validation:** Sensible defaults and validation for configuration props.
+
 
 
 ## Demo
@@ -45,9 +54,10 @@ See a live demo of the component in action: [Basic Example](https://places-autoc
 ## Installation Svelte 5
 
 ```bash
-npm i places-autocomplete-svelte
+npm install places-autocomplete-svelte
+# or
+yarn add places-autocomplete-svelte
 ```
-
 
 
 
@@ -56,140 +66,192 @@ npm i places-autocomplete-svelte
 1. Replace `'___YOUR_API_KEY___'` with your actual **Google Maps API Key**.
 2. Use the `onResponse` callback to **handle the response**.
 
-```svelte
+```javascript
 <script>
 import { PlaceAutocomplete } from 'places-autocomplete-svelte';
+import type { PlaceResult, ComponentOptions, RequestParams } from 'places-autocomplete-svelte/interfaces'; // Adjust path if needed
 
-//Recommended: Store your key securely as an environment variable
-const PUBLIC_GOOGLE_MAPS_API_KEY = '___YOUR_API_KEY___';
+// Get API Key securely (e.g., from environment variables)
+const PUBLIC_GOOGLE_MAPS_API_KEY = import.meta.env.VITE_PUBLIC_GOOGLE_MAPS_API_KEY;
+let fullResponse: PlaceResult | null = $state(null);
+let placesError = $state('');
 
 
-let fullResponse = $state('')
-let onResponse = (response) => {
+// --- Event Handlers ---
+const handleResponse = (response: PlaceResult) => {
+	console.log('Place Selected:', response);
 	fullResponse = response;
-};
-</script>
-
-<PlaceAutocomplete  {onResponse} {PUBLIC_GOOGLE_MAPS_API_KEY} />
-
-<p>Response Object: {JSON.stringify(fullResponse, null, 2)}</p>
-```
-
-
-## Component Properties
-
-| Property                 | Type            | Description                                                                                                                                                                                                                        | Required | Default Value                               |
-|--------------------------|-----------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------|-----------------------------------------------|
-| `PUBLIC_GOOGLE_MAPS_API_KEY` | `String`        | Your Google Maps Places API Key.                                                                                                                                                                                             | Yes       |                                               |
-| `onResponse`              | `CustomEvent`    | Dispatched when a place is selected, containing the place details in `event.detail`.                                                                                                                                              | Yes       |                                               |
-| `onError`                 | `CustomEvent`    | Dispatched when an error occurs, with the error message in `event.detail`.                                                                                                                                                 | No        |                                               |
-| `requestParams`          | `Object`        | Object for additional request parameters (e.g., `types`, `bounds`, `origin`, `region`, `language`). See [AutocompleteRequest](https://developers.google.com/maps/documentation/javascript/reference/autocomplete-data#AutocompleteRequest). | No        | `{}`                                       |
-| `fetchFields`            | `Array`         | Array of place data fields to return. See [Supported Fields](https://developers.google.com/maps/documentation/javascript/place-class-data-fields) documentation for a comprehensive list of available fields. Note that the Places Autocomplete service does not support the following fields, even if they are available in the Place Details API: `geometry`, `icon`, `name`, `permanentlyClosed`, `photo`, `placeId`, `url`, `utcOffset`, `vicinity`, `openingHours`, `icon`, and `name`. If you need these fields, make a separate call to the Place Details API using the returned `place_id`.                                                            | No        | `['formattedAddress', 'addressComponents']` |
-| `options`                | `Object`        |  Options for customizing the component's behavior and appearance. See "Customization" below.                                                                                                                               | No        | See default values in "Customization"       |
-
-
-
-## Customization
-### Options
-
-| Property       | Type      | Description                                                                                                                                                  | Default Value |
-|----------------|-----------|--------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------|
-| `autofocus`    | `boolean` | If `true`, the input field will be focused automatically when the component mounts.                                                                        | `false`       |
-| `placeholder` | `String`   | Placeholder text for the input field.                                                                                                                      | `"Search..."` |
-| `autocomplete`| `string`  | HTML `autocomplete` attribute for the input field. Set to `"off"` to disable browser autocomplete.                                                          | `"off"`      |
-| `distance`| `boolean` | If `true`, and if an `origin` is specified in `requestParams`, displays the distance to each suggestion. The distance is calculated as a geodesic in meters. | `false`       |
-| `distance_units`| `km` or `miles` | Specified the distance units. | `km`       |
-| `classes`     | `Object`   | Object to override default Tailwind CSS classes.                                                | See [styling](https://places-autocomplete-demo.pages.dev/examples/styling)    |
-
-### Styling
-Customise the component's appearance by providing an object to the classes property. This object should contain key-value pairs, where the keys correspond to the component's elements and the values are your custom CSS class names. See [styling](https://places-autocomplete-demo.pages.dev/examples/styling) for details.
-
-
-### Request Parameters (requestParams)
-Fine-tune the autocomplete search with the requestParams property. This property accepts an object corresponding to the AutocompleteRequest object in the Google Maps API documentation. See this [request parameters](https://places-autocomplete-demo.pages.dev/component/request-parameters) for more details. Here are some common examples:
-
-```svelte
-<script>
-// ... other imports
-
-/**
- * @type object optional
- * AutocompleteRequest properties
- */
-const requestParams = {
-	/**
-	 * @type string optional
-	 */
-	language : 'en-GB',
-	/**
-	 * @type string optional
-	 */
-	region : 'GB',
-}
-
-/**
- * @type object optional
- * Options
- */
-const options = {
-	autofocus: false,
-	autocompete: 'off',
-	placeholder: 'Start typing your address',
-	distance: true,
-	distance_units: 'km' // or miles
+	placesError = ''; // Clear previous errors
 };
 
-/**
- * @type array optional
- */
-const fetchFields = ['formattedAddress', 'addressComponents'];
+const handleError = (error: string) => {
+	console.error('Places Autocomplete Error:', error);
+	placesError = error;
+	fullResponse = null; // Clear previous results
+};
+
+// --- Configuration (Optional) ---
+
+// Control API request parameters
+const requestParams: Partial<RequestParams> = $state({
+	region: 'GB', // Example: Bias results to Great Britain
+	language: 'en-GB',
+	// includedRegionCodes: ['GB'], // Example: Only show results in the specified regions,
+	// includedPrimaryTypes: ['address'], // Example: Only show addresses
+});
+
+// Control which data fields are fetched for Place Details (affects cost!)
+const fetchFields: string[] = $state(['formattedAddress', 'addressComponents', 'name']);
+
+// Control component appearance and behavior
+const options: Partial<ComponentOptions> = $state({
+	placeholder: 'Start typing your address...',
+	debounce: 200, // Debounce input by 200ms (default is 100ms)
+	distance: true, // Show distance if origin is provided in requestParams
+	classes: {
+		// Example: Override input styling and highlight class
+		input: 'my-custom-input-class border-blue-500',
+		highlight: 'bg-yellow-200 text-black', // Customize suggestion highlighting
+	}
+});
+
 </script>
 
-<PlaceAutocomplete 
-	{onError} 
-	{onResponse} 
-	{PUBLIC_GOOGLE_MAPS_API_KEY} 
-	{requestParams}
-	{options} 
-	{fetchFields}
-	
+{#if placesError}
+    <div class="error-message" role="alert">
+        Error: {placesError}
+    </div>
+{/if}
+
+<PlaceAutocomplete
+    {PUBLIC_GOOGLE_MAPS_API_KEY}
+    {requestParams}
+    {fetchFields}
+    {options}
+    onResponse={handleResponse}
+    onError={handleError}
 />
 
-```
-
-
-
-
-## Error Handling
-
-Use the `onError` event handler to gracefully manage any errors that may occur during the autocomplete process:
-
-
-```svelte
-<script>
-// ... other imports
-
-// Error handler
-let pacError = '';
-let onError = (error: string) => {
-	console.error(error);
-	pacError = error;
-};
-</script>
-
-<PlaceAutocomplete 
-{onResponse} 
-{onError} 
-{PUBLIC_GOOGLE_MAPS_API_KEY} />
-
-{#if pacError}
-	<p class="error">{pacError}</p>
+{#if fullResponse}
+    <h2>Selected Place Details:</h2>
+    <pre>{JSON.stringify(fullResponse, null, 2)}</pre>
 {/if}
+
+<style>
+    /* Example of styling an overridden class */
+    :global(.my-custom-input-class) {
+        padding: 0.75rem;
+        border-radius: 0.25rem;
+        width: 100%;
+        /* Add other styles */
+    }
+    .error-message {
+        color: red;
+        margin-bottom: 1rem;
+    }
+</style>
 ```
+## Component Properties
+| Prop                       | Type                            | Required | Default                                   | Description                                                                                                     |
+|----------------------------|---------------------------------|----------|-------------------------------------------|-----------------------------------------------------------------------------------------------------------------|
+| PUBLIC_GOOGLE_MAPS_API_KEY | string                          | Yes      | -                                         | Your Google Maps API Key with Places API enabled.                                                               |
+| fetchFields                | string[]                        | No       | ['formattedAddress', 'addressComponents'] | Array of Place Data Fields to request when a place is selected. Affects API cost.                               |
+| requestParams              | Partial<RequestParams>          | No       | { inputOffset: 3, ... }                   | Parameters for the Autocomplete request. See AutocompletionRequest options.                                     |
+| options                    | Partial<ComponentOptions>       | No       | { debounce: 100, ... }                    | Options to control component behavior and appearance. See details below.                                        |
+| onResponse                 | (response: PlaceResult) => void | Yes      | -                                         | Callback function triggered with the selected place details (PlaceResult object) after fetchFields is complete. |
+| onError                    | (error: string) => void         | Yes      | -                                         | Callback function triggered when an error occurs (API loading, fetching suggestions, fetching details).         |
+
+
+
+### Options
+
+
+| Option         | Type                      | Default | Description                                                                                                                     |
+|----------------|---------------------------|---------|---------------------------------------------------------------------------------------------------------------------------------|
+| placeholder    | string                    | ''      | Placeholder text for the input field.                                                                                           |
+| debounce       | number                    | 100     | (New) Delay in milliseconds before triggering autocomplete API request after user stops typing. Set to 0 to disable debouncing. |
+| distance       | boolean                   | true    | Show distance from requestParams.origin in suggestions (if origin is provided).                                                 |
+| distance_units | 'km' \| 'miles'           | 'km'    | Units to display distance in.                                                                                                   |
+| label          | string                    | ''      | Optional label text displayed above the input field.                                                                            |
+| autofocus      | boolean                   | false   | Automatically focus the input field on mount.                                                                                   |
+| autocomplete   | string                    | 'off'   | Standard HTML autocomplete attribute for the input field.                                                                       |
+| classes        | Partial<ComponentClasses> | {}      | Object to override default CSS classes. See Styling section.                                                                    |
+
+
+
+
+### Styling (`options.classes`)
+---------------------------
+
+You can customize the appearance of the component by providing your own CSS classes via the `options.classes` prop. The component uses Tailwind CSS utility classes by default. Provide an object where keys are the component parts and values are the class strings you want to apply. See [styling](https://places-autocomplete-demo.pages.dev/examples/styling) for details.
+
+
+**Available Class Keys:**
+
+-   `section`: The main container section.
+-   `container`: The div containing the input and suggestions list.
+-   `label`: The label element (if `options.label` is provided).
+-   `input`: The main text input element.
+-   `icon_container`: Container for the optional icon.
+-   `icon`: SVG string for the icon.
+-   `ul`: The `<ul>` element for the suggestions list.
+-   `li`: Each `<li>` suggestion item.
+-   `li_current`: Class added to the currently highlighted/selected `<li>` (keyboard/mouse).
+-   `li_a`: The inner `<a>` or `<button>` element within each `<li>`.
+-   `li_a_current`: Class added to the inner element when its `<li>` is current.
+-   `li_div_container`: Container div within the `<a>`/`<button>`.
+-   `li_div_one`: First inner div (usually contains the main text).
+-   `li_div_one_p`: The `<p>` tag containing the main suggestion text (`@html` is used).
+-   `li_div_two`: Second inner div (usually contains the distance).
+-   `li_div_two_p`: The `<p>` tag containing the distance text.
+-   `kbd_container`: Container for the keyboard hint keys (Esc, Up, Down).
+-   `kbd_escape`: The `<kbd>` tag for the 'Esc' hint.
+-   `kbd_up`: The `<kbd>` tag for the 'Up Arrow' hint.
+-   `kbd_down`: The `<kbd>` tag for the 'Down Arrow' hint.
+-   `highlight`: **(New)** The class applied to the `<span>` wrapping the matched text within suggestions. Defaults to `'font-bold'`.
+
+### Example: 
+
+```javascript
+const options = {
+  classes: {
+    input: 'form-input w-full rounded-md shadow-sm', // Replace default input style
+    ul: 'absolute bg-white shadow-lg rounded-md mt-1 w-full z-10', // Custom dropdown style
+    li_current: 'bg-blue-500 text-white', // Custom highlight style for selected item
+    highlight: 'text-blue-700 font-semibold' // Custom style for matched text
+  }
+};
+```
+
+Events
+------
+
+-   **`onResponse`**: `(response: PlaceResult) => void`
+    -   Fired after a user selects a suggestion and the requested `fetchFields` have been successfully retrieved.
+    -   The `response` argument is an object containing the place details based on the `fetchFields` requested. Its structure mirrors the [PlaceResult](https://developers.google.com/maps/documentation/javascript/reference/places-service#PlaceResult) but includes only the requested fields.
+-   **`onError`**: `(error: string) => void`
+    -   Fired if there's an error loading the Google Maps API, fetching autocomplete suggestions, or fetching place details.
+    -   The `error` argument is a string describing the error.
+
+
+TypeScript
+----------
+
+This component is written in TypeScript and includes type definitions for props (`Props`, `ComponentOptions`, `RequestParams`, `ComponentClasses`) and the response (`PlaceResult`, `AddressComponent`). You can import these types from `places-autocomplete-svelte/interfaces` (adjust path if needed based on your setup).
+
+
+
+Google Places API & Billing
+---------------------------
+
+-   This component uses the Google Maps JavaScript API (specifically the Places library). Usage is subject to Google's terms and pricing.
+-   An API key enabled for the "Places API" is required.
+-   The component uses **Session Tokens** automatically to group Autocomplete requests, which can lead to significant cost savings compared to per-request billing. See [Google's Session Token Pricing](https://developers.google.com/maps/documentation/places/web-service/usage-and-billing#session-pricing).
+-   Place Details requests (made via `fetchFields` when a suggestion is selected) are billed separately. Carefully select only the `fetchFields` you need to manage costs. See [Place Data Fields Pricing](https://developers.google.com/maps/documentation/javascript/usage-and-billing#data-pricing).
 
 ## Contributing
 
-Contributions are welcome! Please open an issue or submit a pull request on the [GitHub](https://github.com/alexpechkarev/places-autocomplete-svelte/).
+Contributions are welcome! Please feel free to open an issue or submit a pull request.
 
 ## License
 

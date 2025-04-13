@@ -117,22 +117,22 @@ export const requestParamsDefault: RequestParams = {
  * geometry, icon, name, permanentlyClosed, photo, placeId, url, utcOffset, vicinity, openingHours, icon, name
  */
 export const defaultFetchFields: Array<string> = [
-    'formattedAddress', 
-    'addressComponents', 
-    'accessibilityOptions', 
-    'allowsDogs', 
-    'businessStatus', 
-    'hasCurbsidePickup', 
-    'hasDelivery', 
-    'hasDineIn', 
-    'displayName', 
-    'displayNameLanguageCode', 
-    'editorialSummary', 
-    'evChargeOptions', 
-    'adrFormatAddress', 
-    'fuelOptions', 
-    'isGoodForChildren', 
-    'isGoodForGroups', 
+    'formattedAddress',
+    'addressComponents',
+    'accessibilityOptions',
+    'allowsDogs',
+    'businessStatus',
+    'hasCurbsidePickup',
+    'hasDelivery',
+    'hasDineIn',
+    'displayName',
+    'displayNameLanguageCode',
+    'editorialSummary',
+    'evChargeOptions',
+    'adrFormatAddress',
+    'fuelOptions',
+    'isGoodForChildren',
+    'isGoodForGroups',
     'isGoodForWatchingSports',
     'svgIconMaskURI',
     'iconBackgroundColor',
@@ -300,10 +300,10 @@ export const validateFetchFields = (fetchFields: Array<string> | undefined) => {
      * create a new object to store validated parameters
     */
     const validatedFetchFields: Array<string> = [];
-      
-    if(typeof fetchFields === 'undefined' || fetchFields.length === 0) {
+
+    if (typeof fetchFields === 'undefined' || fetchFields.length === 0) {
         return [
-            'formattedAddress', 
+            'formattedAddress',
             'addressComponents'
         ];
     }
@@ -312,11 +312,11 @@ export const validateFetchFields = (fetchFields: Array<string> | undefined) => {
     for (const key of fetchFields) {
         // Check if key is in requestParamsDefault
         if (defaultFetchFields.includes(key)) {
-            validatedFetchFields.push(key);   
+            validatedFetchFields.push(key);
         }
     }
 
-    if(validateFetchFields.length === 0) {
+    if (validateFetchFields.length === 0) {
         return [
             'formattedAddress',
             'addressComponents'
@@ -358,9 +358,10 @@ export const componentClasses: ComponentClasses = {
     li_a_current: 'text-white',
     li_div_container: 'flex min-w-0 gap-x-4',
     li_div_one: 'min-w-0 flex-auto',
-    li_div_one_p: 'text-sm/6 font-semibold',
+    li_div_one_p: 'text-sm/6 ',
     li_div_two: 'shrink-0 flex flex-col items-end min-w-16',
-    li_div_two_p: 'mt-1 text-xs/5'
+    li_div_two_p: 'mt-1 text-xs/5',
+    highlight: 'font-bold',
 }
 
 /**
@@ -373,6 +374,8 @@ export const componentOptions: ComponentOptions = {
     distance: true,
     distance_units: 'km',
     classes: componentClasses,
+    label: '',
+    debounce: 100,
 }
 
 
@@ -401,12 +404,18 @@ export const validateOptions = (options: ComponentOptions | undefined): Componen
                     case 'distance':
                         validatedOptions.distance = Boolean(options.distance);
                         break;
+                    case 'label':
+                        validatedOptions.label = String(options.label);
+                        break;
                     case 'distance_units':
                         validatedOptions.distance_units = String(options.distance_units) as DistanceUnits;
                         break;
                     case 'classes':
                         if (options.classes && typeof options.classes === 'object') {
-                            validatedOptions.classes = { ...componentOptions.classes, ...options.classes }
+                            validatedOptions.classes = {
+                                ...componentOptions.classes,
+                                ...options.classes ?? {}
+                            }
                         }
                         break;
                 }
