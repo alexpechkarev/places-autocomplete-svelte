@@ -38,7 +38,7 @@ See a live demo of the component in action: [Basic Example](https://places-autoc
 [Customise request parameters](https://places-autocomplete-demo.pages.dev/examples/customise-request-parameters) - construct a `requestParams` object and control various aspects of the search, including language, region, and more.
 
 
-<video  src="https://github.com/user-attachments/assets/dcbf28bc-fc53-4965-b97d-e0ff9190d463" width="660" height="764" controls autoplay loop muted>
+<video  src="https://github.com/user-attachments/assets/b424b267-da1b-40d8-bf78-abf5d4353081" width="660" height="764" controls autoplay loop muted>
 </video>
 
 
