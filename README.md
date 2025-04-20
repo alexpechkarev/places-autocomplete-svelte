@@ -101,7 +101,7 @@ const requestParams: Partial<RequestParams> = $state({
 });
 
 // Control which data fields are fetched for Place Details (affects cost!)
-const fetchFields: string[] = $state(['formattedAddress', 'addressComponents', 'name']);
+const fetchFields: string[] = $state(['formattedAddress', 'addressComponents', 'displayName']);
 
 // Control component appearance and behavior
 const options: Partial<ComponentOptions> = $state({

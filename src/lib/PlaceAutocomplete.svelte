@@ -17,7 +17,6 @@
 		 * @see https://developers.google.com/maps/documentation/javascript/usage-and-billing#location-placedetails
 		 */
 		PUBLIC_GOOGLE_MAPS_API_KEY,
-		//fetchFields = $bindable(['formattedAddress', 'addressComponents']),
 		fetchFields,
 		options,
 		onResponse = $bindable((response: PlaceResult) => {}),

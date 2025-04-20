@@ -42,7 +42,7 @@
 	//  geometry, icon, name, permanentlyClosed, photo, placeId, url, utcOffset, vicinity, openingHours, icon, name
 
 	// 'formattedAddress', 'addressComponents', 'accessibilityOptions', 'allowsDogs', 'businessStatus','hasCurbsidePickup', 'hasDelivery','hasDineIn','displayName','displayNameLanguageCode','editorialSummary','evChargeOptions'
-	const fetchFields = ['formattedAddress', 'addressComponents', 'name'];
+	const fetchFields = ['formattedAddress', 'addressComponents', 'displayName'];
 
 
 	// Options
