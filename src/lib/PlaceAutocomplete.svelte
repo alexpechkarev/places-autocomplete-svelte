@@ -273,9 +273,17 @@
 			resetKbdClasses();
 		}, 300);
 	}
+
+	// Handle click outside the input
+	// to reset the search input and results
+	function handleClickOutside(event: MouseEvent) {
+		if (inputRef && !inputRef.contains(event.target as Node)) {
+			reset();
+		}
+	}
 </script>
 
-<svelte:window onkeydown={onKeyDown} />
+<svelte:window onkeydown={onKeyDown} onclick={handleClickOutside}/>
 
 <section class={options.classes?.section}>
 	{#if options?.label ?? ''}
