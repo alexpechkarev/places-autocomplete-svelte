@@ -9,10 +9,10 @@ This component handles API loading, session tokens, fetching suggestions, and re
 
 
 
-## Places (New) Autocomplete – JavaScript Integration
+## Places (New) Autocomplete - JavaScript Library
 
-Simply include a single script tag and handle the response in your JavaScript code.
-[View Details](https://pacservice.pages.dev/) 
+A flexible and customizable vanilla JavaScript library leveraging the Google Maps Places (New) Autocomplete API. This library provides a user-friendly way to search for and retrieve detailed address information in any web application.
+[View Details](https://github.com/alexpechkarev/places-autocomplete-js) 
 
 
 ## Features
@@ -38,8 +38,8 @@ See a live demo of the component in action: [Basic Example](https://places-autoc
 [Customise request parameters](https://places-autocomplete-demo.pages.dev/examples/customise-request-parameters) - construct a `requestParams` object and control various aspects of the search, including language, region, and more.
 
 
-<video  src="https://github.com/user-attachments/assets/b424b267-da1b-40d8-bf78-abf5d4353081" width="660" height="764" controls autoplay loop muted>
-</video>
+<img src="places-autocomplete-svelte.gif" alt="Places (New) Autocomplete Svelte">
+
 
 
 
