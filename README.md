@@ -66,7 +66,7 @@ yarn add places-autocomplete-svelte
 1. Replace `'___YOUR_API_KEY___'` with your actual **Google Maps API Key**.
 2. Use the `onResponse` callback to **handle the response**.
 
-```javascript
+```js
 <script>
 import { PlaceAutocomplete } from 'places-autocomplete-svelte';
 import type { PlaceResult, ComponentOptions, RequestParams } from 'places-autocomplete-svelte/interfaces'; // Adjust path if needed

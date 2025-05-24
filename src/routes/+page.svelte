@@ -3,23 +3,6 @@
 	import PlaceAutocomplete from '$lib/PlaceAutocomplete.svelte';
 
 
-	// interface PlaceResult {
-	// 	formattedAddress: string;
-	// 	addressComponents: {
-	// 		longText: string;
-	// 		shortText: string;
-	// 		types: string[];
-	// 	}[];
-	// }
-    // interface FormattedAddress {
-    //     street_number: string;
-    //     street: string;
-    //     town: string;
-    //     county: string;
-    //     country_iso2: string;
-    //     postcode: string;
-    // }	
-
 	let unique = $state({}); // every {} is unique, {} === {} evaluates to false
 	let handleChange = (e: Event | null) => {
 		unique = {};
