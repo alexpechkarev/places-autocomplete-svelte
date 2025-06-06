@@ -48,6 +48,7 @@ export interface ComponentOptions {
     distance_units?: DistanceUnits;
     label?: string;
     debounce?: number;
+    clear_input?: boolean;
    
 }
 

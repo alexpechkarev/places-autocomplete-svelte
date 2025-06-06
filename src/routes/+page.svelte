@@ -5,7 +5,9 @@
 
 	let unique = $state({}); // every {} is unique, {} === {} evaluates to false
 	let handleChange = (e: Event | null) => {
-		unique = {};
+		if(typeof e === 'object' && e !== null) {
+			unique = {};
+		}
 	};
 
 	// Request parameters
@@ -33,6 +35,7 @@
 		placeholder: 'Start typing your address',
 		distance: true,
 		distance_units: 'km',
+		clear_input: false,
 		//  label: 'Address',
 		// classes:{
 		// 	icon: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-right-from-line-icon lucide-arrow-right-from-line"><path d="M3 5v14"/><path d="M21 12H7"/><path d="m15 18 6-6-6-6"/></svg>',

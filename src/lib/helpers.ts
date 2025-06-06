@@ -376,6 +376,7 @@ export const componentOptions: ComponentOptions = {
     classes: componentClasses,
     label: '',
     debounce: 100,
+    clear_input: true
 }
 
 
@@ -418,6 +419,20 @@ export const validateOptions = (options: ComponentOptions | undefined): Componen
                             }
                         }
                         break;
+                    case 'debounce':
+                        {
+                            const debounceValue = Number(options.debounce);
+                            if (!isNaN(debounceValue) && debounceValue >= 0) { // Allow 0 for debounce
+                                validatedOptions.debounce = debounceValue;
+                            }
+                            break;
+                        }
+                    case 'clear_input':
+                        validatedOptions.clear_input = Boolean(options.clear_input);
+                        break;
+                    default:
+                        // Ignore any other keys that are not in the default options
+                        break;  
                 }
             }
         }

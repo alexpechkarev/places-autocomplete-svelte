@@ -62,9 +62,16 @@
 	/**
 	 * Reset search input and results.
 	 */
-	const reset = () => {
+	const reset = (placeData?: PlaceResult) => {
 		currentSuggestion = -1;
-		request.input = '';
+		if(options?.clear_input == false){
+			if (placeData && placeData.formattedAddress) {
+				// set input to formatted address
+				request.input = placeData.formattedAddress;
+			}
+		}else{
+			request.input = '';
+		}
 		results = [];
 		setSessionToken();
 		//console.log('reset completed', results);
@@ -188,7 +195,7 @@
 			});
 			let placeData = place.toJSON();
 			// reset search input and results
-			reset();
+			reset(placeData);
 			onResponse(placeData);
 		} catch (e: any) {
 			// reset search input and results
