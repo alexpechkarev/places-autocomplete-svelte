@@ -271,6 +271,7 @@
 			}
 		} else if (e.key === 'Escape') {
 			// reset srarch input and results
+			request.input = '';
 			reset();
 		}
 		// Optional: Scroll suggestion into view

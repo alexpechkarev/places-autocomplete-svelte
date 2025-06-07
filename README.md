@@ -3,7 +3,7 @@
 [![npm version](https://badge.fury.io/js/places-autocomplete-svelte.svg)](https://badge.fury.io/js/places-autocomplete-svelte)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-A flexible and customizable [Svelte](https://kit.svelte.dev) component leveraging the [Google Maps Places (New) Autocomplete API](https://developers.google.com/maps/documentation/javascript/place-autocomplete-overview) to provide a user-friendly way to search for and retrieve detailed address information within your [SvelteKit](https://kit.svelte.dev) applications.
+A flexible and customizable [Svelte](https://kit.svelte.dev) component leveraging the [Google Maps Places Autocomplete API (New)](https://developers.google.com/maps/documentation/javascript/place-autocomplete-overview) to provide a user-friendly way to search for and retrieve detailed address information within your [SvelteKit](https://kit.svelte.dev) applications.
 
 This component handles API loading, session tokens, fetching suggestions, and requesting place details, allowing you to focus on integrating the results into your application. Includes features like debounced input, highlighting of matched suggestions, extensive customization via CSS classes, and full TypeScript support.
 
@@ -16,7 +16,7 @@ Need this functionality for a non-Svelte project? Check out our companion vanill
 
 ## Features
 
-*   Integrates with the modern **Google Places (New) Autocomplete API**.
+*   Integrates with the modern **"Google Maps Places Autocomplete API (New)**.
 *   Automatically handles **session tokens** for cost management per Google's guidelines.
 *   **Debounced Input:** Limits API calls while the user is typing (configurable).
 *   **Suggestion Highlighting:** Automatically highlights the portion of text matching the user's input in the suggestions list.
@@ -48,7 +48,7 @@ See a live demo of the component in action: [Basic Example](https://places-autoc
 
 ## Requirements
 
-- **Google Maps API Key** with the Places API (New) enabled. Refer to [Use API Keys](https://developers.google.com/maps/documentation/javascript/get-api-key) for detailed instructions.
+- **Google Maps API Key** with the Google Maps Places API (New) enabled. Refer to [Use API Keys](https://developers.google.com/maps/documentation/javascript/get-api-key) for detailed instructions.
 
 ## Installation
 
@@ -65,7 +65,7 @@ yarn add places-autocomplete-svelte
 1. Replace `'___YOUR_API_KEY___'` with your actual **Google Maps API Key**.
 2. Use the `onResponse` callback to **handle the response**.
 
-```js
+```svelte
 <script>
 import { PlaceAutocomplete } from 'places-autocomplete-svelte';
 import type { PlaceResult, ComponentOptions, RequestParams } from 'places-autocomplete-svelte/interfaces'; // Adjust path if needed
@@ -112,7 +112,7 @@ const options: Partial<ComponentOptions> = $state({
 		input: 'my-custom-input-class border-blue-500',
 		highlight: 'bg-yellow-200 text-black', // Customize suggestion highlighting
 	},
-    clear_input: false, // Keep the input value after selecting a suggestion. The value of the input will be the value of `formattedAddress`
+    clear_input: false, // Overriding the default value to keep the input value after selecting a suggestion. The value of the input will be the value of `formattedAddress`
 });
 
 </script>
@@ -151,7 +151,7 @@ const options: Partial<ComponentOptions> = $state({
     }
 </style>
 ```
-## Component Properties
+## Props
 | Prop                       | Type                            | Required | Default                                   | Description                                                                                                     |
 |----------------------------|---------------------------------|----------|-------------------------------------------|-----------------------------------------------------------------------------------------------------------------|
 | PUBLIC_GOOGLE_MAPS_API_KEY | string                          | Yes      | -                                         | Your Google Maps API Key with Places API enabled.                                                               |
@@ -175,7 +175,7 @@ const options: Partial<ComponentOptions> = $state({
 | label          | string                    | ''      | Optional label text displayed above the input field.                                                                            |
 | autofocus      | boolean                   | false   | Automatically focus the input field on mount.                                                                                   |
 | autocomplete   | string                    | 'off'   | Standard HTML autocomplete attribute for the input field.                                                                       |
-| classes        | Partial<ComponentClasses> | {}      | Object to override default CSS classes. See Styling section.                                                                    |                             |
+| classes        | Partial<ComponentClasses> | {}      | Object to override default CSS classes for various component parts. See Styling (options.classes) section for keys.                                                                |                             |
 | clear_input        | Boolean | true      | If `true` (default), clears the input field after a suggestion is selected. If `false`, the input field retains the `formattedAddress` of the selected place.                                      |
 
 
@@ -188,6 +188,7 @@ You can customize the appearance of the component by providing your own CSS clas
 
 
 **Available Class Keys:**
+The following keys can be used within the `options.classes object to target specific parts of the component:
 
 -   `section`: The main container section.
 -   `container`: The div containing the input and suggestions list.
