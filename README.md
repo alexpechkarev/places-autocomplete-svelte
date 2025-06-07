@@ -36,6 +36,9 @@ See a live demo of the component in action: [Basic Example](https://places-autoc
 
 [Customise request parameters](https://places-autocomplete-demo.pages.dev/examples/customise-request-parameters) - construct a `requestParams` object and control various aspects of the search, including language, region, and more.
 
+[Retain Input Value After Selection](https://places-autocomplete-demo.pages.dev/examples/retain-input-value) -
+This example demonstrates how to configure the Places (New) Autocomplete Svelte component to keep the selected address visible in the input field after a suggestion is chosen. It utilises the `options.clear_input = false` setting.
+
 
 <img src="places-autocomplete-svelte.gif" alt="A video demonstrating the Places Autocomplete Svelte component in action, showing address suggestions and selection.">
 
