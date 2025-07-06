@@ -1,20 +1,24 @@
 {
 	"name": "places-autocomplete-svelte",
 	"license": "MIT",
-	"version": "1.0.1",
-	"description": "A Svelte component that leverages the power of Google Places New API to provide a user-friendly autocomplete experience for location searches.",
+	"version": "2.2.10",
+	"description": "A flexible and customizable Svelte component leveraging the Google Maps Places (New) Autocomplete API to provide a user-friendly way to search for and retrieve detailed address information within your SvelteKit applications.",
 	"keywords": [
 		"svelte",
+		"sveltekit",
 		"autocomplete",
-		"location",
-		"search",
 		"google-maps",
 		"google-places",
-		"places-api",
+		"places-autocomplete",
+		"location",
+		"geocoding",
+		"address",
+		"address-input",
 		"input",
-		"address"
+		"search",
+		"new api"
 	],
-	"homepage": "https://github.com/alexpechkarev",
+	"homepage": "https://places-autocomplete-demo.pages.dev",
 	"repository": {
 		"type": "git",
 		"url": "git+https://github.com/alexpechkarev/places-autocomplete-svelte.git"
@@ -44,6 +48,11 @@
 			"svelte": "./dist/PlaceAutocomplete.svelte",
 			"default": "./dist/PlaceAutocomplete.svelte"
 		},
+		"./interfaces": {
+			"types": "./dist/interfaces.d.ts",
+			"svelte": "./dist/interfaces.js",
+			"default": "./dist/interfaces.js"
+		},
 		".": {
 			"types": "./dist/index.d.ts",
 			"svelte": "./dist/index.js",
@@ -55,34 +64,44 @@
 		"!dist/**/*.test.*",
 		"!dist/**/*.spec.*"
 	],
+	"publishConfig": {
+		"@alexpechkarev:registry": "https://npm.pkg.github.com",
+		"provenance": true
+	},
 	"peerDependencies": {
-		"svelte": "^4.0.0"
+		"svelte": "^5.1.4"
 	},
 	"devDependencies": {
-		"@sveltejs/adapter-auto": "^3.2.2",
-		"@sveltejs/adapter-cloudflare": "^4.6.1",
-		"@sveltejs/kit": "^2.5.18",
-		"@sveltejs/package": "^2.3.2",
-		"@sveltejs/vite-plugin-svelte": "^3.1.1",
-		"@types/eslint": "^8.56.10",
-		"eslint": "^9.7.0",
-		"eslint-config-prettier": "^9.1.0",
-		"eslint-plugin-svelte": "^2.43.0",
-		"globals": "^15.8.0",
-		"prettier": "^3.3.3",
-		"prettier-plugin-svelte": "^3.2.6",
-		"publint": "^0.2.9",
-		"svelte": "^4.2.18",
-		"svelte-check": "^3.8.4",
-		"tslib": "^2.6.3",
-		"typescript": "^5.5.3",
-		"typescript-eslint": "^8.0.0-alpha.47",
-		"vite": "^5.3.4"
+		"@sveltejs/adapter-auto": "^6.0.1",
+		"@sveltejs/adapter-cloudflare": "^7.0.3",
+		"@sveltejs/kit": "^2.21.1",
+		"@sveltejs/package": "^2.3.11",
+		"@sveltejs/vite-plugin-svelte": "^5.0.3",
+		"@tailwindcss/postcss": "^4.1.7",
+		"@tailwindcss/typography": "^0.5.16",
+		"@tailwindcss/vite": "^4.1.7",
+		"@types/eslint": "^9.6.1",
+		"autoprefixer": "^10.4.21",
+		"eslint": "^9.27.0",
+		"eslint-config-prettier": "^10.1.5",
+		"eslint-plugin-svelte": "^3.9.0",
+		"globals": "^16.1.0",
+		"postcss": "^8.5.3",
+		"prettier": "^3.5.3",
+		"prettier-plugin-svelte": "^3.4.0",
+		"publint": "^0.3.12",
+		"svelte": "^5.33.1",
+		"svelte-check": "^4.2.1",
+		"tailwindcss": "^4.1.7",
+		"tslib": "^2.8.1",
+		"typescript": "^5.8.3",
+		"typescript-eslint": "^8.32.1",
+		"vite": "^6.3.5"
 	},
 	"svelte": "./dist/index.js",
 	"types": "./dist/PlaceAutocomplete.svelte.d.ts",
 	"type": "module",
 	"dependencies": {
-		"@googlemaps/js-api-loader": "^1.16.6"
+		"@googlemaps/js-api-loader": "^1.16.8"
 	}
 }

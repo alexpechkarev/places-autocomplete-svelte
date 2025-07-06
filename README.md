@@ -20,6 +20,7 @@ Need this functionality for a non-Svelte project? Check out our companion vanill
 *   Automatically handles **session tokens** for cost management per Google's guidelines.
 *   **Debounced Input:** Limits API calls while the user is typing (configurable).
 *   **Suggestion Highlighting:** Automatically highlights the portion of text matching the user's input in the suggestions list.
+*   **Imperative API:** Exposes `clear()`, `focus()`, and `getRequestParams()` methods for direct control over the component.
 *   **Customizable Styling:** Easily override default styles or apply your own using the `options.classes` prop. Built with [Tailwind CSS](https://tailwindcss.com/) utility classes by default.
 *   **TypeScript Support:** Fully written in TypeScript with included type definitions.
 *   **Event Handling:** Provides `onResponse` and `onError` callbacks.
@@ -72,6 +73,7 @@ yarn add places-autocomplete-svelte
 <script>
 import { PlaceAutocomplete } from 'places-autocomplete-svelte';
 import type { PlaceResult, ComponentOptions, RequestParams } from 'places-autocomplete-svelte/interfaces'; // Adjust path if needed
+
 
 // Get API Key securely (e.g., from environment variables)
 const PUBLIC_GOOGLE_MAPS_API_KEY = import.meta.env.VITE_PUBLIC_GOOGLE_MAPS_API_KEY;
@@ -164,7 +166,33 @@ const options: Partial<ComponentOptions> = $state({
 | onResponse                 | (response: PlaceResult) => void | Yes      | -                                         | Callback function triggered with the selected place details (PlaceResult object) after fetchFields is complete. |
 | onError                    | (error: string) => void         | Yes      | -                                         | Callback function triggered when an error occurs (API loading, fetching suggestions, fetching details).         |
 
+Component Methods (Imperative API)
+----------------------------------
 
+For advanced use cases, you can get a reference to the component instance using `bind:this` and call its methods directly. This is useful for controlling the component from a parent, such as clearing the input from an external button.
+
+**Example Setup:**
+
+```svelte
+<script lang="ts">
+    import PlaceAutocomplete from 'places-autocomplete-svelte';
+    let autocompleteComponent = $state(null); // This will hold the component instance
+</script>
+
+<PlaceAutocomplete bind:this={autocompleteComponent} ... />
+
+<button onclick={() => autocompleteComponent.clear()}>Clear</button>
+<button onclick={() => autocompleteComponent.focus()}>Focus Input</button>
+<button onclick={() => console.log(JSON.stringify(autocompleteComponent.getRequestParams()))}>Get Request Params</button>
+```
+
+**Available Methods:**
+
+| Method | Signature | Description |
+| :-- | :-- | :-- |
+| `clear()` | `() => void` | Clears the input field, removes all suggestions, and resets the Google Places session token. |
+| `focus()` | `() => void` | Programmatically sets focus on the text input field. |
+| `getRequestParams()` | `() => RequestParams` | Returns the component's current internal `requestParams` object. Useful for debugging or state inspection. |
 
 ### Options
 
@@ -187,7 +215,7 @@ const options: Partial<ComponentOptions> = $state({
 ### Styling (`options.classes`)
 ---------------------------
 
-You can customize the appearance of the component by providing your own CSS classes via the `options.classes` prop. The component uses Tailwind CSS utility classes by default. Provide an object where keys are the component parts and values are the class strings you want to apply. See [styling](https://places-autocomplete-demo.pages.dev/examples/styling) for details.
+You can customize the appearance of the component by providing your own CSS classes via the `options.classes` prop. The component uses Tailwind CSS utility classes by default. Provide an object where keys are the component parts and values are the class strings you want to apply. See [styling](https://places-autocomplete-demo.pages.dev/examples/styling) for details.
 
 
 **Available Class Keys:**
@@ -195,25 +223,25 @@ The following keys can be used within the `options.classes object to target spec
 
 -   `section`: The main container section.
 -   `container`: The div containing the input and suggestions list.
--   `label`: The label element (if `options.label` is provided).
+-   `label`: The label element (if `options.label` is provided).
 -   `input`: The main text input element.
 -   `icon_container`: Container for the optional icon.
 -   `icon`: SVG string for the icon.
--   `ul`: The `<ul>` element for the suggestions list.
--   `li`: Each `<li>` suggestion item.
--   `li_current`: Class added to the currently highlighted/selected `<li>` (keyboard/mouse).
--   `li_a`: The inner `<a>` or `<button>` element within each `<li>`.
--   `li_a_current`: Class added to the inner element when its `<li>` is current.
--   `li_div_container`: Container div within the `<a>`/`<button>`.
+-   `ul`: The `<ul>` element for the suggestions list.
+-   `li`: Each `<li>` suggestion item.
+-   `li_current`: Class added to the currently highlighted/selected `<li>` (keyboard/mouse).
+-   `li_a`: The inner `<a>` or `<button>` element within each `<li>`.
+-   `li_a_current`: Class added to the inner element when its `<li>` is current.
+-   `li_div_container`: Container div within the `<a>`/`<button>`.
 -   `li_div_one`: First inner div (usually contains the main text).
--   `li_div_one_p`: The `<p>` tag containing the main suggestion text (`@html` is used).
+-   `li_div_one_p`: The `<p>` tag containing the main suggestion text (`@html` is used).
 -   `li_div_two`: Second inner div (usually contains the distance).
--   `li_div_two_p`: The `<p>` tag containing the distance text.
+-   `li_div_two_p`: The `<p>` tag containing the distance text.
 -   `kbd_container`: Container for the keyboard hint keys (Esc, Up, Down).
--   `kbd_escape`: The `<kbd>` tag for the 'Esc' hint.
--   `kbd_up`: The `<kbd>` tag for the 'Up Arrow' hint.
--   `kbd_down`: The `<kbd>` tag for the 'Down Arrow' hint.
--   `highlight`: The class applied to the `<span>` wrapping the matched text within suggestions. Defaults to `'font-bold'`.
+-   `kbd_escape`: The `<kbd>` tag for the 'Esc' hint.
+-   `kbd_up`: The `<kbd>` tag for the 'Up Arrow' hint.
+-   `kbd_down`: The `<kbd>` tag for the 'Down Arrow' hint.
+-   `highlight`: The class applied to the `<span>` wrapping the matched text within suggestions. Defaults to `'font-bold'`.
 
 ### Example: 
 
@@ -231,18 +259,18 @@ const options = {
 Events
 ------
 
--   **`onResponse`**: `(response: PlaceResult) => void`
-    -   Fired after a user selects a suggestion and the requested `fetchFields` have been successfully retrieved.
-    -   The `response` argument is an object containing the place details based on the `fetchFields` requested. Its structure mirrors the [PlaceResult](https://developers.google.com/maps/documentation/javascript/reference/places-service#PlaceResult) but includes only the requested fields.
--   **`onError`**: `(error: string) => void`
+-   **`onResponse`**: `(response: PlaceResult) => void`
+    -   Fired after a user selects a suggestion and the requested `fetchFields` have been successfully retrieved.
+    -   The `response` argument is an object containing the place details based on the `fetchFields` requested. Its structure mirrors the [PlaceResult](https://developers.google.com/maps/documentation/javascript/reference/places-service#PlaceResult) but includes only the requested fields.
+-   **`onError`**: `(error: string) => void`
     -   Fired if there's an error loading the Google Maps API, fetching autocomplete suggestions, or fetching place details.
-    -   The `error` argument is a string describing the error.
+    -   The `error` argument is a string describing the error.
 
 
 TypeScript
 ----------
 
-This component is written in TypeScript and includes type definitions for props (`Props`, `ComponentOptions`, `RequestParams`, `ComponentClasses`) and the response (`PlaceResult`, `AddressComponent`). You can import these types from `places-autocomplete-svelte/interfaces` (adjust path if needed based on your setup).
+This component is written in TypeScript and includes type definitions for props (`Props`, `ComponentOptions`, `RequestParams`, `ComponentClasses`) and the response (`PlaceResult`, `AddressComponent`). You can import these types from `places-autocomplete-svelte/interfaces` (adjust path if needed based on your setup).
 
 
 
@@ -251,8 +279,8 @@ Google Places API & Billing
 
 -   This component uses the Google Maps JavaScript API (specifically the Places library). Usage is subject to Google's terms and pricing.
 -   An API key enabled for the "Places API" is required.
--   The component uses **Session Tokens** automatically to group Autocomplete requests, which can lead to significant cost savings compared to per-request billing. See [Google's Session Token Pricing](https://developers.google.com/maps/documentation/places/web-service/usage-and-billing#session-pricing).
--   Place Details requests (made via `fetchFields` when a suggestion is selected) are billed separately. Carefully select only the `fetchFields` you need to manage costs. See [Place Data Fields Pricing](https://developers.google.com/maps/documentation/javascript/usage-and-billing#data-pricing).
+-   The component uses **Session Tokens** automatically to group Autocomplete requests, which can lead to significant cost savings compared to per-request billing. See [Google's Session Token Pricing](https://developers.google.com/maps/documentation/places/web-service/usage-and-billing#session-pricing).
+-   Place Details requests (made via `fetchFields` when a suggestion is selected) are billed separately. Carefully select only the `fetchFields` you need to manage costs. See [Place Data Fields Pricing](https://developers.google.com/maps/documentation/javascript/usage-and-billing#data-pricing).
 
 ## Contributing
 
