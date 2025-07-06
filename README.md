@@ -8,7 +8,7 @@ A flexible and customizable [Svelte](https://kit.svelte.dev) component leveragin
 This component handles API loading, session tokens, fetching suggestions, and requesting place details, allowing you to focus on integrating the results into your application. Includes features like debounced input, highlighting of matched suggestions, extensive customization via CSS classes, and full TypeScript support.
 
 
-## Also Available: Standalone JavaScript Library
+## Available: Standalone JavaScript Library
 
 Need this functionality for a non-Svelte project? Check out our companion vanilla JavaScript library, `places-autocomplete-js`, which offers the same core Google Places (New) Autocomplete features.
 [View `places-autocomplete-js` on GitHub](https://github.com/alexpechkarev/places-autocomplete-js)
@@ -186,7 +186,7 @@ For advanced use cases, you can get a reference to the component instance using 
 <button onclick={() => console.log(JSON.stringify(autocompleteComponent.getRequestParams()))}>Get Request Params</button>
 ```
 
-**vailable Methods:**
+**Available Methods:**
 
 | Method | Signature | Description |
 | :-- | :-- | :-- |
