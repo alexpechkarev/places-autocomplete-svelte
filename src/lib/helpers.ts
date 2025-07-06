@@ -387,58 +387,23 @@ export const componentOptions: ComponentOptions = {
  */
 export const validateOptions = (options: ComponentOptions | undefined): ComponentOptions => {
 
-    const validatedOptions: ComponentOptions = { ...componentOptions };
-
-    if (options && typeof options === 'object') {
-        for (const key in validatedOptions) {
-            if (key in options) {
-                switch (key) {
-                    case 'autofocus':
-                        validatedOptions.autofocus = Boolean(options.autofocus);
-                        break;
-                    case 'autocomplete':
-                        validatedOptions.autocomplete = String(options.autocomplete) as AutoFill;
-                        break;
-                    case 'placeholder':
-                        validatedOptions.placeholder = String(options.placeholder);
-                        break;
-                    case 'distance':
-                        validatedOptions.distance = Boolean(options.distance);
-                        break;
-                    case 'label':
-                        validatedOptions.label = String(options.label);
-                        break;
-                    case 'distance_units':
-                        validatedOptions.distance_units = String(options.distance_units) as DistanceUnits;
-                        break;
-                    case 'classes':
-                        if (options.classes && typeof options.classes === 'object') {
-                            validatedOptions.classes = {
-                                ...componentOptions.classes,
-                                ...options.classes ?? {}
-                            }
-                        }
-                        break;
-                    case 'debounce':
-                        {
-                            const debounceValue = Number(options.debounce);
-                            if (!isNaN(debounceValue) && debounceValue >= 0) { // Allow 0 for debounce
-                                validatedOptions.debounce = debounceValue;
-                            }
-                            break;
-                        }
-                    case 'clear_input':
-                        validatedOptions.clear_input = Boolean(options.clear_input);
-                        break;
-                    default:
-                        // Ignore any other keys that are not in the default options
-                        break;  
-                }
-            }
-        }
+   if (!options) {
+        return componentOptions;
     }
 
-    return validatedOptions;
+    // Perform a deep merge for the 'classes' object, inspired by the JS library
+    const mergedClasses = {
+        ...componentOptions.classes,
+        ...(options.classes ?? {})
+    };
+
+    const validated: ComponentOptions = {
+        ...componentOptions, // Start with all defaults
+        ...options, // Override with user-provided options
+        classes: mergedClasses // Apply the specifically merged classes
+    };
+
+    return validated;
 
 };
 

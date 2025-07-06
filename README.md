@@ -20,6 +20,7 @@ Need this functionality for a non-Svelte project? Check out our companion vanill
 *   Automatically handles **session tokens** for cost management per Google's guidelines.
 *   **Debounced Input:** Limits API calls while the user is typing (configurable).
 *   **Suggestion Highlighting:** Automatically highlights the portion of text matching the user's input in the suggestions list.
+*   **Imperative API:** Exposes `clear()`, `focus()`, and `getRequestParams()` methods for direct control over the component.
 *   **Customizable Styling:** Easily override default styles or apply your own using the `options.classes` prop. Built with [Tailwind CSS](https://tailwindcss.com/) utility classes by default.
 *   **TypeScript Support:** Fully written in TypeScript with included type definitions.
 *   **Event Handling:** Provides `onResponse` and `onError` callbacks.
@@ -72,6 +73,7 @@ yarn add places-autocomplete-svelte
 <script>
 import { PlaceAutocomplete } from 'places-autocomplete-svelte';
 import type { PlaceResult, ComponentOptions, RequestParams } from 'places-autocomplete-svelte/interfaces'; // Adjust path if needed
+
 
 // Get API Key securely (e.g., from environment variables)
 const PUBLIC_GOOGLE_MAPS_API_KEY = import.meta.env.VITE_PUBLIC_GOOGLE_MAPS_API_KEY;
@@ -164,7 +166,33 @@ const options: Partial<ComponentOptions> = $state({
 | onResponse                 | (response: PlaceResult) => void | Yes      | -                                         | Callback function triggered with the selected place details (PlaceResult object) after fetchFields is complete. |
 | onError                    | (error: string) => void         | Yes      | -                                         | Callback function triggered when an error occurs (API loading, fetching suggestions, fetching details).         |
 
+Component Methods (Imperative API)
+----------------------------------
 
+For advanced use cases, you can get a reference to the component instance using `bind:this` and call its methods directly. This is useful for controlling the component from a parent, such as clearing the input from an external button.
+
+**Example Setup:**
+
+```svelte
+<script lang="ts">
+    import PlaceAutocomplete from 'places-autocomplete-svelte';
+    let autocompleteComponent = $state(null); // This will hold the component instance
+</script>
+
+<PlaceAutocomplete bind:this={autocompleteComponent} ... />
+
+<button onclick={() => autocompleteComponent.clear()}>Clear</button>
+<button onclick={() => autocompleteComponent.focus()}>Focus Input</button>
+<button onclick={() => console.log(JSON.stringify(autocompleteComponent.getRequestParams()))}>Get Request Params</button>
+```
+
+**vailable Methods:**
+
+| Method | Signature | Description |
+| :-- | :-- | :-- |
+| `clear()` | `() => void` | Clears the input field, removes all suggestions, and resets the Google Places session token. |
+| `focus()` | `() => void` | Programmatically sets focus on the text input field. |
+| `getRequestParams()` | `() => RequestParams` | Returns the component's current internal `requestParams` object. Useful for debugging or state inspection. |
 
 ### Options
 

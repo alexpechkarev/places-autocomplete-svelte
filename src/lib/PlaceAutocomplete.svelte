@@ -7,7 +7,6 @@
 		validateRequestParams,
 		formatDistance,
 		validateFetchFields,
-		componentOptions
 	} from './helpers.js';
 	const { Loader } = GMaps;
 
@@ -24,6 +23,8 @@
 		requestParams = {}
 	}: Props = $props();
 
+	const isDefaultOnResponse = onResponse.toString() === ((response: PlaceResult) => {}).toString();
+
 	// validate options
 	options = validateOptions(options);
 	//console.log(options);
@@ -32,13 +33,7 @@
 	fetchFields = validateFetchFields(fetchFields);
 	//console.log(fetchFields);
 
-	// set classes as state
-	let cl = $state(options.classes ?? {});
-	// reset keyboard classes
-	const resetKbdClasses = () => {
-		cl.kbd_down = options.classes?.kbd_down ?? componentOptions.classes?.kbd_down ?? '';
-		cl.kbd_up = options.classes?.kbd_up ?? componentOptions.classes?.kbd_up ?? '';
-	};
+	let kbdAction = $state(''); // 'up', 'down', or 'escape'
 
 	// Local variables
 	let inputRef: HTMLInputElement;
@@ -64,18 +59,48 @@
 	 */
 	const reset = (placeData?: PlaceResult) => {
 		currentSuggestion = -1;
-		if(options?.clear_input == false){
+		if (options?.clear_input == false) {
 			if (placeData && placeData.formattedAddress) {
 				// set input to formatted address
 				request.input = placeData.formattedAddress;
 			}
-		}else{
+		} else {
 			request.input = '';
 		}
 		results = [];
 		setSessionToken();
 		//console.log('reset completed', results);
 	};
+
+	/**
+	 * Clears the autocomplete input field and suggestions list.
+	 * Refreshes the Google Places session token for a new session.
+	 * Can be called imperatively on the component instance.
+	 * @example
+	 * let autocompleteComponent;
+	 * autocompleteComponent.clear();
+	 */
+	export function clear() {
+		reset(); // The existing reset function already handles this
+	}
+
+	/**
+	 * Programmatically focuses the input element.
+	 * @example
+	 * autocompleteComponent.focus();
+	 */
+	export function focus() {
+		inputRef?.focus();
+	}
+
+	/**
+	 * Returns the current internal request parameters.
+	 * Useful for debugging or inspecting the component's state.
+	 * @returns {RequestParams}
+	 */
+	export function getRequestParams() {
+		return request;
+	}
 
 	/**
 	 * Debounce function to limit the rate at which a function can fire.
@@ -204,8 +229,6 @@
 				(e.name || 'An error occurred') + ' - ' + (e.message || 'error fetching place details')
 			);
 		}
-
-		
 	};
 
 	/**
@@ -223,6 +246,11 @@
 	 * Initialize the Google Maps JavaScript API Loader.
 	 */
 	onMount(async (): Promise<void> => {
+		if (isDefaultOnResponse) {
+			console.warn(
+				'PlaceAutocomplete: The `onResponse` callback has not been provided. Selected place data will not be handled. See documentation for usage.'
+			);
+		}
 		if (options.autofocus) {
 			// focus on the input
 			inputRef.focus();
@@ -236,7 +264,7 @@
 				libraries: ['places']
 			});
 
-			const { AutocompleteSessionToken, AutocompleteSuggestion} =
+			const { AutocompleteSessionToken, AutocompleteSuggestion } =
 				await loader.importLibrary('places');
 
 			placesApi.AutocompleteSessionToken = AutocompleteSessionToken;
@@ -258,28 +286,27 @@
 	function onKeyDown(e: KeyboardEvent) {
 		if (e.key === 'ArrowDown') {
 			currentSuggestion = Math.min(currentSuggestion + 1, results.length - 1);
-			resetKbdClasses();
-			cl.kbd_down += ' ' + (cl?.kbd_active ?? 'bg-indigo-500 text-white');
+			kbdAction = 'down';
 		} else if (e.key === 'ArrowUp') {
 			currentSuggestion = Math.max(currentSuggestion - 1, 0);
-			resetKbdClasses();
-			cl.kbd_up += ' ' + (cl?.kbd_active ?? 'bg-indigo-500 text-white');
+			kbdAction = 'up';
 		} else if (e.key === 'Enter') {
 			e.preventDefault();
 			if (currentSuggestion >= 0) {
 				onPlaceSelected(results[currentSuggestion].place);
 			}
 		} else if (e.key === 'Escape') {
-			// reset srarch input and results
+			kbdAction = 'escape';
 			request.input = '';
 			reset();
 		}
 		// Optional: Scroll suggestion into view
 		const selectedElement = document.getElementById(`option-${currentSuggestion + 1}`);
 		selectedElement?.scrollIntoView({ block: 'nearest' });
+		// Reset the action state after a short delay to allow CSS transition to finish
 		setTimeout(() => {
-			resetKbdClasses();
-		}, 300);
+			kbdAction = '';
+		}, 200);
 	}
 
 	// Handle click outside the input
@@ -291,7 +318,7 @@
 	}
 </script>
 
-<svelte:window onkeydown={onKeyDown} onclick={handleClickOutside}/>
+<svelte:window onkeydown={onKeyDown} onclick={handleClickOutside} />
 
 <section class={options.classes?.section}>
 	{#if options?.label ?? ''}
@@ -326,11 +353,15 @@
 
 		{#if results.length > 0}
 			<div class={options.classes?.kbd_container ?? ''}>
-				<kbd class={options.classes?.kbd_escape ?? ''}>Esc</kbd>
-				<kbd class={cl.kbd_up}>&uArr;</kbd>
-				<kbd class={cl.kbd_down}>&dArr;</kbd>
+				<kbd class={options.classes?.kbd_escape ?? ''} class:kbd-active={kbdAction === 'escape'}
+					>Esc</kbd
+				>
+				<kbd class={options.classes?.kbd_up ?? ''} class:kbd-active={kbdAction === 'up'}>&uArr;</kbd
+				>
+				<kbd class={options.classes?.kbd_down ?? ''} class:kbd-active={kbdAction === 'down'}
+					>&dArr;</kbd
+				>
 			</div>
-
 			<ul class={options.classes?.ul ?? ''} id="options" role="listbox">
 				{#each results as p, i}
 					<li
@@ -389,3 +420,15 @@
 		{/if}
 	</div>
 </section>
+
+<style>
+	/* Combining Tailwind CSS classes bg-indigo-500 text-white */
+	.kbd-active {
+		/* Use the active class from options if available, or a default */
+		background-color: var(--kbd-active-bg, #4f46e5); /* Indigo 500 */
+		color: var(--kbd-active-color, white);
+		transition:
+			background-color 0.1s ease-in-out,
+			color 0.1s ease-in-out;
+	}
+</style>

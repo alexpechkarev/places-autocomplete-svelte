@@ -1,11 +1,11 @@
 <script lang="ts">
 	import type { ComponentOptions, FormattedAddress, PlaceResult } from '$lib/interfaces.js';
 	import PlaceAutocomplete from '$lib/PlaceAutocomplete.svelte';
-
+	let autocompleteComponent = $state(null); // This will hold the component instance
 
 	let unique = $state({}); // every {} is unique, {} === {} evaluates to false
 	let handleChange = (e: Event | null) => {
-		if(typeof e === 'object' && e !== null) {
+		if (typeof e === 'object' && e !== null) {
 			unique = {};
 		}
 	};
@@ -29,23 +29,22 @@
 	// 'formattedAddress', 'addressComponents', 'accessibilityOptions', 'allowsDogs', 'businessStatus','hasCurbsidePickup', 'hasDelivery','hasDineIn','displayName','displayNameLanguageCode','editorialSummary','evChargeOptions'
 	const fetchFields = ['formattedAddress', 'addressComponents', 'displayName'];
 
-
 	// Options
 	const options: ComponentOptions = {
 		placeholder: 'Start typing your address',
 		distance: true,
 		distance_units: 'km',
-		clear_input: false,
+		clear_input: false
 		//  label: 'Address',
 		// classes:{
 		// 	icon: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-right-from-line-icon lucide-arrow-right-from-line"><path d="M3 5v14"/><path d="M21 12H7"/><path d="m15 18 6-6-6-6"/></svg>',
 		// }
-	};	
+	};
 
 	// Full address as string
 	let formattedAddress = $state('');
 	// Formatted address object
-	let formattedAddressObj:FormattedAddress = $state({
+	let formattedAddressObj: FormattedAddress = $state({
 		street_number: '',
 		street: '',
 		town: '',
@@ -82,22 +81,21 @@
 	// Error message
 	let placesError = $state('');
 	// Error handler function
-	let onError = (error:string) => {
+	let onError = (error: string) => {
 		placesError = error;
 	};
 
 	// Handle response from Google Places API
-	let onResponse = (response:PlaceResult) => {
-
+	let onResponse = (response: PlaceResult) => {
 		if (!response.addressComponents || response.addressComponents.length === 0) {
 			// Handle the case where addressComponents is empty or undefined
 			onError('No address components found in the response.');
 			return;
 		}
-		
+
 		formattedAddress = response.formattedAddress ?? '';
 		fullResponse = response;
-        
+
 		// Reset formattedAddressObj before populating
 		formattedAddressObj = {
 			street_number: '',
@@ -115,17 +113,17 @@
 				case 'establishment':
 					formattedAddressObj.street_number = component.longText;
 					break;
-					// Street name
-				case 'route': 
+				// Street name
+				case 'route':
 				case 'premise':
 					formattedAddressObj.street = component.longText;
 					break;
-					// Often the town/city
+				// Often the town/city
 				case 'postal_town':
 				case 'locality':
 					formattedAddressObj.town = component.longText;
 					break;
-				// Typically county in UK/US						
+				// Typically county in UK/US
 				case 'administrative_area_level_2':
 					formattedAddressObj.county = component.longText;
 					break;
@@ -148,10 +146,6 @@
 		{ name: 'Formatted Resposne', id: 2 }
 	];
 	let selectedTab = $state(tabs.find((tab) => tab.id === 1)?.id ?? tabs[0].id);
-
-
-
-
 </script>
 
 <svelte:head>
@@ -181,6 +175,7 @@
 				>
 				{#key unique}
 					<PlaceAutocomplete
+						bind:this={autocompleteComponent}
 						{onError}
 						{onResponse}
 						{PUBLIC_GOOGLE_MAPS_API_KEY}
@@ -191,6 +186,7 @@
 				{/key}
 			</div>
 
+			<!-- Country selector -->
 			<div
 				class={[countries.length && 'lg:col-span-2 mt-10 lg:mt-0', !countries.length && 'hidden']}
 			>
@@ -224,6 +220,12 @@
 			/>
 		</div>
 	</div>
+
+	<button onclick={() => console.log(JSON.stringify(autocompleteComponent.getRequestParams()))}>
+		Get Request Param
+	</button>
+
+	<button onclick={() => autocompleteComponent.focus()}> Focus </button>
 
 	{#if Object.values(formattedAddressObj).filter((value) => value).length > 0}
 		<h1 class="text-base font-semibold leading-6 text-gray-900 mt-10">Response</h1>
