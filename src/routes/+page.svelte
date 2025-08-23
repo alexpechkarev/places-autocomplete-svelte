@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { ComponentOptions, FormattedAddress, PlaceResult } from '$lib/interfaces.js';
 	import PlaceAutocomplete from '$lib/PlaceAutocomplete.svelte';
-	let autocompleteComponent = $state(null); // This will hold the component instance
+	let autocompleteComponent: PlaceAutocomplete | undefined = $state(undefined); // This will hold the component instance
 
 	let unique = $state({}); // every {} is unique, {} === {} evaluates to false
 	let handleChange = (e: Event | null) => {
@@ -34,7 +34,8 @@
 		placeholder: 'Start typing your address',
 		distance: true,
 		distance_units: 'km',
-		clear_input: false
+		clear_input: false,
+		debounce: 100
 		//  label: 'Address',
 		// classes:{
 		// 	icon: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-right-from-line-icon lucide-arrow-right-from-line"><path d="M3 5v14"/><path d="M21 12H7"/><path d="m15 18 6-6-6-6"/></svg>',
@@ -169,6 +170,9 @@
 
 	<div class="my-12">
 		<div class="grid grid-cols-1 lg:grid-cols-6 gap-x-4 mb-10">
+			<div class="col-span-6">
+			<textarea name="address" id="address" placeholder="Enter your address" class="border-2 block w-full p-2 rounded-md"></textarea>
+			</div>
 			<div class={[countries.length && 'lg:col-span-4', !countries.length && 'lg:col-span-6']}>
 				<label class="mt-1 text-sm leading-6 text-gray-600" for="search"
 					>Start typing your address</label
@@ -221,11 +225,11 @@
 		</div>
 	</div>
 
-	<button onclick={() => console.log(JSON.stringify(autocompleteComponent.getRequestParams()))}>
+	<button onclick={() => console.log(JSON.stringify(autocompleteComponent?.getRequestParams()))}>
 		Get Request Param
 	</button>
 
-	<button onclick={() => autocompleteComponent.focus()}> Focus </button>
+	<button onclick={() => autocompleteComponent?.focus()}> Focus </button>
 
 	{#if Object.values(formattedAddressObj).filter((value) => value).length > 0}
 		<h1 class="text-base font-semibold leading-6 text-gray-900 mt-10">Response</h1>

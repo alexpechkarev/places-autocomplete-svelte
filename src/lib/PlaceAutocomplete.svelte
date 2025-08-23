@@ -7,6 +7,8 @@
 		validateRequestParams,
 		formatDistance,
 		validateFetchFields,
+		createHighlightedSegments,
+		debounce
 	} from './helpers.js';
 	const { Loader } = GMaps;
 
@@ -32,6 +34,9 @@
 	// validate fetchFields
 	fetchFields = validateFetchFields(fetchFields);
 	//console.log(fetchFields);
+
+	// variable to hold a reference to the component's root element
+	//let componentRoot: HTMLElement;
 
 	let kbdAction = $state(''); // 'up', 'down', or 'escape'
 
@@ -102,27 +107,6 @@
 		return request;
 	}
 
-	/**
-	 * Debounce function to limit the rate at which a function can fire.
-	 * @param func
-	 * @param wait
-	 */
-	function debounce<T extends (...args: any[]) => any>(
-		func: T,
-		wait: number
-	): (...args: Parameters<T>) => void {
-		let timeout: ReturnType<typeof setTimeout> | null = null;
-		return function executedFunction(...args: Parameters<T>) {
-			const later = () => {
-				timeout = null;
-				func(...args);
-			};
-			if (timeout !== null) {
-				clearTimeout(timeout);
-			}
-			timeout = setTimeout(later, wait);
-		};
-	}
 
 	/**
 	 * Make request and get autocomplete suggestions.
@@ -164,30 +148,15 @@
 				const matches = predictionText.matches;
 
 				//Highlighting Logic
-				let highlightedText = '';
-				let lastIndex = 0;
+				let highlightedText: { text: string; highlighted: boolean }[] = [];
 
 				// Sort matches just in case they aren't ordered (though they usually are)
 				matches.sort(
 					(a: { startOffset: number }, b: { startOffset: number }) => a.startOffset - b.startOffset
 				);
-				for (const match of matches) {
-					// Append text before the current match
-					highlightedText += originalText.substring(lastIndex, match.startOffset);
 
-					// Append the highlighted match segment
-					// Choose your highlighting class (e.g., 'font-bold' or a custom one)
-					highlightedText += `<span class="${options.classes?.highlight ?? 'font-bold'}">`;
-					highlightedText += originalText.substring(match.startOffset, match.endOffset);
-					highlightedText += `</span>`;
-
-					// Update the last index processed
-					lastIndex = match.endOffset;
-				}
-
-				// Append any remaining text after the last match
-				highlightedText += originalText.substring(lastIndex);
-				// --- End Highlighting Logic ---
+				// Create highlighted segments
+				highlightedText = createHighlightedSegments(originalText, matches);
 
 				results.push({
 					place: suggestion.placePrediction.toPlace(),
@@ -318,11 +287,19 @@
 	}
 </script>
 
-<svelte:window onkeydown={onKeyDown} onclick={handleClickOutside} />
+<svelte:window onclick={handleClickOutside} />
 
-<section class={options.classes?.section}>
+<section
+	class={options.classes?.section}
+	role="combobox"
+	aria-controls="autocomplete-listbox"
+	tabindex="0"
+	aria-haspopup="listbox"
+	aria-expanded={results.length > 0}
+	aria-owns="autocomplete-listbox"
+>
 	{#if options?.label ?? ''}
-		<label for="search" class={options.classes?.label ?? ''}>
+		<label for="places-autocomplete-input" class={options.classes?.label ?? ''}>
 			{options.label}
 		</label>
 	{/if}
@@ -334,6 +311,7 @@
 		{/if}
 
 		<input
+			id="places-autocomplete-input"
 			type="text"
 			name="search"
 			bind:this={inputRef}
@@ -346,7 +324,9 @@
 			aria-labelledby="search"
 			aria-label="Search"
 			aria-haspopup="listbox"
+			aria-activedescendant={currentSuggestion > -1 ? `option-${currentSuggestion + 1}` : undefined}
 			bind:value={request.input}
+			onkeydown={onKeyDown}
 			oninput={(event) => debouncedMakeAcRequest(event.currentTarget.value)}
 		/>
 		<!-- oninput={makeAcRequest} -->
@@ -362,7 +342,7 @@
 					>&dArr;</kbd
 				>
 			</div>
-			<ul class={options.classes?.ul ?? ''} id="options" role="listbox">
+			<ul class={options.classes?.ul ?? ''} id="autocomplete-listbox" role="listbox">
 				{#each results as p, i}
 					<li
 						role="option"
@@ -373,8 +353,8 @@
 						]}
 						onmouseenter={() => (currentSuggestion = i)}
 						id="option-{i + 1}"
+						
 					>
-						<!-- svelte-ignore a11y_invalid_attribute -->
 						<button
 							type="button"
 							class={[
@@ -396,8 +376,14 @@
 											options.classes?.li_div_one_p
 										]}
 									>
-										<!-- {p.text} -->
-										{@html p.text}
+										{#each p.text as segment}
+											{#if segment.highlighted}
+												<span class={options.classes?.highlight ?? 'font-bold'}>{segment.text}</span
+												>
+											{:else}
+												{segment.text}
+											{/if}
+										{/each}
 									</p>
 								</div>
 							</div>

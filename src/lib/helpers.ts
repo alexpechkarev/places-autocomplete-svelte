@@ -1,4 +1,4 @@
-import type { RequestParams, ComponentOptions, ComponentClasses, AutoFill, DistanceUnits } from './interfaces.js';
+import type { RequestParams, ComponentOptions, ComponentClasses, DistanceUnits } from './interfaces.js';
 
 /**
  * Default request parameters
@@ -387,7 +387,7 @@ export const componentOptions: ComponentOptions = {
  */
 export const validateOptions = (options: ComponentOptions | undefined): ComponentOptions => {
 
-   if (!options) {
+    if (!options) {
         return componentOptions;
     }
 
@@ -423,3 +423,58 @@ export const formatDistance = function (distance: number, units: DistanceUnits):
         return `${(distance / 1609.34).toFixed(2)} miles`;
     }
 }
+
+/**
+ * Create highlighted segments from the original text based on the provided matches.
+ * @param originalText The original text to segment.
+ * @param matches An array of match objects containing start and end offsets.
+ * @returns An array of text segments with highlighting information.
+ */
+export function createHighlightedSegments(originalText: string, matches: { startOffset: number; endOffset: number }[]) {
+    const segments: { text: string; highlighted: boolean }[] = [];
+    if (!originalText || !matches) return segments;
+    let lastIndex = 0;
+
+    // Sort matches just in case they aren't ordered
+    matches.sort((a, b) => a.startOffset - b.startOffset);
+
+    for (const match of matches) {
+        // Add text before the match
+        if (match.startOffset > lastIndex) {
+            segments.push({ text: originalText.substring(lastIndex, match.startOffset), highlighted: false });
+        }
+        // Add the matched text
+        segments.push({ text: originalText.substring(match.startOffset, match.endOffset), highlighted: true });
+        lastIndex = match.endOffset;
+    }
+
+    // Add any remaining text after the last match
+    if (lastIndex < originalText.length) {
+        segments.push({ text: originalText.substring(lastIndex), highlighted: false });
+    }
+
+    return segments;
+}
+
+
+
+/**
+ * Debounce function that takes a function and a delay
+ * and returns a new function that will only execute
+ * after the delay has passed without any new calls.
+ * This version is generic and preserves the types of the original function.
+ * @param func The function to debounce.
+ * @param delay The debounce delay in milliseconds.
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const debounce = <T extends (...args: any[]) => void>(func: T, delay: number) => {
+    let timeout: NodeJS.Timeout;
+
+    return (...args: Parameters<T>) => {
+        clearTimeout(timeout);
+        timeout = setTimeout(() => {
+            func(...args);
+        }, delay);
+    };
+};
+
