@@ -143,7 +143,7 @@ The `PlaceAutocomplete` component only loads the `places` library by default.
 
 	const PUBLIC_GOOGLE_MAPS_API_KEY = import.meta.env.VITE_PUBLIC_GOOGLE_MAPS_API_KEY;
 
-	// Pre-initialize the loader with all libraries needed for this page.
+	// Pre-initialise the loader with all libraries needed for this page.
 	onMount(async () => {
 		const loader = getGMapsLoader(PUBLIC_GOOGLE_MAPS_API_KEY);
 		const { Map } = await loader.importLibrary('maps');
