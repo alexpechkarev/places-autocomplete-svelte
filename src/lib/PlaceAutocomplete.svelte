@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import * as GMaps from '@googlemaps/js-api-loader';
 	import type { PlaceResult, Props } from './interfaces.js';
 	import {
 		validateOptions,
@@ -10,7 +9,9 @@
 		createHighlightedSegments,
 		debounce
 	} from './helpers.js';
-	const { Loader } = GMaps;
+
+	import { getGMapsLoader, type GMapsLoaderType } from './gmaps.js';
+
 
 	let {
 		/**
@@ -35,8 +36,6 @@
 	fetchFields = validateFetchFields(fetchFields);
 	//console.log(fetchFields);
 
-	// variable to hold a reference to the component's root element
-	//let componentRoot: HTMLElement;
 
 	let kbdAction = $state(''); // 'up', 'down', or 'escape'
 
@@ -44,8 +43,8 @@
 	let inputRef: HTMLInputElement;
 	let currentSuggestion = $state(-1);
 	let results: any[] = $state([]);
-	let loader: GMaps.Loader;
 	let placesApi: { [key: string]: any } = {};
+	let loader: GMapsLoaderType;
 
 	//https://developers.google.com/maps/documentation/javascript/reference/autocomplete-data
 	// validate requestParams
@@ -106,7 +105,6 @@
 	export function getRequestParams() {
 		return request;
 	}
-
 
 	/**
 	 * Make request and get autocomplete suggestions.
@@ -225,25 +223,24 @@
 			inputRef.focus();
 		}
 
-		// load the Google Maps API
 		try {
-			loader = new Loader({
-				apiKey: PUBLIC_GOOGLE_MAPS_API_KEY,
-				version: 'weekly',
-				libraries: ['places']
-			});
+			loader = getGMapsLoader(PUBLIC_GOOGLE_MAPS_API_KEY);
+		} catch (e: any) {
+			onError(
+				(e.name || 'An error occurred') + ' - ' + (e.message || 'Error loading Google Maps API')
+			);
+		}
 
+		try {
 			const { AutocompleteSessionToken, AutocompleteSuggestion } =
 				await loader.importLibrary('places');
 
 			placesApi.AutocompleteSessionToken = AutocompleteSessionToken;
 			placesApi.AutocompleteSuggestion = AutocompleteSuggestion;
 
-			// const {Geocoder} = await loader.importLibrary("geocoding");
-			// placesApi.Geocoder = new Geocoder();
-
 			setSessionToken();
 		} catch (e: any) {
+			console.log(e);
 			onError(
 				(e.name || 'An error occurred') + ' - ' + (e.message || 'Error loading Google Maps API')
 			);
@@ -353,7 +350,6 @@
 						]}
 						onmouseenter={() => (currentSuggestion = i)}
 						id="option-{i + 1}"
-						
 					>
 						<button
 							type="button"

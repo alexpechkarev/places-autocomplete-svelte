@@ -1,6 +1,8 @@
 <script lang="ts">
 	import type { ComponentOptions, FormattedAddress, PlaceResult } from '$lib/interfaces.js';
 	import PlaceAutocomplete from '$lib/PlaceAutocomplete.svelte';
+	import { getGMapsLoader, type GMapsLoaderType } from '$lib/gmaps.js';
+	import { onMount } from 'svelte';
 	let autocompleteComponent: PlaceAutocomplete | undefined = $state(undefined); // This will hold the component instance
 
 	let unique = $state({}); // every {} is unique, {} === {} evaluates to false
@@ -27,7 +29,7 @@
 	//  geometry, icon, name, permanentlyClosed, photo, placeId, url, utcOffset, vicinity, openingHours, icon, name
 
 	// 'formattedAddress', 'addressComponents', 'accessibilityOptions', 'allowsDogs', 'businessStatus','hasCurbsidePickup', 'hasDelivery','hasDineIn','displayName','displayNameLanguageCode','editorialSummary','evChargeOptions'
-	const fetchFields = ['formattedAddress', 'addressComponents', 'displayName'];
+	const fetchFields = ['formattedAddress', 'addressComponents', 'displayName', 'location'];
 
 	// Options
 	const options: ComponentOptions = {
@@ -137,6 +139,19 @@
 			}
 		}
 
+		if (response.location) {
+			map.setCenter(response.location);
+			map.setZoom(15);
+			if (marker) {
+				marker.setPosition(response.location);
+			} else {
+				marker = new loadedLibs.AdvancedMarkerElement({
+					position: response.location,
+					map: map
+				});
+			}
+		}
+
 		// Trigger UI update if needed, e.g., by reassigning unique
 		handleChange(null); // Or pass a relevant event/data
 	};
@@ -144,9 +159,44 @@
 	// Display response in tabs
 	const tabs = [
 		{ name: 'Response', id: 1 },
-		{ name: 'Formatted Resposne', id: 2 }
+		{ name: 'Formatted Response', id: 2 }
 	];
+
 	let selectedTab = $state(tabs.find((tab) => tab.id === 1)?.id ?? tabs[0].id);
+
+	// 1. Define the types for the libraries you will load.
+	type LoadedLibraries = {
+		Map?: typeof google.maps.Map;
+		AdvancedMarkerElement?: typeof google.maps.marker.AdvancedMarkerElement;
+	};
+
+	let mapElement: HTMLElement;
+	let map: google.maps.Map;
+	let marker: google.maps.AdvancedMarkerElement;
+	let loadedLibs: LoadedLibraries = {};
+
+	onMount(async () => {
+		const loader = getGMapsLoader(PUBLIC_GOOGLE_MAPS_API_KEY);
+		const { Map } = await loader.importLibrary('maps');
+		const { AdvancedMarkerElement } = await loader.importLibrary('marker');
+		loadedLibs = { Map, AdvancedMarkerElement };
+
+		
+
+		const mapEl = document.getElementById('map');
+		// Check if the element was found before using it
+		if (mapEl && loadedLibs.Map) {
+			mapElement = mapEl; // This is now safe
+			map = new loadedLibs.Map(mapElement, {
+				center: { lat: 51.5072, lng: -0.1276 }, // Default to London
+				zoom: 10,
+				mapId: 'your-map-id'
+			});
+		} else {
+			// It's good practice to log an error if the element is missing
+			console.error('Failed to find the map element with ID "map"');
+		}
+	});
 </script>
 
 <svelte:head>
@@ -158,6 +208,7 @@
 </svelte:head>
 
 <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+	<div id="map" class="h-96 w-full rounded-md"></div>
 	{#if placesError}
 		<div
 			class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mt-10"
@@ -171,7 +222,12 @@
 	<div class="my-12">
 		<div class="grid grid-cols-1 lg:grid-cols-6 gap-x-4 mb-10">
 			<div class="col-span-6">
-			<textarea name="address" id="address" placeholder="Enter your address" class="border-2 block w-full p-2 rounded-md"></textarea>
+				<textarea
+					name="address"
+					id="address"
+					placeholder="Enter your address"
+					class="border-2 block w-full p-2 rounded-md"
+				></textarea>
 			</div>
 			<div class={[countries.length && 'lg:col-span-4', !countries.length && 'lg:col-span-6']}>
 				<label class="mt-1 text-sm leading-6 text-gray-600" for="search"

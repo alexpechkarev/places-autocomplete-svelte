@@ -3,9 +3,9 @@
 [![npm version](https://badge.fury.io/js/places-autocomplete-svelte.svg)](https://badge.fury.io/js/places-autocomplete-svelte)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-A flexible, accessible, and secure [Svelte](https://kit.svelte.dev) component leveraging the [Google Maps Places Autocomplete API (New)](https://developers.google.com/maps/documentation/javascript/place-autocomplete-overview) to provide a user-friendly way to search for and retrieve detailed address information.
+A flexible, accessible, and secure [Svelte](https://kit.svelte.dev) component leveraging the [Google Maps Places Autocomplete API (New)](https://developers.google.com/maps/documentation/javascript/place-autocomplete-overview).
 
-This component handles API loading, session tokens, fetching suggestions, and requesting place details, allowing you to focus on integrating the results into your application. It is built with accessibility and security in mind.
+The component handles API loading, session tokens, debounced fetching, and accessibility, allowing you to focus on building your application. It intelligently manages the Google Maps API loader, creating a shared instance that prevents conflicts with other map components on the same page. 
 
 ## Available: Standalone JavaScript Library
 
@@ -15,16 +15,16 @@ Need this functionality for a non-Svelte project? Check out our companion vanill
 ## Features
 
 *   Integrates with the modern **Google Maps Places Autocomplete API (New)**.
+*   **Automatic Shared Loader:** Intelligently creates a single Google Maps loader instance and shares it via Svelte's context.
 *   **Highly Accessible:** Follows WAI-ARIA patterns for comboboxes, with full keyboard navigation and screen reader support.
 *   **Secure:** Safely renders suggestions to protect against XSS attacks.
-*   Automatically handles **session tokens** for cost management per Google's guidelines.
+*   Automatically handles **session tokens** for cost management.
 *   **Debounced Input:** Limits API calls while the user is typing (configurable).
 *   **Suggestion Highlighting:** Automatically highlights the portion of text matching the user's input.
 *   **Imperative API:** Exposes `clear()`, `focus()`, and `getRequestParams()` methods for direct control.
 *   **Customisable Styling:** Easily override default styles using the `options.classes` prop.
 *   **TypeScript Support:** Fully written in TypeScript with included type definitions.
 *   **Event Handling:** Provides `onResponse` and `onError` callbacks.
-*   **Configurable:** Control API parameters (`requestParams`), requested data fields (`fetchFields`), and component behavior (`options`).
 
 ## Demo
 
@@ -51,45 +51,22 @@ npm install places-autocomplete-svelte
 yarn add places-autocomplete-svelte
 ```
 
-## Security
+## Usage
 
-### API Key Security
-
-Your Google Maps API Key is a sensitive credential. To prevent unauthorised use and unexpected charges, you **must** restrict it.
-
-1.  Go to the [Google Cloud Console](https://console.cloud.google.com/google/maps-apis/credentials).
-2.  Select your API key.
-3.  Under **Application restrictions**, select **HTTP referrers (web sites)** and add your application's domain(s) (e.g., `your-domain.com/*`).
-4.  Under **API restrictions**, select **Restrict key** and choose only the **Places API**.
-
-### XSS Protection
-
-This component is designed to be secure out-of-the-box. It safely renders user-input and API responses to prevent Cross-Site Scripting (XSS) vulnerabilities.
-
-## Accessibility
-
-This component is built to be accessible and follows the [WAI-ARIA Authoring Practices for a Combobox](https://www.w3.org/WAI/ARIA/apg/patterns/combobox/).
-
-*   **Keyboard Navigation:** Users can navigate suggestions using `ArrowUp`, `ArrowDown`, select with `Enter`, and close the list with `Escape`.
-*   **Screen Reader Support:** Uses `role="combobox"`, `aria-autocomplete`, `aria-expanded`, and `aria-activedescendant` to provide a clear experience for screen reader users.
-*   **Focus Management:** Focus remains on the input field while navigating the suggestion list, creating a predictable experience.
-
-## Basic Usage
-
-1.  Replace `___YOUR_API_KEY___` with your actual **Google Maps API Key**.
-2.  Use the `onResponse` callback to **handle the response**.
+Provide your Google Maps API key to the component. It will automatically handle loading the required `places` library.
 
 ```javascript
-<script>
+<script lang="ts">
 import { PlaceAutocomplete } from 'places-autocomplete-svelte';
 import type { PlaceResult, ComponentOptions, RequestParams } from 'places-autocomplete-svelte/interfaces';
 
 // Get API Key securely (e.g., from environment variables)
 const PUBLIC_GOOGLE_MAPS_API_KEY = import.meta.env.VITE_PUBLIC_GOOGLE_MAPS_API_KEY;
+
+// --- Event Handlers ---
 let fullResponse: PlaceResult | null = $state(null);
 let placesError = $state('');
 
-// --- Event Handlers ---
 const handleResponse = (response: PlaceResult) => {
 	console.log('Place Selected:', response);
 	fullResponse = response;
@@ -152,6 +129,62 @@ const options: Partial<ComponentOptions> = $state({
 </style>
 ```
 
+### Advanced: Using with other Google Maps Libraries
+
+You can reuse the shared Google Maps loader created by the `PlaceAutocomplete` component to load other libraries (like `maps`). Because the loader instance is shared, you can access it from any other component to load additional libraries without causing conflicts.
+
+The `PlaceAutocomplete` component only loads the `places` library by default. 
+```javascript
+// In a parent component, e.g., src/routes/+page.svelte
+<script lang="ts">
+	import { onMount } from 'svelte';
+	import { getGMapsLoader } from 'places-autocomplete-svelte/gmaps';
+	import PlaceAutocomplete from '$lib/PlaceAutocomplete.svelte';
+
+	const PUBLIC_GOOGLE_MAPS_API_KEY = import.meta.env.VITE_PUBLIC_GOOGLE_MAPS_API_KEY;
+
+	// Pre-initialize the loader with all libraries needed for this page.
+	onMount(async () => {
+		const loader = getGMapsLoader(PUBLIC_GOOGLE_MAPS_API_KEY);
+		const { Map } = await loader.importLibrary('maps');
+        ...
+	});
+</script>
+
+<!-- The component will now use the loader you created above -->
+<PlaceAutocomplete
+    {PUBLIC_GOOGLE_MAPS_API_KEY}
+    onResponse={...}
+    onError={...}
+/>
+
+<!-- You can now use other Google Maps services, e.g., a map -->
+<div id="map"></div>
+```
+
+## Security
+
+### API Key Security
+
+Your Google Maps API Key is a sensitive credential. To prevent unauthorised use and unexpected charges, you **must** restrict it.
+
+1.  Go to the [Google Cloud Console](https://console.cloud.google.com/google/maps-apis/credentials).
+2.  Select your API key.
+3.  Under **Application restrictions**, select **HTTP referrers (web sites)** and add your application's domain(s) (e.g., `your-domain.com/*`).
+4.  Under **API restrictions**, select **Restrict key** and choose the APIs you are using (e.g., **Places API**, **Maps JavaScript API**).
+
+### XSS Protection
+
+This component is designed to be secure out-of-the-box. It safely renders user-input and API responses to prevent Cross-Site Scripting (XSS) vulnerabilities.
+
+## Accessibility
+
+This component is built to be accessible and follows the [WAI-ARIA Authoring Practices for a Combobox](https://www.w3.org/WAI/ARIA/apg/patterns/combobox/).
+
+*   **Keyboard Navigation:** Users can navigate suggestions using `ArrowUp`, `ArrowDown`, select with `Enter`, and close the list with `Escape`.
+*   **Screen Reader Support:** Uses `role="combobox"`, `aria-autocomplete`, `aria-expanded`, and `aria-activedescendant` to provide a clear experience for screen reader users.
+*   **Focus Management:** Focus remains on the input field while navigating the suggestion list.
+
 ## Props
 
 | Prop | Type | Required | Default | Description |
@@ -177,7 +210,8 @@ Get a reference to the component instance using `bind:this` to call its methods 
 
 <PlaceAutocomplete bind:this={autocompleteComponent} ... />
 
-<button onclick={() => autocompleteComponent.clear()}>Clear</button>
+<button onclick={() => autocompleteComponent?.clear()}>Clear</button>
+<button onclick={() => autocompleteComponent?.focus()}>Focus</button>
 ```
 
 | Method | Signature | Description |
@@ -248,7 +282,7 @@ const options = {
 
 ## TypeScript
 
-This component is written in TypeScript. Import types from `places-autocomplete-svelte/interfaces`.
+This component is written in TypeScript. Import types from `places-autocomplete-svelte/interfaces` and helpers from `places-autocomplete-svelte/gmaps`.
 
 ## Google Places API & Billing
 

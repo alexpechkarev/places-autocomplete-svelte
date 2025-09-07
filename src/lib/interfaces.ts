@@ -59,6 +59,11 @@ export interface PlaceResult {
         shortText: string;
         types: string[];
     }[];
+    location?: {
+        lat: number;
+        lng: number;
+    };
+    [key: string]: unknown;
 }
 
 export interface FormattedAddress {
@@ -74,6 +79,7 @@ export interface Props {
     PUBLIC_GOOGLE_MAPS_API_KEY: string;
     options?:ComponentOptions;
     fetchFields?: string[];
+    libraries?: string[];
     requestParams?: RequestParams;
     onResponse: (response: PlaceResult) => void;
     onError: (error: string) => void;
