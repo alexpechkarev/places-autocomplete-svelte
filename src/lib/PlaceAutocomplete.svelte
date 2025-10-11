@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import type { PlaceResult, Props } from './interfaces.js';
+	import { getGMapsContext, hasGMapsContext, importLibrary, initialiseGMapsNoContext, type GMapsContext } from './gmaps.js';
 	import {
 		validateOptions,
 		validateRequestParams,
@@ -10,7 +11,13 @@
 		debounce
 	} from './helpers.js';
 
-	import { getGMapsLoader, type GMapsLoaderType } from './gmaps.js';
+
+	let gmaps: GMapsContext | undefined;
+	// Get the context synchronously. This is safe.
+	if (hasGMapsContext()) {
+		gmaps = getGMapsContext();
+	}
+	
 
 
 	let {
@@ -18,7 +25,7 @@
 		 * By default using SKU: Place Detals (Location Only) - 0.005 USD per each
 		 * @see https://developers.google.com/maps/documentation/javascript/usage-and-billing#location-placedetails
 		 */
-		PUBLIC_GOOGLE_MAPS_API_KEY,
+		PUBLIC_GOOGLE_MAPS_API_KEY='',
 		fetchFields,
 		options,
 		onResponse = $bindable((response: PlaceResult) => {}),
@@ -36,7 +43,6 @@
 	fetchFields = validateFetchFields(fetchFields);
 	//console.log(fetchFields);
 
-
 	let kbdAction = $state(''); // 'up', 'down', or 'escape'
 
 	// Local variables
@@ -44,7 +50,6 @@
 	let currentSuggestion = $state(-1);
 	let results: any[] = $state([]);
 	let placesApi: { [key: string]: any } = {};
-	let loader: GMapsLoaderType;
 
 	//https://developers.google.com/maps/documentation/javascript/reference/autocomplete-data
 	// validate requestParams
@@ -213,6 +218,8 @@
 	 * Initialize the Google Maps JavaScript API Loader.
 	 */
 	onMount(async (): Promise<void> => {
+
+
 		if (isDefaultOnResponse) {
 			console.warn(
 				'PlaceAutocomplete: The `onResponse` callback has not been provided. Selected place data will not be handled. See documentation for usage.'
@@ -224,16 +231,26 @@
 		}
 
 		try {
-			loader = getGMapsLoader(PUBLIC_GOOGLE_MAPS_API_KEY);
-		} catch (e: any) {
-			onError(
-				(e.name || 'An error occurred') + ' - ' + (e.message || 'Error loading Google Maps API')
-			);
-		}
+       		// Await the promise that was stored in the context by the parent.
+            // If the parent has already finished, this resolves immediately.
+            // If the parent is still loading, this will wait.
+			if(typeof gmaps !== 'undefined' && gmaps) {
+				await gmaps?.initializationPromise;
+			}else{
 
-		try {
-			const { AutocompleteSessionToken, AutocompleteSuggestion } =
-				await loader.importLibrary('places');
+				// Check if the API key is provided
+				if(PUBLIC_GOOGLE_MAPS_API_KEY === '' || !PUBLIC_GOOGLE_MAPS_API_KEY) {
+					throw new Error('Google Maps API key is required. Please provide a valid API key.');
+				}
+
+				// No context available, initialize without context
+				// This will load the Google Maps script
+				// and set up the necessary objects
+				// for places API usage.
+				await initialiseGMapsNoContext({key: PUBLIC_GOOGLE_MAPS_API_KEY, 'v': 'weekly'});
+			}
+
+			const { AutocompleteSessionToken, AutocompleteSuggestion } = await importLibrary('places');
 
 			placesApi.AutocompleteSessionToken = AutocompleteSessionToken;
 			placesApi.AutocompleteSuggestion = AutocompleteSuggestion;

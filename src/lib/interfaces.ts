@@ -76,7 +76,7 @@ export interface FormattedAddress {
 }
 
 export interface Props {
-    PUBLIC_GOOGLE_MAPS_API_KEY: string;
+    PUBLIC_GOOGLE_MAPS_API_KEY?: string;
     options?:ComponentOptions;
     fetchFields?: string[];
     libraries?: string[];

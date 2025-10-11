@@ -1,9 +1,26 @@
 <script lang="ts">
+	import { importLibrary } from '@googlemaps/js-api-loader';
 	import type { ComponentOptions, FormattedAddress, PlaceResult } from '$lib/interfaces.js';
 	import PlaceAutocomplete from '$lib/PlaceAutocomplete.svelte';
-	import { getGMapsLoader, type GMapsLoaderType } from '$lib/gmaps.js';
+	import { browser } from '$app/environment';
+	import { initialiseGMaps, setGMapsContext } from '$lib/gmaps.js';
 	import { onMount } from 'svelte';
 	let autocompleteComponent: PlaceAutocomplete | undefined = $state(undefined); // This will hold the component instance
+
+	setGMapsContext();
+	 // 2. If we are in the browser, trigger the asynchronous loading process.
+    // This will update the stores that all components are subscribed to.
+    if (browser) {
+        initialiseGMaps({
+			key: import.meta.env.VITE_PUBLIC_GOOGLE_MAPS_API_KEY,
+			v: 'weekly'
+		}).catch((error: any) => {
+			// Error is already logged and set in the store by initialiseGMaps
+			// You can add additional global error handling here if needed.
+			console.error('Error initializing Google Maps in +page.svelte:', error);
+        });
+    }
+
 
 	let unique = $state({}); // every {} is unique, {} === {} evaluates to false
 	let handleChange = (e: Event | null) => {
@@ -37,7 +54,7 @@
 		distance: true,
 		distance_units: 'km',
 		clear_input: false,
-		debounce: 100
+		debounce: 100,
 		//  label: 'Address',
 		// classes:{
 		// 	icon: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-right-from-line-icon lucide-arrow-right-from-line"><path d="M3 5v14"/><path d="M21 12H7"/><path d="m15 18 6-6-6-6"/></svg>',
@@ -62,6 +79,8 @@
 	let fullResponse: PlaceResult | null = $state(null);
 	// Google Maps API key
 	const PUBLIC_GOOGLE_MAPS_API_KEY = import.meta.env.VITE_PUBLIC_GOOGLE_MAPS_API_KEY;
+
+
 
 	// Countries - optional, if not provided defaults to GB
 	let countries = $state([
@@ -143,7 +162,7 @@
 			map.setCenter(response.location);
 			map.setZoom(15);
 			if (marker) {
-				marker.setPosition(response.location);
+				marker.position = response.location;
 			} else {
 				marker = new loadedLibs.AdvancedMarkerElement({
 					position: response.location,
@@ -172,29 +191,33 @@
 
 	let mapElement: HTMLElement;
 	let map: google.maps.Map;
-	let marker: google.maps.AdvancedMarkerElement;
+	let marker: google.maps.marker.AdvancedMarkerElement;
 	let loadedLibs: LoadedLibraries = {};
 
 	onMount(async () => {
-		const loader = getGMapsLoader(PUBLIC_GOOGLE_MAPS_API_KEY);
-		const { Map } = await loader.importLibrary('maps');
-		const { AdvancedMarkerElement } = await loader.importLibrary('marker');
-		loadedLibs = { Map, AdvancedMarkerElement };
+		try {
+			// Initialize the loader once for all child components.
+    		//initializeGMaps({ key: PUBLIC_GOOGLE_MAPS_API_KEY, v: 'weekly' });
+			const { Map } = await importLibrary('maps');
+			const { AdvancedMarkerElement } = await importLibrary('marker');
+			loadedLibs = { Map, AdvancedMarkerElement };
 
-		
-
-		const mapEl = document.getElementById('map');
-		// Check if the element was found before using it
-		if (mapEl && loadedLibs.Map) {
-			mapElement = mapEl; // This is now safe
-			map = new loadedLibs.Map(mapElement, {
-				center: { lat: 51.5072, lng: -0.1276 }, // Default to London
-				zoom: 10,
-				mapId: 'your-map-id'
-			});
-		} else {
-			// It's good practice to log an error if the element is missing
-			console.error('Failed to find the map element with ID "map"');
+			const mapEl = document.getElementById('map');
+			// Check if the element was found before using it
+			if (mapEl && loadedLibs.Map) {
+				mapElement = mapEl; // This is now safe
+				map = new loadedLibs.Map(mapElement, {
+					center: { lat: 51.5072, lng: -0.1276 }, // Default to London
+					zoom: 10,
+					mapId: 'YOUR_MAP_ID' // Replace with your map ID
+				});
+			} else {
+				// It's good practice to log an error if the element is missing
+				console.error('Failed to find the map element with ID "map"');
+			}
+		} catch (e) {
+			onError('Failed to load Google Maps libraries.');
+			console.error(e);
 		}
 	});
 </script>
@@ -244,6 +267,8 @@
 						{options}
 					/>
 				{/key}
+								
+	
 			</div>
 
 			<!-- Country selector -->
@@ -281,11 +306,11 @@
 		</div>
 	</div>
 
-	<button onclick={() => console.log(JSON.stringify(autocompleteComponent?.getRequestParams()))}>
+	<button onclick={() => console.log(JSON.stringify(autocompleteComponent?.getRequestParams()))} class="mb-10 rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
 		Get Request Param
 	</button>
 
-	<button onclick={() => autocompleteComponent?.focus()}> Focus </button>
+	<button onclick={() => autocompleteComponent?.focus()} class="ml-4 mb-10 rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-indigo-600"> Focus </button>
 
 	{#if Object.values(formattedAddressObj).filter((value) => value).length > 0}
 		<h1 class="text-base font-semibold leading-6 text-gray-900 mt-10">Response</h1>
