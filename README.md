@@ -92,10 +92,10 @@ Here is how you would set it up in your `+page.svelte`:
 ```javascript
 // src/routes/+page.svelte
 <script lang="ts">
-    import PlaceAutocomplete from '$lib/PlaceAutocomplete.svelte';
-    import { browser } from '$app/environment';
-    import { initialiseGMaps, setGMapsContext, getGMapsContext } from '$lib/gmaps.js';
     import { onMount } from 'svelte';
+    import { browser } from '$app/environment';
+    import { PlaceAutocomplete } from 'places-autocomplete-svelte';
+    import { initialiseGMaps, setGMapsContext, getGMapsContext } from 'places-autocomplete-svelte/gmaps.js';
 
     // 1. Set the context for Google Maps. This should be done in the script's top-level scope.
     setGMapsContext();
@@ -104,7 +104,7 @@ Here is how you would set it up in your `+page.svelte`:
     if (browser) {
         initialiseGMaps({
 			key: import.meta.env.VITE_PUBLIC_GOOGLE_MAPS_API_KEY,
-			v: 'weekly'
+			v: 'weekly' 
 		}).catch((error: any) => {
 			// ... handle error (already logged in initialiseGMaps)
         });
@@ -114,6 +114,7 @@ Here is how you would set it up in your `+page.svelte`:
 </script>
 
 <!-- The PlaceAutocomplete component will automatically use the context -->
+<!-- You do NOT need to pass the `PUBLIC_GOOGLE_MAPS_API_KEY` prop to the component if you initialise the loader in a parent component.-->
 <PlaceAutocomplete onResponse={...} onError={...} />
 
 <!-- You can now use other Google Maps services, e.g., a map -->
