@@ -95,7 +95,7 @@ Here is how you would set it up in your `+page.svelte`:
     import { onMount } from 'svelte';
     import { browser } from '$app/environment';
     import { PlaceAutocomplete } from 'places-autocomplete-svelte';
-    import { initialiseGMaps, setGMapsContext, getGMapsContext } from 'places-autocomplete-svelte/gmaps.js';
+    import { initialiseGMaps, setGMapsContext, getGMapsContext } from 'places-autocomplete-svelte/gmaps';
 
     // 1. Set the context for Google Maps. This should be done in the script's top-level scope.
     setGMapsContext();
