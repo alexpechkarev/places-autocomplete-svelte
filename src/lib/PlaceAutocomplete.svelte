@@ -111,6 +111,21 @@
 		return request;
 	}
 
+	// Helper function to find a specific address component
+	const getAddressComponent = (response: { addressComponents: any[]; },type: string) =>
+		response.addressComponents?.find((c: { types: string | string[]; }) => c.types.includes(type))?.longText || '';	
+
+	// Helper function to get secondary text from address components
+	const getSecondaryText = (place: { addressComponents: any[]; }) => {
+		const locality = getAddressComponent(place, 'locality');
+		const adminArea = getAddressComponent(place, 'administrative_area_level_1');
+		const postalCode = getAddressComponent(place, 'postal_code');
+		const country = getAddressComponent(place, 'country');
+
+		let components = [locality, adminArea, country, postalCode].filter(Boolean);
+		return components.join(', ');
+	};
+
 	/**
 	 * Make request and get autocomplete suggestions.
 	 * @param event
@@ -142,10 +157,16 @@
 			// Clear previous results
 			results = [];
 
+
+
 			// ieterate over suggestions and add results to an array
 			for (const suggestion of suggestions) {
 				// get prediction text
-				const predictionText = suggestion.placePrediction.text;
+				//console.log(suggestion.placePrediction.toPlace());
+				let place = suggestions[0].placePrediction.toPlace();
+				await place.fetchFields({fields: ["addressComponents"]});
+
+				const predictionText = suggestion.placePrediction.mainText;
 				const originalText = predictionText.text;
 				// Array of objects with startOffset, endOffset
 				const matches = predictionText.matches;
@@ -162,14 +183,16 @@
 				highlightedText = createHighlightedSegments(originalText, matches);
 
 				results.push({
-					place: suggestion.placePrediction.toPlace(),
-					text: highlightedText,
+					place: place,
+					mainText: highlightedText,
+					secondaryText: getSecondaryText(place),
 					distance: formatDistance(
 						suggestion.placePrediction.distanceMeters,
 						options.distance_units ?? 'km'
 					)
 				});
 			}
+			//console.log('Autocomplete suggestions:', results);
 		} catch (e: any) {
 			onError((e.name || 'An error occurred') + ' - ' + (e.message || 'see console for details.'));
 		}
@@ -383,21 +406,47 @@
 										i === currentSuggestion && options.classes?.li_div_current
 									]}
 								>
-									<p
-										class={[
-											i === currentSuggestion && options.classes?.li_current,
-											options.classes?.li_div_one_p
-										]}
-									>
-										{#each p.text as segment}
-											{#if segment.highlighted}
-												<span class={options.classes?.highlight ?? 'font-bold'}>{segment.text}</span
-												>
-											{:else}
-												{segment.text}
-											{/if}
-										{/each}
-									</p>
+									{#if options.classes?.map_pin_icon}
+										<svg
+											xmlns="http://www.w3.org/2000/svg"
+											width="24"
+											height="24"
+											viewBox="0 0 24 24"
+											fill="none"
+											stroke="currentColor"
+											stroke-width="2"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+											class="size-5">{@html options.classes.map_pin_icon}</svg
+										>
+									{/if}
+
+									<div class={[options.classes?.li_div_p_container ?? '']}>
+										<p
+											class={[
+												i === currentSuggestion && options.classes?.li_current,
+												options.classes?.li_div_one_p
+											]}
+										>
+											{#each p.mainText as segment}
+												{#if segment.highlighted}
+													<span class={options.classes?.highlight ?? 'font-bold'}
+														>{segment.text}</span
+													>
+												{:else}
+													{segment.text}
+												{/if}
+											{/each}
+										</p>
+										<p
+											class={[
+												i === currentSuggestion && options.classes?.li_current,
+												options.classes?.li_div_one_p_secondaryText
+											]}
+										>
+											{p.secondaryText}
+										</p>
+									</div>
 								</div>
 							</div>
 							{#if options.distance && p.distance}

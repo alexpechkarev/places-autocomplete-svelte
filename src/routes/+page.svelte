@@ -38,9 +38,9 @@
 		// The location around which to retrieve place information. This will bias results to the specified area, but will not restrict results to this area.
 		includedRegionCodes: ['GB'],
 		//includedPrimaryTypes: ['restaurant', 'food'],
-		origin: {
-			lat: 53.76538654312942,
-			lng: -3.0181503295898438
+		"origin": {
+			"lat": 53.75651836830397,
+			"lng": -3.0215336287433003
 		}
 	};
 	//  geometry, icon, name, permanentlyClosed, photo, placeId, url, utcOffset, vicinity, openingHours, icon, name
@@ -267,8 +267,6 @@
 						{options}
 					/>
 				{/key}
-								
-	
 			</div>
 
 			<!-- Country selector -->
@@ -306,11 +304,19 @@
 		</div>
 	</div>
 
-	<button onclick={() => console.log(JSON.stringify(autocompleteComponent?.getRequestParams()))} class="mb-10 rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
+	<button
+		onclick={() => console.log(JSON.stringify(autocompleteComponent?.getRequestParams()))}
+		class="mb-10 rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+	>
 		Get Request Param
 	</button>
 
-	<button onclick={() => autocompleteComponent?.focus()} class="ml-4 mb-10 rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-indigo-600"> Focus </button>
+	<button
+		onclick={() => autocompleteComponent?.focus()}
+		class="ml-4 mb-10 rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+	>
+		Focus
+	</button>
 
 	{#if Object.values(formattedAddressObj).filter((value) => value).length > 0}
 		<h1 class="text-base font-semibold leading-6 text-gray-900 mt-10">Response</h1>

@@ -5,7 +5,11 @@
 
 A flexible, accessible, and secure [Svelte](https://kit.svelte.dev) component leveraging the [Google Maps Places Autocomplete API (New)](https://developers.google.com/maps/documentation/javascript/place-autocomplete-overview).
 
-The component handles API loading, session tokens, debounced fetching, and accessibility, allowing you to focus on building your application. It intelligently manages the Google Maps API loader, creating a shared instance that prevents conflicts with other map components on the same page. 
+The component handles API loading, session tokens, debounced fetching, and accessibility, allowing you to focus on building your application. It intelligently manages the Google Maps API loader, creating a shared instance via Svelte's context that prevents conflicts with other map components on the same page.
+
+**Two initialisation patterns:**
+- **Simple/Automatic**: Pass your API key directly to the component for basic use cases
+- **Advanced/Manual**: Initialise the loader once in a parent component when using multiple Google Maps libraries or components 
 
 ## Available: Standalone JavaScript Library
 
@@ -53,73 +57,121 @@ yarn add places-autocomplete-svelte
 
 ## Usage
 
-The `PlaceAutocomplete` component is designed for simplicity. Here’s the minimum required to get it working:
+### Basic Usage (Automatic Initialisation)
+
+For simple use cases, just pass your API key to the component. It will automatically handle the Google Maps loader initialisation:
 
 
 ```javascript
-// In your +page.svelte or a parent component
-
 <script lang="ts">
     import { PlaceAutocomplete } from 'places-autocomplete-svelte';
     import type { PlaceResult } from 'places-autocomplete-svelte/interfaces';
 
     // Get API Key securely (e.g., from environment variables)
-    const PUBLIC_GOOGLE_MAPS_API_KEY = import.meta.env.VITE_PUBLIC_GOOGLE_MAPS_API_KEY;    
+    const PUBLIC_GOOGLE_MAPS_API_KEY = import.meta.env.VITE_PUBLIC_GOOGLE_MAPS_API_KEY;
 
-    // --- Handle Component Response ---
     const handleResponse = (response: PlaceResult) => {
-        console.log('Place Selected:', response.formattedAddress);
+        console.log('Selected:', response.formattedAddress);
     };
 
-    // --- Handle Component Errors ---
     const handleError = (error: string) => {
         console.error('Error:', error);
     };
 </script>
 
-<!-- Add the component to your page -->
-<PlaceAutocomplete {onResponse} {onError} {PUBLIC_GOOGLE_MAPS_API_KEY} />
+<PlaceAutocomplete 
+    {PUBLIC_GOOGLE_MAPS_API_KEY}
+    onResponse={handleResponse} 
+    onError={handleError} 
+/>
 ```
 
-### Advanced: Using with other Google Maps Libraries
+### Advanced Usage (Manual Initialisation)
 
-The `PlaceAutocomplete` component intelligently manages the Google Maps loader. For simple use cases, it handles loading automatically. However, if you need to use other Google Maps libraries (like `maps` or `marker`) on the same page, you should initialise the loader once in a parent component (`+page.svelte` or `+layout.svelte`). This prevents conflicts and ensures all libraries are loaded efficiently.
+For applications that need multiple Google Maps libraries (e.g., `places`, `maps`, `marker`) or multiple map components, initialise the loader once in a parent component. This approach:
 
-The component provides helper functions (`setGMapsContext`, `getGMapsContext`, `initialiseGMaps`) to manage this.
+- Loads all required libraries in a single API call (more efficient)
+- Prevents "Loader must not be called again" errors
+- Shares the loader instance across all child components via Svelte context
+- Works seamlessly with SvelteKit's SSR (only initialises in the browser)
 
-Here is how you would set it up in your `+page.svelte`:
+**When to use manual initialisation:**
+- Using multiple Google Maps components on the same page
+- Need to load multiple libraries (`maps`, `marker`, `geometry`, etc.)
+- Building a layout that shares map functionality across routes
+- Want centralised error handling for the loader
 
 ```javascript
-// src/routes/+page.svelte
+// In +layout.svelte or +page.svelte
 <script lang="ts">
-    import { onMount } from 'svelte';
     import { browser } from '$app/environment';
     import { PlaceAutocomplete } from 'places-autocomplete-svelte';
-    import { initialiseGMaps, setGMapsContext, getGMapsContext } from 'places-autocomplete-svelte/gmaps';
+    import { setGMapsContext, initialiseGMaps, importLibrary } from 'places-autocomplete-svelte/gmaps';
+    import { onMount } from 'svelte';
 
-    // 1. Set the context for Google Maps. This should be done in the script's top-level scope.
+    // 1. Set the context at the top level (must be synchronous)
     setGMapsContext();
 
-    // 2. If we are in the browser, trigger the asynchronous loading process.
+    // 2. Initialise the loader in the browser
     if (browser) {
         initialiseGMaps({
-			key: import.meta.env.VITE_PUBLIC_GOOGLE_MAPS_API_KEY,
-			v: 'weekly' 
-		}).catch((error: any) => {
-			// ... handle error (already logged in initialiseGMaps)
+            key: import.meta.env.VITE_PUBLIC_GOOGLE_MAPS_API_KEY,
+            v: 'weekly'
+        }).catch((error) => {
+            console.error('Failed to initialise Google Maps:', error);
         });
     }
 
-    // ... rest of your component logic
+    // 3. Load additional libraries as needed
+    let map: google.maps.Map;
+    
+    onMount(async () => {
+        const { Map } = await importLibrary('maps');
+        const { AdvancedMarkerElement } = await importLibrary('marker');
+        
+        const mapElement = document.getElementById('map');
+        if (mapElement) {
+            map = new Map(mapElement, {
+                center: { lat: 51.5072, lng: -0.1276 },
+                zoom: 10,
+                mapId: 'YOUR_MAP_ID'
+            });
+        }
+    });
+
+    // 4. Handle autocomplete responses
+    const handleResponse = (response: PlaceResult) => {
+        console.log('Selected:', response.formattedAddress);
+        // Update map with selected location
+        if (response.location && map) {
+            map.setCenter(response.location);
+            map.setZoom(15);
+        }
+    };
+
+    const handleError = (error: string) => {
+        console.error('Error:', error);
+    };
 </script>
 
-<!-- The PlaceAutocomplete component will automatically use the context -->
-<!-- You do NOT need to pass the `PUBLIC_GOOGLE_MAPS_API_KEY` prop to the component if you initialise the loader in a parent component.-->
-<PlaceAutocomplete onResponse={...} onError={...} />
+<!-- The component automatically uses the shared context -->
+<!-- No need to pass PUBLIC_GOOGLE_MAPS_API_KEY when using manual initialisation -->
+<PlaceAutocomplete 
+    onResponse={handleResponse} 
+    onError={handleError} 
+/>
 
-<!-- You can now use other Google Maps services, e.g., a map -->
-<div id="map"></div>
+<div id="map" class="h-96 w-full"></div>
 ```
+
+**Available helper functions from `places-autocomplete-svelte/gmaps`:**
+
+- `setGMapsContext()` - Creates the shared context (call once at the top level)
+- `getGMapsContext()` - Retrieves the context (returns stores for initialisation state and errors)
+- `hasGMapsContext()` - Checks if context exists (useful for conditional logic)
+- `initialiseGMaps(options)` - Initialises the loader with your API key and options
+- `initialiseGMapsNoContext(options)` - Initialises without context (for edge cases)
+- `importLibrary(library)` - Dynamically imports Google Maps libraries
 
 ## Security
 
@@ -148,12 +200,14 @@ This component is built to be accessible and follows the [WAI-ARIA Authoring Pra
 
 | Prop | Type | Required | Default | Description |
 | :--- | :--- | :--- | :--- | :--- |
-| `PUBLIC_GOOGLE_MAPS_API_KEY` | `string` | Yes | - | Your restricted Google Maps API Key. Not required if the loader has been initialised in a parent component. |
-| `fetchFields` | `string[]` | No | `['formattedAddress', 'addressComponents']` | Place Data Fields to request. **Affects API cost.** |
-| `requestParams` | `Partial<RequestParams>` | No | `{ inputOffset: 3, ... }` | Parameters for the Autocomplete API request. |
-| `options` | `Partial<ComponentOptions>` | No | `{ debounce: 100, ... }` | Options to control component behavior and appearance. |
-| `onResponse` | `(response: PlaceResult) => void` | Yes | - | Callback triggered with the selected place details. |
-| `onError` | `(error: string) => void` | Yes | - | Callback triggered when an error occurs. |
+| `PUBLIC_GOOGLE_MAPS_API_KEY` | `string` | No* | - | Your Google Maps API Key. **Required for automatic initialisation.** Optional if you've initialised the loader in a parent component using `initialiseGMaps()`. |
+| `onResponse` | `(response: PlaceResult) => void` | Yes | - | Callback triggered when a user selects a place. Receives the full place details object. |
+| `onError` | `(error: string) => void` | Yes | - | Callback triggered when an error occurs (API loading, network issues, etc.). |
+| `fetchFields` | `string[]` | No | `['formattedAddress', 'addressComponents']` | Place Data Fields to request from the API. See [Place Data Fields](https://developers.google.com/maps/documentation/javascript/place-data-fields). **Affects API billing.** |
+| `requestParams` | `Partial<RequestParams>` | No | `{ inputOffset: 3 }` | Parameters for the Autocomplete API request (language, region, location bias, etc.). See RequestParams interface. |
+| `options` | `Partial<ComponentOptions>` | No | `{ debounce: 100 }` | UI and behavior options (placeholder, debounce delay, distance display, custom classes, etc.). See ComponentOptions interface. |
+
+*Either `PUBLIC_GOOGLE_MAPS_API_KEY` prop OR manual initialisation with `initialiseGMaps()` is required.
 
 ## Component Methods (Imperative API)
 
@@ -241,7 +295,36 @@ const options = {
 
 ## TypeScript
 
-This component is written in TypeScript. Import types from `places-autocomplete-svelte/interfaces` and helpers from `places-autocomplete-svelte/gmaps`.
+This component is written in TypeScript with full type definitions included.
+
+**Available imports:**
+
+```typescript
+// Component
+import { PlaceAutocomplete } from 'places-autocomplete-svelte';
+
+// Types and interfaces
+import type { 
+    PlaceResult,
+    ComponentOptions,
+    RequestParams,
+    FormattedAddress,
+    ComponentClasses,
+    Props
+} from 'places-autocomplete-svelte/interfaces';
+
+// Google Maps loader helpers
+import { 
+    setGMapsContext,
+    getGMapsContext,
+    hasGMapsContext,
+    initialiseGMaps,
+    initialiseGMapsNoContext,
+    importLibrary,
+    type GMapsContext,
+    type APIOptions
+} from 'places-autocomplete-svelte/gmaps';
+```
 
 ## Google Places API & Billing
 
