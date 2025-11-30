@@ -1,7 +1,7 @@
 {
 	"name": "places-autocomplete-svelte",
 	"license": "MIT",
-	"version": "2.2.18",
+	"version": "2.2.19",
 	"description": "A flexible, accessible, and secure Svelte component leveraging the Google Maps Places Autocomplete API (New) to provide a user-friendly way to search for and retrieve detailed address information.",
 	"keywords": [
 		"svelte",
