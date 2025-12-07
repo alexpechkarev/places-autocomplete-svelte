@@ -163,7 +163,7 @@
 			for (const suggestion of suggestions) {
 				// get prediction text
 				//console.log(suggestion.placePrediction.toPlace());
-				let place = suggestions[0].placePrediction.toPlace();
+				let place = suggestion.placePrediction.toPlace();
 				await place.fetchFields({fields: ["addressComponents"]});
 
 				const predictionText = suggestion.placePrediction.mainText;
