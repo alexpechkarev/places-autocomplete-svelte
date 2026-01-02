@@ -26,7 +26,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#157878">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <link rel="stylesheet" href="/places-autocomplete-svelte/assets/css/style.css?v=9b721d20bb5dd50648da6f4f54a6280bd5d7ed86">
+    <link rel="stylesheet" href="/places-autocomplete-svelte/assets/css/style.css?v=b6b595570c1acb5a78d93d4d18c4110207eb83cf">
     <meta name="google-site-verification" content="ZBPJY6t8GM1Cuu4udri69DMYVoM0M1ePgvRp9q8IFfs" />
 <link rel="icon" href="/places-autocomplete-svelte/favicon.svg" type="image/svg+xml">
   </head>
@@ -49,49 +49,105 @@
       <h1 id="places-new-autocomplete-svelte">Places (New) Autocomplete Svelte</h1>
 
 <p><a href="https://badge.fury.io/js/places-autocomplete-svelte"><img src="https://badge.fury.io/js/places-autocomplete-svelte.svg" alt="npm version" /></a>
-<a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT" /></a></p>
+<a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT" /></a>
+<a href="https://developers.google.com/maps"><img src="https://img.shields.io/badge/Google%20Maps%20Platform-Awards%202025%20Winner-4285F4?style=flat&amp;logo=google-maps&amp;logoColor=white" alt="Google Maps Platform Awards 2025" /></a></p>
 
-<p>A flexible and customizable <a href="https://kit.svelte.dev">Svelte</a> component leveraging the <a href="https://developers.google.com/maps/documentation/javascript/place-autocomplete-overview">Google Maps Places Autocomplete API (New)</a> to provide a user-friendly way to search for and retrieve detailed address information within your <a href="https://kit.svelte.dev">SvelteKit</a> applications.</p>
+<p>A flexible, accessible, and secure <a href="https://kit.svelte.dev">Svelte</a> component leveraging the <a href="https://developers.google.com/maps/documentation/javascript/place-autocomplete-overview">Google Maps Places Autocomplete API (New)</a>. <strong>Winner of the Google Maps Platform Awards 2025</strong>, recognising excellence in Google Maps Platform development.</p>
 
-<p>This component handles API loading, session tokens, fetching suggestions, and requesting place details, allowing you to focus on integrating the results into your application. Includes features like debounced input, highlighting of matched suggestions, extensive customization via CSS classes, and full TypeScript support.</p>
+<p>The component handles API loading, session tokens, debounced fetching, and accessibility, allowing you to focus on building your application. It intelligently manages the Google Maps API loader, creating a shared instance via Svelte’s context that prevents conflicts with other map components on the same page.</p>
 
-<h2 id="also-available-standalone-javascript-library">Also Available: Standalone JavaScript Library</h2>
+<p><strong>Two initialisation patterns:</strong></p>
+<ul>
+  <li><strong>Simple/Automatic</strong>: Pass your API key directly to the component for basic use cases</li>
+  <li><strong>Advanced/Manual</strong>: Initialise the loader once in a parent component when using multiple Google Maps libraries or components</li>
+</ul>
 
-<p>Need this functionality for a non-Svelte project? Check out our companion vanilla JavaScript library, <code class="language-plaintext highlighter-rouge">places-autocomplete-js</code>, which offers the same core Google Places (New) Autocomplete features.
-<a href="https://github.com/alexpechkarev/places-autocomplete-js">View <code class="language-plaintext highlighter-rouge">places-autocomplete-js</code> on GitHub</a></p>
+<h2 id="table-of-contents">Table of Contents</h2>
+
+<ul>
+  <li><a href="#features">Features</a></li>
+  <li><a href="#demo">Demo</a></li>
+  <li><a href="#recognition">Recognition</a></li>
+  <li><a href="#requirements">Requirements</a></li>
+  <li><a href="#installation">Installation</a></li>
+  <li><a href="#usage">Usage</a>
+    <ul>
+      <li><a href="#basic-usage-automatic-initialisation">Basic Usage</a></li>
+      <li><a href="#advanced-usage-manual-initialisation">Advanced Usage</a></li>
+    </ul>
+  </li>
+  <li><a href="#props">Props</a></li>
+  <li><a href="#component-methods-imperative-api">Component Methods</a></li>
+  <li><a href="#options">Options</a></li>
+  <li><a href="#styling">Styling</a></li>
+  <li><a href="#events">Events</a></li>
+  <li><a href="#typescript">TypeScript</a></li>
+  <li><a href="#security">Security</a></li>
+  <li><a href="#accessibility">Accessibility</a></li>
+  <li><a href="#google-places-api--billing">Google Places API &amp; Billing</a></li>
+  <li><a href="#standalone-javascript-library">Standalone JavaScript Library</a></li>
+  <li><a href="#contributing">Contributing</a></li>
+  <li><a href="#license">License</a></li>
+</ul>
 
 <h2 id="features">Features</h2>
 
+<h3 id="core-functionality">Core Functionality</h3>
 <ul>
-  <li>Integrates with the modern <strong>“Google Maps Places Autocomplete API (New)</strong>.</li>
-  <li>Automatically handles <strong>session tokens</strong> for cost management per Google’s guidelines.</li>
-  <li><strong>Debounced Input:</strong> Limits API calls while the user is typing (configurable).</li>
-  <li><strong>Suggestion Highlighting:</strong> Automatically highlights the portion of text matching the user’s input in the suggestions list.</li>
-  <li><strong>Imperative API:</strong> Exposes <code class="language-plaintext highlighter-rouge">clear()</code>, <code class="language-plaintext highlighter-rouge">focus()</code>, and <code class="language-plaintext highlighter-rouge">getRequestParams()</code> methods for direct control over the component.</li>
-  <li><strong>Customizable Styling:</strong> Easily override default styles or apply your own using the <code class="language-plaintext highlighter-rouge">options.classes</code> prop. Built with <a href="https://tailwindcss.com/">Tailwind CSS</a> utility classes by default.</li>
-  <li><strong>TypeScript Support:</strong> Fully written in TypeScript with included type definitions.</li>
-  <li><strong>Event Handling:</strong> Provides <code class="language-plaintext highlighter-rouge">onResponse</code> and <code class="language-plaintext highlighter-rouge">onError</code> callbacks.</li>
-  <li><strong>Configurable:</strong> Control API parameters (<code class="language-plaintext highlighter-rouge">requestParams</code>), requested data fields (<code class="language-plaintext highlighter-rouge">fetchFields</code>), and component behavior/appearance (<code class="language-plaintext highlighter-rouge">options</code>).</li>
-  <li><strong>Prop Validation:</strong> Sensible defaults and validation for configuration props.</li>
+  <li>🗺️ Integrates with the modern <strong>Google Maps Places Autocomplete API (New)</strong></li>
+  <li>🔄 <strong>Automatic Shared Loader:</strong> Intelligently creates a single Google Maps loader instance and shares it via Svelte’s context</li>
+  <li>💰 Automatically handles <strong>session tokens</strong> for optimal cost management</li>
+  <li>⚡ <strong>Debounced Input:</strong> Configurable delay to minimise API calls while typing</li>
+  <li>✨ <strong>Suggestion Highlighting:</strong> Automatically highlights matched text in suggestions</li>
+</ul>
+
+<h3 id="accessibility--user-experience">Accessibility &amp; User Experience</h3>
+<ul>
+  <li>♿ <strong>WCAG Compliant:</strong> Follows WAI-ARIA patterns for comboboxes</li>
+  <li>⌨️ <strong>Full Keyboard Navigation:</strong> Arrow keys, Enter, and Escape support</li>
+  <li>📢 <strong>Screen Reader Support:</strong> Proper ARIA attributes for assistive technologies</li>
+</ul>
+
+<h3 id="developer-experience">Developer Experience</h3>
+<ul>
+  <li>🎨 <strong>Customisable Styling:</strong> Override default styles via <code class="language-plaintext highlighter-rouge">options.classes</code> prop</li>
+  <li>🔧 <strong>Imperative API:</strong> Direct control with <code class="language-plaintext highlighter-rouge">clear()</code>, <code class="language-plaintext highlighter-rouge">focus()</code>, <code class="language-plaintext highlighter-rouge">getRequestParams()</code>, <code class="language-plaintext highlighter-rouge">setRequestParams()</code>, <code class="language-plaintext highlighter-rouge">setFetchFields()</code>, and <code class="language-plaintext highlighter-rouge">getFetchFields()</code> methods</li>
+  <li>📘 <strong>TypeScript Support:</strong> Fully typed with comprehensive type definitions</li>
+  <li>🔐 <strong>Secure:</strong> XSS protection with safe rendering of suggestions</li>
+  <li>🎯 <strong>Event Handling:</strong> <code class="language-plaintext highlighter-rouge">onResponse</code> and <code class="language-plaintext highlighter-rouge">onError</code> callbacks for complete control</li>
 </ul>
 
 <h2 id="demo">Demo</h2>
 
-<p>See a live demo of the component in action: <a href="https://places-autocomplete-demo.pages.dev/">Basic Example</a></p>
+<p>Explore live examples showcasing different features and use cases:</p>
 
-<p><a href="https://places-autocomplete-demo.pages.dev/examples/reactive-parameters">Reactive parameters</a> - change the search criteria based on user input, like filtering by country or change results language.</p>
+<p><strong><a href="https://places-autocomplete-demo.pages.dev/">🚀 Basic Example</a></strong> - Get started with the simplest implementation</p>
 
-<p><a href="https://places-autocomplete-demo.pages.dev/examples/customise-request-parameters">Customise request parameters</a> - construct a <code class="language-plaintext highlighter-rouge">requestParams</code> object and control various aspects of the search, including language, region, and more.</p>
+<p><strong><a href="https://places-autocomplete-demo.pages.dev/examples/reactive-parameters">🔄 Reactive Parameters</a></strong> - Dynamically change search criteria based on user input, such as filtering by country or switching languages</p>
 
-<p><a href="https://places-autocomplete-demo.pages.dev/examples/retain-input-value">Retain Input Value After Selection</a> -
-This example demonstrates how to configure the Places (New) Autocomplete Svelte component to keep the selected address visible in the input field after a suggestion is chosen. It utilises the <code class="language-plaintext highlighter-rouge">options.clear_input = false</code> setting.</p>
+<p><strong><a href="https://places-autocomplete-demo.pages.dev/examples/customise-request-parameters">⚙️ Custom Request Parameters</a></strong> - Configure advanced search options including language, region, location bias, and place types</p>
+
+<p><strong><a href="https://places-autocomplete-demo.pages.dev/examples/retain-input-value">📝 Retain Input Value</a></strong> - Keep the selected address visible in the input field after selection</p>
 
 <p><img src="places-autocomplete-svelte.gif" alt="A video demonstrating the Places Autocomplete Svelte component in action, showing address suggestions and selection." /></p>
+
+<h2 id="recognition">Recognition</h2>
+
+<h3 id="-google-maps-platform-awards-2025-winner">🏆 Google Maps Platform Awards 2025 Winner</h3>
+<p align="left">
+  <a href="https://developers.google.com/maps">
+    <img src="badge.svg" alt="Google Maps Platform Awards 2025 Winner" width="200" />
+  </a>
+</p>
+
+<p>This component has been recognised as a winner of the <strong>Google Maps Platform Awards 2025</strong> by the Google Developer Program. This award celebrates outstanding projects that demonstrate exceptional use of Google Maps Platform APIs, innovation, and contribution to the developer community.</p>
+
+<p><a href="https://developers.google.com/maps">Learn more about the Google Maps Platform Awards</a></p>
 
 <h2 id="requirements">Requirements</h2>
 
 <ul>
-  <li><strong>Google Maps API Key</strong> with the Google Maps Places API (New) enabled. Refer to <a href="https://developers.google.com/maps/documentation/javascript/get-api-key">Use API Keys</a> for detailed instructions.</li>
+  <li><strong>Google Maps API Key</strong> with the “Places API” enabled. Refer to <a href="https://developers.google.com/maps/documentation/javascript/get-api-key">Use API Keys</a> for detailed instructions.</li>
 </ul>
 
 <h2 id="installation">Installation</h2>
@@ -101,128 +157,232 @@ This example demonstrates how to configure the Places (New) Autocomplete Svelte 
 yarn add places-autocomplete-svelte
 </code></pre></div></div>
 
-<h2 id="basic-usage">Basic Usage</h2>
+<h2 id="usage">Usage</h2>
+
+<h3 id="basic-usage-automatic-initialisation">Basic Usage (Automatic Initialisation)</h3>
+
+<p>For simple use cases, just pass your API key to the component. It will automatically handle the Google Maps loader initialisation:</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">&lt;</span><span class="nx">script</span> <span class="nx">lang</span><span class="o">=</span><span class="dl">"</span><span class="s2">ts</span><span class="dl">"</span><span class="o">&gt;</span>
+    <span class="k">import</span> <span class="p">{</span> <span class="nx">PlaceAutocomplete</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">places-autocomplete-svelte</span><span class="dl">'</span><span class="p">;</span>
+    <span class="k">import</span> <span class="nx">type</span> <span class="p">{</span> <span class="nx">PlaceResult</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">places-autocomplete-svelte/interfaces</span><span class="dl">'</span><span class="p">;</span>
+
+    <span class="c1">// Get API Key securely (e.g., from environment variables)</span>
+    <span class="kd">const</span> <span class="nx">PUBLIC_GOOGLE_MAPS_API_KEY</span> <span class="o">=</span> <span class="k">import</span><span class="p">.</span><span class="nx">meta</span><span class="p">.</span><span class="nx">env</span><span class="p">.</span><span class="nx">VITE_PUBLIC_GOOGLE_MAPS_API_KEY</span><span class="p">;</span>
+
+    <span class="kd">const</span> <span class="nx">handleResponse</span> <span class="o">=</span> <span class="p">(</span><span class="nx">response</span><span class="p">:</span> <span class="nx">PlaceResult</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="dl">'</span><span class="s1">Selected:</span><span class="dl">'</span><span class="p">,</span> <span class="nx">response</span><span class="p">.</span><span class="nx">formattedAddress</span><span class="p">);</span>
+    <span class="p">};</span>
+
+    <span class="kd">const</span> <span class="nx">handleError</span> <span class="o">=</span> <span class="p">(</span><span class="nx">error</span><span class="p">:</span> <span class="nx">string</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+        <span class="nx">console</span><span class="p">.</span><span class="nx">error</span><span class="p">(</span><span class="dl">'</span><span class="s1">Error:</span><span class="dl">'</span><span class="p">,</span> <span class="nx">error</span><span class="p">);</span>
+    <span class="p">};</span>
+<span class="o">&lt;</span><span class="sr">/script</span><span class="err">&gt;
+</span>
+<span class="o">&lt;</span><span class="nx">PlaceAutocomplete</span> 
+    <span class="p">{</span><span class="nx">PUBLIC_GOOGLE_MAPS_API_KEY</span><span class="p">}</span>
+    <span class="nx">onResponse</span><span class="o">=</span><span class="p">{</span><span class="nx">handleResponse</span><span class="p">}</span> 
+    <span class="nx">onError</span><span class="o">=</span><span class="p">{</span><span class="nx">handleError</span><span class="p">}</span> 
+<span class="sr">/</span><span class="err">&gt;
+</span></code></pre></div></div>
+
+<h3 id="advanced-usage-manual-initialisation">Advanced Usage (Manual Initialisation)</h3>
+
+<p>For applications using multiple Google Maps libraries (e.g., <code class="language-plaintext highlighter-rouge">places</code>, <code class="language-plaintext highlighter-rouge">maps</code>, <code class="language-plaintext highlighter-rouge">marker</code>) or multiple map components, initialise the loader once in a parent component.</p>
+
+<p><strong>Benefits:</strong></p>
+<ul>
+  <li>✅ Loads all required libraries in a single API call (more efficient)</li>
+  <li>✅ Prevents “Loader must not be called again” errors</li>
+  <li>✅ Shares the loader instance across all child components via Svelte context</li>
+  <li>✅ Works seamlessly with SvelteKit’s SSR (only initialises in the browser)</li>
+</ul>
+
+<p><strong>When to use manual initialisation:</strong></p>
+<ul>
+  <li>Multiple Google Maps components on the same page</li>
+  <li>Multiple libraries needed (<code class="language-plaintext highlighter-rouge">maps</code>, <code class="language-plaintext highlighter-rouge">marker</code>, <code class="language-plaintext highlighter-rouge">geometry</code>, etc.)</li>
+  <li>Shared map functionality across routes</li>
+  <li>Centralised error handling for the loader</li>
+</ul>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// In +layout.svelte or +page.svelte</span>
+<span class="o">&lt;</span><span class="nx">script</span> <span class="nx">lang</span><span class="o">=</span><span class="dl">"</span><span class="s2">ts</span><span class="dl">"</span><span class="o">&gt;</span>
+    <span class="k">import</span> <span class="p">{</span> <span class="nx">browser</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">$app/environment</span><span class="dl">'</span><span class="p">;</span>
+    <span class="k">import</span> <span class="p">{</span> <span class="nx">PlaceAutocomplete</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">places-autocomplete-svelte</span><span class="dl">'</span><span class="p">;</span>
+    <span class="k">import</span> <span class="p">{</span> <span class="nx">setGMapsContext</span><span class="p">,</span> <span class="nx">initialiseGMaps</span><span class="p">,</span> <span class="nx">importLibrary</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">places-autocomplete-svelte/gmaps</span><span class="dl">'</span><span class="p">;</span>
+    <span class="k">import</span> <span class="p">{</span> <span class="nx">onMount</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">svelte</span><span class="dl">'</span><span class="p">;</span>
+    <span class="k">import</span> <span class="nx">type</span> <span class="p">{</span> <span class="nx">PlaceResult</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">places-autocomplete-svelte/interfaces</span><span class="dl">'</span><span class="p">;</span>
+
+    <span class="c1">// 1. Set the context at the top level (must be synchronous)</span>
+    <span class="nx">setGMapsContext</span><span class="p">();</span>
+
+    <span class="c1">// 2. Initialise the loader in the browser</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nx">browser</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">initialiseGMaps</span><span class="p">({</span>
+            <span class="na">key</span><span class="p">:</span> <span class="k">import</span><span class="p">.</span><span class="nx">meta</span><span class="p">.</span><span class="nx">env</span><span class="p">.</span><span class="nx">VITE_PUBLIC_GOOGLE_MAPS_API_KEY</span><span class="p">,</span>
+            <span class="na">v</span><span class="p">:</span> <span class="dl">'</span><span class="s1">weekly</span><span class="dl">'</span>
+        <span class="p">}).</span><span class="k">catch</span><span class="p">((</span><span class="nx">error</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+            <span class="nx">console</span><span class="p">.</span><span class="nx">error</span><span class="p">(</span><span class="dl">'</span><span class="s1">Failed to initialise Google Maps:</span><span class="dl">'</span><span class="p">,</span> <span class="nx">error</span><span class="p">);</span>
+        <span class="p">});</span>
+    <span class="p">}</span>
+
+    <span class="c1">// 3. Load additional libraries as needed</span>
+    <span class="kd">let</span> <span class="nx">map</span><span class="p">:</span> <span class="nx">google</span><span class="p">.</span><span class="nx">maps</span><span class="p">.</span><span class="nb">Map</span><span class="p">;</span>
+    
+    <span class="nx">onMount</span><span class="p">(</span><span class="k">async</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+        <span class="kd">const</span> <span class="p">{</span> <span class="nb">Map</span> <span class="p">}</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">importLibrary</span><span class="p">(</span><span class="dl">'</span><span class="s1">maps</span><span class="dl">'</span><span class="p">);</span>
+        <span class="kd">const</span> <span class="nx">mapElement</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">getElementById</span><span class="p">(</span><span class="dl">'</span><span class="s1">map</span><span class="dl">'</span><span class="p">);</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nx">mapElement</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nx">map</span> <span class="o">=</span> <span class="k">new</span> <span class="nb">Map</span><span class="p">(</span><span class="nx">mapElement</span><span class="p">,</span> <span class="p">{</span>
+                <span class="na">center</span><span class="p">:</span> <span class="p">{</span> <span class="na">lat</span><span class="p">:</span> <span class="mf">51.5072</span><span class="p">,</span> <span class="na">lng</span><span class="p">:</span> <span class="o">-</span><span class="mf">0.1276</span> <span class="p">},</span>
+                <span class="na">zoom</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span>
+                <span class="na">mapId</span><span class="p">:</span> <span class="dl">'</span><span class="s1">YOUR_MAP_ID</span><span class="dl">'</span>
+            <span class="p">});</span>
+        <span class="p">}</span>
+    <span class="p">});</span>
+
+    <span class="c1">// 4. Handle autocomplete responses</span>
+    <span class="kd">const</span> <span class="nx">handleResponse</span> <span class="o">=</span> <span class="p">(</span><span class="nx">response</span><span class="p">:</span> <span class="nx">PlaceResult</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="dl">'</span><span class="s1">Selected:</span><span class="dl">'</span><span class="p">,</span> <span class="nx">response</span><span class="p">.</span><span class="nx">formattedAddress</span><span class="p">);</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nx">response</span><span class="p">.</span><span class="nx">location</span> <span class="o">&amp;&amp;</span> <span class="nx">map</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nx">map</span><span class="p">.</span><span class="nx">setCenter</span><span class="p">(</span><span class="nx">response</span><span class="p">.</span><span class="nx">location</span><span class="p">);</span>
+            <span class="nx">map</span><span class="p">.</span><span class="nx">setZoom</span><span class="p">(</span><span class="mi">15</span><span class="p">);</span>
+        <span class="p">}</span>
+    <span class="p">};</span>
+
+    <span class="kd">const</span> <span class="nx">handleError</span> <span class="o">=</span> <span class="p">(</span><span class="nx">error</span><span class="p">:</span> <span class="nx">string</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+        <span class="nx">console</span><span class="p">.</span><span class="nx">error</span><span class="p">(</span><span class="dl">'</span><span class="s1">Error:</span><span class="dl">'</span><span class="p">,</span> <span class="nx">error</span><span class="p">);</span>
+    <span class="p">};</span>
+<span class="o">&lt;</span><span class="sr">/script</span><span class="err">&gt;
+</span>
+<span class="c">&lt;!--</span> <span class="nx">The</span> <span class="nx">component</span> <span class="nx">automatically</span> <span class="nx">uses</span> <span class="nx">the</span> <span class="nx">shared</span> <span class="nx">context</span> <span class="o">--&gt;</span>
+<span class="c">&lt;!--</span> <span class="nx">No</span> <span class="nx">need</span> <span class="nx">to</span> <span class="nx">pass</span> <span class="nx">PUBLIC_GOOGLE_MAPS_API_KEY</span> <span class="nx">when</span> <span class="nx">using</span> <span class="nx">manual</span> <span class="nx">initialisation</span> <span class="o">--&gt;</span>
+<span class="o">&lt;</span><span class="nx">PlaceAutocomplete</span> 
+    <span class="nx">onResponse</span><span class="o">=</span><span class="p">{</span><span class="nx">handleResponse</span><span class="p">}</span> 
+    <span class="nx">onError</span><span class="o">=</span><span class="p">{</span><span class="nx">handleError</span><span class="p">}</span> 
+<span class="sr">/</span><span class="err">&gt;
+</span>
+<span class="o">&lt;</span><span class="nx">div</span> <span class="nx">id</span><span class="o">=</span><span class="dl">"</span><span class="s2">map</span><span class="dl">"</span> <span class="kd">class</span><span class="o">=</span><span class="dl">"</span><span class="s2">h-96 w-full</span><span class="dl">"</span><span class="o">&gt;&lt;</span><span class="sr">/div</span><span class="err">&gt;
+</span></code></pre></div></div>
+
+<p><strong>Available helper functions from <code class="language-plaintext highlighter-rouge">places-autocomplete-svelte/gmaps</code>:</strong></p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">setGMapsContext()</code> - Creates the shared context (call once at the top level)</li>
+  <li><code class="language-plaintext highlighter-rouge">getGMapsContext()</code> - Retrieves the context (returns stores for initialisation state and errors)</li>
+  <li><code class="language-plaintext highlighter-rouge">hasGMapsContext()</code> - Checks if context exists (useful for conditional logic)</li>
+  <li><code class="language-plaintext highlighter-rouge">initialiseGMaps(options)</code> - Initialises the loader with your API key and options</li>
+  <li><code class="language-plaintext highlighter-rouge">initialiseGMapsNoContext(options)</code> - Initialises without context (for edge cases)</li>
+  <li><code class="language-plaintext highlighter-rouge">importLibrary(library)</code> - Dynamically imports Google Maps libraries</li>
+</ul>
+
+<h2 id="security">Security</h2>
+
+<h3 id="api-key-security">API Key Security</h3>
+
+<p>Your Google Maps API Key is a sensitive credential. To prevent unauthorised use and unexpected charges, you <strong>must</strong> restrict it.</p>
 
 <ol>
-  <li>Replace <code class="language-plaintext highlighter-rouge">'___YOUR_API_KEY___'</code> with your actual <strong>Google Maps API Key</strong>.</li>
-  <li>Use the <code class="language-plaintext highlighter-rouge">onResponse</code> callback to <strong>handle the response</strong>.</li>
+  <li>Go to the <a href="https://console.cloud.google.com/google/maps-apis/credentials">Google Cloud Console</a>.</li>
+  <li>Select your API key.</li>
+  <li>Under <strong>Application restrictions</strong>, select <strong>HTTP referrers (web sites)</strong> and add your application’s domain(s) (e.g., <code class="language-plaintext highlighter-rouge">your-domain.com/*</code>).</li>
+  <li>Under <strong>API restrictions</strong>, select <strong>Restrict key</strong> and choose the APIs you are using (e.g., <strong>Places API</strong>, <strong>Maps JavaScript API</strong>).</li>
 </ol>
 
-<pre><code class="language-svelte">&lt;script&gt;
-import { PlaceAutocomplete } from 'places-autocomplete-svelte';
-import type { PlaceResult, ComponentOptions, RequestParams } from 'places-autocomplete-svelte/interfaces'; // Adjust path if needed
+<h3 id="xss-protection">XSS Protection</h3>
 
+<p>This component is designed to be secure out-of-the-box. It safely renders user-input and API responses to prevent Cross-Site Scripting (XSS) vulnerabilities.</p>
 
-// Get API Key securely (e.g., from environment variables)
-const PUBLIC_GOOGLE_MAPS_API_KEY = import.meta.env.VITE_PUBLIC_GOOGLE_MAPS_API_KEY;
-let fullResponse: PlaceResult | null = $state(null);
-let placesError = $state('');
+<h2 id="accessibility">Accessibility</h2>
 
+<p>This component is built to be accessible and follows the <a href="https://www.w3.org/WAI/ARIA/apg/patterns/combobox/">WAI-ARIA Authoring Practices for a Combobox</a>.</p>
 
-// --- Event Handlers ---
-const handleResponse = (response: PlaceResult) =&gt; {
-	console.log('Place Selected:', response);
-	fullResponse = response;
-	placesError = ''; // Clear previous errors
-};
+<ul>
+  <li><strong>Keyboard Navigation:</strong> Users can navigate suggestions using <code class="language-plaintext highlighter-rouge">ArrowUp</code>, <code class="language-plaintext highlighter-rouge">ArrowDown</code>, select with <code class="language-plaintext highlighter-rouge">Enter</code>, and close the list with <code class="language-plaintext highlighter-rouge">Escape</code>.</li>
+  <li><strong>Screen Reader Support:</strong> Uses <code class="language-plaintext highlighter-rouge">role="combobox"</code>, <code class="language-plaintext highlighter-rouge">aria-autocomplete</code>, <code class="language-plaintext highlighter-rouge">aria-expanded</code>, and <code class="language-plaintext highlighter-rouge">aria-activedescendant</code> to provide a clear experience for screen reader users.</li>
+  <li><strong>Focus Management:</strong> Focus remains on the input field while navigating the suggestion list.</li>
+</ul>
 
-const handleError = (error: string) =&gt; {
-	console.error('Places Autocomplete Error:', error);
-	placesError = error;
-	fullResponse = null; // Clear previous results
-};
-
-// --- Configuration (Optional) ---
-
-// Control API request parameters
-const requestParams: Partial&lt;RequestParams&gt; = $state({
-	region: 'GB', // Example: Bias results to Great Britain
-	language: 'en-GB',
-	// includedRegionCodes: ['GB'], // Example: Only show results in the specified regions,
-	// includedPrimaryTypes: ['address'], // Example: Only show addresses
-});
-
-// Control which data fields are fetched for Place Details (affects cost!)
-const fetchFields: string[] = $state(['formattedAddress', 'addressComponents', 'displayName']);
-
-// Control component appearance and behavior
-const options: Partial&lt;ComponentOptions&gt; = $state({
-	placeholder: 'Start typing your address...',
-	debounce: 200, // Debounce input by 200ms (default is 100ms)
-	distance: true, // Show distance if origin is provided in requestParams
-	classes: {
-		// Example: Override input styling and highlight class
-		input: 'my-custom-input-class border-blue-500',
-		highlight: 'bg-yellow-200 text-black', // Customize suggestion highlighting
-	},
-    clear_input: false, // Overriding the default value to keep the input value after selecting a suggestion. The value of the input will be the value of `formattedAddress`
-});
-
-&lt;/script&gt;
-
-{#if placesError}
-    &lt;div class="error-message" role="alert"&gt;
-        Error: {placesError}
-    &lt;/div&gt;
-{/if}
-
-&lt;PlaceAutocomplete
-    {PUBLIC_GOOGLE_MAPS_API_KEY}
-    {requestParams}
-    {fetchFields}
-    {options}
-    onResponse={handleResponse}
-    onError={handleError}
-/&gt;
-
-{#if fullResponse}
-    &lt;h2&gt;Selected Place Details:&lt;/h2&gt;
-    &lt;pre&gt;{JSON.stringify(fullResponse, null, 2)}&lt;/pre&gt;
-{/if}
-
-&lt;style&gt;
-    /* Example of styling an overridden class */
-    :global(.my-custom-input-class) {
-        padding: 0.75rem;
-        border-radius: 0.25rem;
-        width: 100%;
-        /* Add other styles */
-    }
-    .error-message {
-        color: red;
-        margin-bottom: 1rem;
-    }
-&lt;/style&gt;
-</code></pre>
 <h2 id="props">Props</h2>
-<p>| Prop                       | Type                            | Required | Default                                   | Description                                                                                                     |
-|—————————-|———————————|———-|——————————————-|—————————————————————————————————————–|
-| PUBLIC_GOOGLE_MAPS_API_KEY | string                          | Yes      | -                                         | Your Google Maps API Key with Places API enabled.                                                               |
-| fetchFields                | string[]                        | No       | [‘formattedAddress’, ‘addressComponents’] | Array of Place Data Fields to request when a place is selected. Affects API cost.                               |
-| requestParams              | Partial<RequestParams>          | No       | { inputOffset: 3, ... }                   | Parameters for the Autocomplete request. See AutocompletionRequest options.                                     |
-| options                    | Partial<ComponentOptions>       | No       | { debounce: 100, ... }                    | Options to control component behavior and appearance. See details below.                                        |
-| onResponse                 | (response: PlaceResult) =&gt; void | Yes      | -                                         | Callback function triggered with the selected place details (PlaceResult object) after fetchFields is complete. |
-| onError                    | (error: string) =&gt; void         | Yes      | -                                         | Callback function triggered when an error occurs (API loading, fetching suggestions, fetching details).         |</ComponentOptions></RequestParams></p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: left">Prop</th>
+      <th style="text-align: left">Type</th>
+      <th style="text-align: left">Required</th>
+      <th style="text-align: left">Default</th>
+      <th style="text-align: left">Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">PUBLIC_GOOGLE_MAPS_API_KEY</code></td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">string</code></td>
+      <td style="text-align: left">No*</td>
+      <td style="text-align: left">-</td>
+      <td style="text-align: left">Your Google Maps API Key. <strong>Required for automatic initialisation.</strong> Optional if you’ve initialised the loader in a parent component using <code class="language-plaintext highlighter-rouge">initialiseGMaps()</code>.</td>
+    </tr>
+    <tr>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">onResponse</code></td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">(response: PlaceResult) =&gt; void</code></td>
+      <td style="text-align: left">Yes</td>
+      <td style="text-align: left">-</td>
+      <td style="text-align: left">Callback triggered when a user selects a place. Receives the full place details object.</td>
+    </tr>
+    <tr>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">onError</code></td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">(error: string) =&gt; void</code></td>
+      <td style="text-align: left">Yes</td>
+      <td style="text-align: left">-</td>
+      <td style="text-align: left">Callback triggered when an error occurs (API loading, network issues, etc.).</td>
+    </tr>
+    <tr>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">fetchFields</code></td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">string[]</code></td>
+      <td style="text-align: left">No</td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">['formattedAddress', 'addressComponents']</code></td>
+      <td style="text-align: left">Place Data Fields to request from the API. See <a href="https://developers.google.com/maps/documentation/javascript/place-data-fields">Place Data Fields</a>. <strong>Affects API billing.</strong></td>
+    </tr>
+    <tr>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">requestParams</code></td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">Partial&lt;RequestParams&gt;</code></td>
+      <td style="text-align: left">No</td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">{ inputOffset: 3 }</code></td>
+      <td style="text-align: left">Parameters for the Autocomplete API request (language, region, location bias, etc.). See RequestParams interface.</td>
+    </tr>
+    <tr>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">options</code></td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">Partial&lt;ComponentOptions&gt;</code></td>
+      <td style="text-align: left">No</td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">{ debounce: 100 }</code></td>
+      <td style="text-align: left">UI and behavior options (placeholder, debounce delay, distance display, custom classes, etc.). See ComponentOptions interface.</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>*Either <code class="language-plaintext highlighter-rouge">PUBLIC_GOOGLE_MAPS_API_KEY</code> prop OR manual initialisation with <code class="language-plaintext highlighter-rouge">initialiseGMaps()</code> is required.</p>
 
 <h2 id="component-methods-imperative-api">Component Methods (Imperative API)</h2>
 
-<p>For advanced use cases, you can get a reference to the component instance using <code class="language-plaintext highlighter-rouge">bind:this</code> and call its methods directly. This is useful for controlling the component from a parent, such as clearing the input from an external button.</p>
+<p>Get a reference to the component instance using <code class="language-plaintext highlighter-rouge">bind:this</code> to call its methods directly.</p>
 
-<p><strong>Example Setup:</strong></p>
+<p><strong>Example:</strong></p>
 
-<pre><code class="language-svelte">&lt;script lang="ts"&gt;
-    import PlaceAutocomplete from 'places-autocomplete-svelte';
-    let autocompleteComponent = $state(null); // This will hold the component instance
-&lt;/script&gt;
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">&lt;</span><span class="nx">script</span> <span class="nx">lang</span><span class="o">=</span><span class="dl">"</span><span class="s2">ts</span><span class="dl">"</span><span class="o">&gt;</span>
+    <span class="k">import</span> <span class="nx">PlaceAutocomplete</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">places-autocomplete-svelte</span><span class="dl">'</span><span class="p">;</span>
+    <span class="kd">let</span> <span class="nx">autocompleteComponent</span><span class="p">:</span> <span class="nx">PlaceAutocomplete</span> <span class="o">|</span> <span class="kc">undefined</span> <span class="o">=</span> <span class="nx">$state</span><span class="p">(</span><span class="kc">undefined</span><span class="p">);</span>
+<span class="o">&lt;</span><span class="sr">/script</span><span class="err">&gt;
+</span>
+<span class="o">&lt;</span><span class="nx">PlaceAutocomplete</span> <span class="nx">bind</span><span class="p">:</span><span class="k">this</span><span class="o">=</span><span class="p">{</span><span class="nx">autocompleteComponent</span><span class="p">}</span> <span class="p">...</span> <span class="o">/&gt;</span>
 
-&lt;PlaceAutocomplete bind:this={autocompleteComponent} ... /&gt;
-
-&lt;button onclick={() =&gt; autocompleteComponent.clear()}&gt;Clear&lt;/button&gt;
-&lt;button onclick={() =&gt; autocompleteComponent.focus()}&gt;Focus Input&lt;/button&gt;
-&lt;button onclick={() =&gt; console.log(JSON.stringify(autocompleteComponent.getRequestParams()))}&gt;Get Request Params&lt;/button&gt;
-</code></pre>
-
-<p><strong>Available Methods:</strong></p>
+<span class="o">&lt;</span><span class="nx">button</span> <span class="nx">onclick</span><span class="o">=</span><span class="p">{()</span> <span class="o">=&gt;</span> <span class="nx">autocompleteComponent</span><span class="p">?.</span><span class="nx">clear</span><span class="p">()}</span><span class="o">&gt;</span><span class="nx">Clear</span><span class="o">&lt;</span><span class="sr">/button</span><span class="err">&gt;
+</span><span class="o">&lt;</span><span class="nx">button</span> <span class="nx">onclick</span><span class="o">=</span><span class="p">{()</span> <span class="o">=&gt;</span> <span class="nx">autocompleteComponent</span><span class="p">?.</span><span class="nx">focus</span><span class="p">()}</span><span class="o">&gt;</span><span class="nx">Focus</span><span class="o">&lt;</span><span class="sr">/button</span><span class="err">&gt;
+</span><span class="o">&lt;</span><span class="nx">button</span> <span class="nx">onclick</span><span class="o">=</span><span class="p">{()</span> <span class="o">=&gt;</span> <span class="nx">autocompleteComponent</span><span class="p">?.</span><span class="nx">setRequestParams</span><span class="p">({</span> <span class="na">region</span><span class="p">:</span> <span class="dl">'</span><span class="s1">FR</span><span class="dl">'</span><span class="p">,</span> <span class="na">language</span><span class="p">:</span> <span class="dl">'</span><span class="s1">fr</span><span class="dl">'</span> <span class="p">})}</span><span class="o">&gt;</span>
+    <span class="nx">Switch</span> <span class="nx">to</span> <span class="nx">French</span>
+<span class="o">&lt;</span><span class="sr">/button</span><span class="err">&gt;
+</span></code></pre></div></div>
 
 <table>
   <thead>
@@ -236,140 +396,185 @@ const options: Partial&lt;ComponentOptions&gt; = $state({
     <tr>
       <td style="text-align: left"><code class="language-plaintext highlighter-rouge">clear()</code></td>
       <td style="text-align: left"><code class="language-plaintext highlighter-rouge">() =&gt; void</code></td>
-      <td style="text-align: left">Clears the input field, removes all suggestions, and resets the Google Places session token.</td>
+      <td style="text-align: left">Clears the input, removes suggestions, and resets the session token.</td>
     </tr>
     <tr>
       <td style="text-align: left"><code class="language-plaintext highlighter-rouge">focus()</code></td>
       <td style="text-align: left"><code class="language-plaintext highlighter-rouge">() =&gt; void</code></td>
-      <td style="text-align: left">Programmatically sets focus on the text input field.</td>
+      <td style="text-align: left">Sets focus on the text input field.</td>
     </tr>
     <tr>
       <td style="text-align: left"><code class="language-plaintext highlighter-rouge">getRequestParams()</code></td>
       <td style="text-align: left"><code class="language-plaintext highlighter-rouge">() =&gt; RequestParams</code></td>
-      <td style="text-align: left">Returns the component’s current internal <code class="language-plaintext highlighter-rouge">requestParams</code> object. Useful for debugging or state inspection.</td>
+      <td style="text-align: left">Returns the current internal <code class="language-plaintext highlighter-rouge">requestParams</code> object.</td>
+    </tr>
+    <tr>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">setRequestParams(params)</code></td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">(params: Partial&lt;RequestParams&gt;) =&gt; void</code></td>
+      <td style="text-align: left">Dynamically updates request parameters. Useful for changing search criteria (region, language, location bias, etc.). Parameters are merged with existing ones.</td>
+    </tr>
+    <tr>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">setFetchFields(fields)</code></td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">(fields: string[]) =&gt; void</code></td>
+      <td style="text-align: left">Dynamically updates the Place Data Fields to fetch when a place is selected.</td>
+    </tr>
+    <tr>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">getFetchFields()</code></td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">() =&gt; string[]</code></td>
+      <td style="text-align: left">Returns the current array of Place Data Fields that will be requested.</td>
     </tr>
   </tbody>
 </table>
 
-<h3 id="options">Options</h3>
+<h2 id="options">Options</h2>
 
 <table>
   <thead>
     <tr>
-      <th>Option</th>
-      <th>Type</th>
-      <th>Default</th>
-      <th>Description</th>
-      <th> </th>
+      <th style="text-align: left">Option</th>
+      <th style="text-align: left">Type</th>
+      <th style="text-align: left">Default</th>
+      <th style="text-align: left">Description</th>
     </tr>
   </thead>
   <tbody>
     <tr>
-      <td>placeholder</td>
-      <td>string</td>
-      <td>’’</td>
-      <td>Placeholder text for the input field.</td>
-      <td> </td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">placeholder</code></td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">string</code></td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">''</code></td>
+      <td style="text-align: left">Placeholder text for the input field.</td>
     </tr>
     <tr>
-      <td>debounce</td>
-      <td>number</td>
-      <td>100</td>
-      <td>Delay in milliseconds before triggering autocomplete API request after user stops typing. Set to 0 to disable debouncing.</td>
-      <td> </td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">debounce</code></td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">number</code></td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">100</code></td>
+      <td style="text-align: left">Delay in ms before firing API request. Set to <code class="language-plaintext highlighter-rouge">0</code> to disable.</td>
     </tr>
     <tr>
-      <td>distance</td>
-      <td>boolean</td>
-      <td>true</td>
-      <td>Show distance from requestParams.origin in suggestions (if origin is provided).</td>
-      <td> </td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">distance</code></td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">boolean</code></td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">true</code></td>
+      <td style="text-align: left">Show distance from <code class="language-plaintext highlighter-rouge">requestParams.origin</code> (if provided).</td>
     </tr>
     <tr>
-      <td>distance_units</td>
-      <td>‘km’ | ‘miles’</td>
-      <td>‘km’</td>
-      <td>Units to display distance in.</td>
-      <td> </td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">distance_units</code></td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">'km' \| 'miles'</code></td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">'km'</code></td>
+      <td style="text-align: left">Units for displaying distance.</td>
     </tr>
     <tr>
-      <td>label</td>
-      <td>string</td>
-      <td>’’</td>
-      <td>Optional label text displayed above the input field.</td>
-      <td> </td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">label</code></td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">string</code></td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">''</code></td>
+      <td style="text-align: left">Optional label text displayed above the input.</td>
     </tr>
     <tr>
-      <td>autofocus</td>
-      <td>boolean</td>
-      <td>false</td>
-      <td>Automatically focus the input field on mount.</td>
-      <td> </td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">autofocus</code></td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">boolean</code></td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">false</code></td>
+      <td style="text-align: left">Automatically focus the input on mount.</td>
     </tr>
     <tr>
-      <td>autocomplete</td>
-      <td>string</td>
-      <td>‘off’</td>
-      <td>Standard HTML autocomplete attribute for the input field.</td>
-      <td> </td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">autocomplete</code></td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">string</code></td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">'off'</code></td>
+      <td style="text-align: left">The <code class="language-plaintext highlighter-rouge">autocomplete</code> attribute for the input field.</td>
     </tr>
     <tr>
-      <td>classes</td>
-      <td>Partial<ComponentClasses></ComponentClasses></td>
-      <td>{}</td>
-      <td>Object to override default CSS classes for various component parts. See Styling (options.classes) section for keys.</td>
-      <td> </td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">classes</code></td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">Partial&lt;ComponentClasses&gt;</code></td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">{}</code></td>
+      <td style="text-align: left">Object to override default CSS classes. See Styling section.</td>
     </tr>
     <tr>
-      <td>clear_input</td>
-      <td>Boolean</td>
-      <td>true</td>
-      <td>If <code class="language-plaintext highlighter-rouge">true</code> (default), clears the input field after a suggestion is selected. If <code class="language-plaintext highlighter-rouge">false</code>, the input field retains the <code class="language-plaintext highlighter-rouge">formattedAddress</code> of the selected place.</td>
-      <td> </td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">clear_input</code></td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">boolean</code></td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">true</code></td>
+      <td style="text-align: left">If <code class="language-plaintext highlighter-rouge">false</code>, retains the <code class="language-plaintext highlighter-rouge">formattedAddress</code> in the input after selection.</td>
     </tr>
   </tbody>
 </table>
 
-<h3 id="styling-optionsclasses">Styling (<code class="language-plaintext highlighter-rouge">options.classes</code>)</h3>
-<hr />
+<h2 id="styling">Styling</h2>
 
-<p>You can customize the appearance of the component by providing your own CSS classes via the <code class="language-plaintext highlighter-rouge">options.classes</code> prop. The component uses Tailwind CSS utility classes by default. Provide an object where keys are the component parts and values are the class strings you want to apply. See <a href="https://places-autocomplete-demo.pages.dev/examples/styling">styling</a> for details.</p>
+<h3 id="default-styles">Default Styles</h3>
 
-<p><strong>Available Class Keys:</strong>
-The following keys can be used within the `options.classes object to target specific parts of the component:</p>
+<p>The component includes built-in styles with <code class="language-plaintext highlighter-rouge">.pac-</code> prefixed CSS classes, providing a complete, accessible UI out of the box. These styles are:</p>
 
 <ul>
-  <li><code class="language-plaintext highlighter-rouge">section</code>: The main container section.</li>
-  <li><code class="language-plaintext highlighter-rouge">container</code>: The div containing the input and suggestions list.</li>
-  <li><code class="language-plaintext highlighter-rouge">label</code>: The label element (if <code class="language-plaintext highlighter-rouge">options.label</code> is provided).</li>
-  <li><code class="language-plaintext highlighter-rouge">input</code>: The main text input element.</li>
-  <li><code class="language-plaintext highlighter-rouge">icon_container</code>: Container for the optional icon.</li>
-  <li><code class="language-plaintext highlighter-rouge">icon</code>: SVG string for the icon.</li>
-  <li><code class="language-plaintext highlighter-rouge">ul</code>: The <code class="language-plaintext highlighter-rouge">&lt;ul&gt;</code> element for the suggestions list.</li>
-  <li><code class="language-plaintext highlighter-rouge">li</code>: Each <code class="language-plaintext highlighter-rouge">&lt;li&gt;</code> suggestion item.</li>
-  <li><code class="language-plaintext highlighter-rouge">li_current</code>: Class added to the currently highlighted/selected <code class="language-plaintext highlighter-rouge">&lt;li&gt;</code> (keyboard/mouse).</li>
-  <li><code class="language-plaintext highlighter-rouge">li_a</code>: The inner <code class="language-plaintext highlighter-rouge">&lt;a&gt;</code> or <code class="language-plaintext highlighter-rouge">&lt;button&gt;</code> element within each <code class="language-plaintext highlighter-rouge">&lt;li&gt;</code>.</li>
-  <li><code class="language-plaintext highlighter-rouge">li_a_current</code>: Class added to the inner element when its <code class="language-plaintext highlighter-rouge">&lt;li&gt;</code> is current.</li>
-  <li><code class="language-plaintext highlighter-rouge">li_div_container</code>: Container div within the <code class="language-plaintext highlighter-rouge">&lt;a&gt;</code>/<code class="language-plaintext highlighter-rouge">&lt;button&gt;</code>.</li>
-  <li><code class="language-plaintext highlighter-rouge">li_div_one</code>: First inner div (usually contains the main text).</li>
-  <li><code class="language-plaintext highlighter-rouge">li_div_one_p</code>: The <code class="language-plaintext highlighter-rouge">&lt;p&gt;</code> tag containing the main suggestion text (<code class="language-plaintext highlighter-rouge">@html</code> is used).</li>
-  <li><code class="language-plaintext highlighter-rouge">li_div_two</code>: Second inner div (usually contains the distance).</li>
-  <li><code class="language-plaintext highlighter-rouge">li_div_two_p</code>: The <code class="language-plaintext highlighter-rouge">&lt;p&gt;</code> tag containing the distance text.</li>
-  <li><code class="language-plaintext highlighter-rouge">kbd_container</code>: Container for the keyboard hint keys (Esc, Up, Down).</li>
-  <li><code class="language-plaintext highlighter-rouge">kbd_escape</code>: The <code class="language-plaintext highlighter-rouge">&lt;kbd&gt;</code> tag for the ‘Esc’ hint.</li>
-  <li><code class="language-plaintext highlighter-rouge">kbd_up</code>: The <code class="language-plaintext highlighter-rouge">&lt;kbd&gt;</code> tag for the ‘Up Arrow’ hint.</li>
-  <li><code class="language-plaintext highlighter-rouge">kbd_down</code>: The <code class="language-plaintext highlighter-rouge">&lt;kbd&gt;</code> tag for the ‘Down Arrow’ hint.</li>
-  <li><code class="language-plaintext highlighter-rouge">highlight</code>: The class applied to the <code class="language-plaintext highlighter-rouge">&lt;span&gt;</code> wrapping the matched text within suggestions. Defaults to <code class="language-plaintext highlighter-rouge">'font-bold'</code>.</li>
+  <li><strong>Framework-agnostic</strong>: Pure CSS with no dependencies on Tailwind or other frameworks</li>
+  <li><strong>Modern design</strong>: Clean, professional appearance with proper spacing, shadows, and hover effects</li>
+  <li><strong>Fully functional</strong>: Includes keyboard navigation indicators, loading states, and responsive behavior</li>
+  <li><strong>Customisable</strong>: All styles can be overridden via the <code class="language-plaintext highlighter-rouge">options.classes</code> prop</li>
 </ul>
 
-<h3 id="example">Example:</h3>
+<p>The default styles include:</p>
+<ul>
+  <li>Rounded input with shadow and focus states</li>
+  <li>Dropdown list with scroll behavior and dividers</li>
+  <li>Keyboard navigation hints (Esc, ↑, ↓)</li>
+  <li>Highlighted current selection with color transitions</li>
+  <li>Distance display for location-based results</li>
+  <li>Icon support with proper alignment</li>
+  <li>Responsive layout for mobile and desktop</li>
+</ul>
+
+<h3 id="customisation-optionsclasses">Customisation (<code class="language-plaintext highlighter-rouge">options.classes</code>)</h3>
+
+<p>Override any default styling by providing your own CSS classes via <code class="language-plaintext highlighter-rouge">options.classes</code>. Your custom classes will replace the default <code class="language-plaintext highlighter-rouge">.pac-</code> classes for the specified elements.</p>
+
+<p><strong>Available Class Keys:</strong></p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">section</code>: The main container <code class="language-plaintext highlighter-rouge">section</code> (default: <code class="language-plaintext highlighter-rouge">.pac-section</code>)</li>
+  <li><code class="language-plaintext highlighter-rouge">container</code>: The <code class="language-plaintext highlighter-rouge">div</code> containing the input and suggestions list (default: <code class="language-plaintext highlighter-rouge">.pac-container</code>)</li>
+  <li><code class="language-plaintext highlighter-rouge">label</code>: The <code class="language-plaintext highlighter-rouge">label</code> element</li>
+  <li><code class="language-plaintext highlighter-rouge">input</code>: The main text <code class="language-plaintext highlighter-rouge">input</code> element (default: <code class="language-plaintext highlighter-rouge">.pac-input</code>)</li>
+  <li><code class="language-plaintext highlighter-rouge">icon_container</code>: Container for the optional icon (default: <code class="language-plaintext highlighter-rouge">.pac-icon-container</code>)</li>
+  <li><code class="language-plaintext highlighter-rouge">icon</code>: SVG string for the icon</li>
+  <li><code class="language-plaintext highlighter-rouge">ul</code>: The <code class="language-plaintext highlighter-rouge">&lt;ul&gt;</code> element for the suggestions list (default: <code class="language-plaintext highlighter-rouge">.pac-ul</code>)</li>
+  <li><code class="language-plaintext highlighter-rouge">li</code>: Each <code class="language-plaintext highlighter-rouge">&lt;li&gt;</code> suggestion item (default: <code class="language-plaintext highlighter-rouge">.pac-li</code>)</li>
+  <li><code class="language-plaintext highlighter-rouge">li_current</code>: Class added to the currently highlighted <code class="language-plaintext highlighter-rouge">&lt;li&gt;</code> (default: <code class="language-plaintext highlighter-rouge">.pac-li-current</code>)</li>
+  <li><code class="language-plaintext highlighter-rouge">li_button</code>: The <code class="language-plaintext highlighter-rouge">&lt;button&gt;</code> within each list item (default: <code class="language-plaintext highlighter-rouge">.pac-li-button</code>)</li>
+  <li><code class="language-plaintext highlighter-rouge">li_button_current</code>: Class added to the currently highlighted button (default: <code class="language-plaintext highlighter-rouge">.pac-li-button-current</code>)</li>
+  <li><code class="language-plaintext highlighter-rouge">li_div_container</code>: Container <code class="language-plaintext highlighter-rouge">div</code> within each list item (default: <code class="language-plaintext highlighter-rouge">.pac-li-div-container</code>)</li>
+  <li><code class="language-plaintext highlighter-rouge">li_div_one</code>: First inner <code class="language-plaintext highlighter-rouge">div</code> containing the main text (default: <code class="language-plaintext highlighter-rouge">.pac-li-div-one</code>)</li>
+  <li><code class="language-plaintext highlighter-rouge">li_div_one_p</code>: The <code class="language-plaintext highlighter-rouge">&lt;p&gt;</code> tag containing the main suggestion text (default: <code class="language-plaintext highlighter-rouge">.pac-li-div-one-p</code>)</li>
+  <li><code class="language-plaintext highlighter-rouge">li_div_one_p_secondaryText</code>: The <code class="language-plaintext highlighter-rouge">&lt;p&gt;</code> tag for secondary text (default: <code class="language-plaintext highlighter-rouge">.pac-li-div-one-p-secondaryText</code>)</li>
+  <li><code class="language-plaintext highlighter-rouge">li_div_p_container</code>: Container for paragraphs (default: <code class="language-plaintext highlighter-rouge">.pac-li-div-p-container</code>)</li>
+  <li><code class="language-plaintext highlighter-rouge">li_div_two</code>: Second inner <code class="language-plaintext highlighter-rouge">div</code> containing the distance (default: <code class="language-plaintext highlighter-rouge">.pac-li-div-two</code>)</li>
+  <li><code class="language-plaintext highlighter-rouge">li_div_two_p</code>: The <code class="language-plaintext highlighter-rouge">&lt;p&gt;</code> tag containing the distance text (default: <code class="language-plaintext highlighter-rouge">.pac-li-div-two-p</code>)</li>
+  <li><code class="language-plaintext highlighter-rouge">kbd_container</code>: Container for the keyboard hint keys (default: <code class="language-plaintext highlighter-rouge">.pac-kbd-container</code>)</li>
+  <li><code class="language-plaintext highlighter-rouge">kbd_escape</code>: The <code class="language-plaintext highlighter-rouge">&lt;kbd&gt;</code> tag for the ‘Esc’ hint (default: <code class="language-plaintext highlighter-rouge">.pac-kbd-escape</code>)</li>
+  <li><code class="language-plaintext highlighter-rouge">kbd_up</code>: The <code class="language-plaintext highlighter-rouge">&lt;kbd&gt;</code> tag for the ‘Up Arrow’ hint (default: <code class="language-plaintext highlighter-rouge">.pac-kbd-up</code>)</li>
+  <li><code class="language-plaintext highlighter-rouge">kbd_down</code>: The <code class="language-plaintext highlighter-rouge">&lt;kbd&gt;</code> tag for the ‘Down Arrow’ hint (default: <code class="language-plaintext highlighter-rouge">.pac-kbd-down</code>)</li>
+  <li><code class="language-plaintext highlighter-rouge">kbd_active</code>: Class applied to active keyboard hints (default: <code class="language-plaintext highlighter-rouge">.pac-kbd-active</code>)</li>
+  <li><code class="language-plaintext highlighter-rouge">map_pin_icon</code>: SVG string for the map pin icon</li>
+  <li><code class="language-plaintext highlighter-rouge">highlight</code>: The class applied to the <code class="language-plaintext highlighter-rouge">&lt;span&gt;</code> wrapping the matched text (default: <code class="language-plaintext highlighter-rouge">.pac-highlight</code>)</li>
+</ul>
+
+<p><strong>Example - Using with Tailwind CSS:</strong></p>
 
 <div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">options</span> <span class="o">=</span> <span class="p">{</span>
   <span class="na">classes</span><span class="p">:</span> <span class="p">{</span>
-    <span class="na">input</span><span class="p">:</span> <span class="dl">'</span><span class="s1">form-input w-full rounded-md shadow-sm</span><span class="dl">'</span><span class="p">,</span> <span class="c1">// Replace default input style</span>
-    <span class="na">ul</span><span class="p">:</span> <span class="dl">'</span><span class="s1">absolute bg-white shadow-lg rounded-md mt-1 w-full z-10</span><span class="dl">'</span><span class="p">,</span> <span class="c1">// Custom dropdown style</span>
-    <span class="na">li_current</span><span class="p">:</span> <span class="dl">'</span><span class="s1">bg-blue-500 text-white</span><span class="dl">'</span><span class="p">,</span> <span class="c1">// Custom highlight style for selected item</span>
-    <span class="na">highlight</span><span class="p">:</span> <span class="dl">'</span><span class="s1">text-blue-700 font-semibold</span><span class="dl">'</span> <span class="c1">// Custom style for matched text</span>
+    <span class="na">input</span><span class="p">:</span> <span class="dl">'</span><span class="s1">w-full px-4 py-2.5 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500</span><span class="dl">'</span><span class="p">,</span>
+    <span class="na">ul</span><span class="p">:</span> <span class="dl">'</span><span class="s1">absolute mt-1 w-full bg-white shadow-lg rounded-md border border-gray-200 max-h-60 overflow-auto</span><span class="dl">'</span><span class="p">,</span>
+    <span class="na">li</span><span class="p">:</span> <span class="dl">'</span><span class="s1">px-4 py-2 hover:bg-blue-500 hover:text-white cursor-pointer</span><span class="dl">'</span><span class="p">,</span>
+    <span class="na">li_current</span><span class="p">:</span> <span class="dl">'</span><span class="s1">bg-blue-500 text-white</span><span class="dl">'</span><span class="p">,</span>
+    <span class="na">highlight</span><span class="p">:</span> <span class="dl">'</span><span class="s1">font-semibold text-blue-700</span><span class="dl">'</span>
+  <span class="p">}</span>
+<span class="p">};</span>
+</code></pre></div></div>
+
+<p><strong>Example - Using with Custom CSS:</strong></p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">options</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="na">classes</span><span class="p">:</span> <span class="p">{</span>
+    <span class="na">section</span><span class="p">:</span> <span class="dl">'</span><span class="s1">autocomplete-wrapper</span><span class="dl">'</span><span class="p">,</span>
+    <span class="na">input</span><span class="p">:</span> <span class="dl">'</span><span class="s1">search-input</span><span class="dl">'</span><span class="p">,</span>
+    <span class="na">ul</span><span class="p">:</span> <span class="dl">'</span><span class="s1">suggestions-list</span><span class="dl">'</span><span class="p">,</span>
+    <span class="na">li</span><span class="p">:</span> <span class="dl">'</span><span class="s1">suggestion-item</span><span class="dl">'</span><span class="p">,</span>
+    <span class="na">li_current</span><span class="p">:</span> <span class="dl">'</span><span class="s1">suggestion-item--active</span><span class="dl">'</span>
   <span class="p">}</span>
 <span class="p">};</span>
 </code></pre></div></div>
@@ -379,38 +584,97 @@ The following keys can be used within the `options.classes object to target spec
 <ul>
   <li><strong><code class="language-plaintext highlighter-rouge">onResponse</code></strong>: <code class="language-plaintext highlighter-rouge">(response: PlaceResult) =&gt; void</code>
     <ul>
-      <li>Fired after a user selects a suggestion and the requested <code class="language-plaintext highlighter-rouge">fetchFields</code> have been successfully retrieved.</li>
-      <li>The <code class="language-plaintext highlighter-rouge">response</code> argument is an object containing the place details based on the <code class="language-plaintext highlighter-rouge">fetchFields</code> requested. Its structure mirrors the <a href="https://developers.google.com/maps/documentation/javascript/reference/places-service#PlaceResult">PlaceResult</a> but includes only the requested fields.</li>
+      <li>Fired after a user selects a suggestion and <code class="language-plaintext highlighter-rouge">fetchFields</code> are retrieved.</li>
     </ul>
   </li>
   <li><strong><code class="language-plaintext highlighter-rouge">onError</code></strong>: <code class="language-plaintext highlighter-rouge">(error: string) =&gt; void</code>
     <ul>
-      <li>Fired if there’s an error loading the Google Maps API, fetching autocomplete suggestions, or fetching place details.</li>
-      <li>The <code class="language-plaintext highlighter-rouge">error</code> argument is a string describing the error.</li>
+      <li>Fired on any error (API loading, fetching suggestions, etc.).</li>
     </ul>
   </li>
 </ul>
 
 <h2 id="typescript">TypeScript</h2>
 
-<p>This component is written in TypeScript and includes type definitions for props (<code class="language-plaintext highlighter-rouge">Props</code>, <code class="language-plaintext highlighter-rouge">ComponentOptions</code>, <code class="language-plaintext highlighter-rouge">RequestParams</code>, <code class="language-plaintext highlighter-rouge">ComponentClasses</code>) and the response (<code class="language-plaintext highlighter-rouge">PlaceResult</code>, <code class="language-plaintext highlighter-rouge">AddressComponent</code>). You can import these types from <code class="language-plaintext highlighter-rouge">places-autocomplete-svelte/interfaces</code> (adjust path if needed based on your setup).</p>
+<p>This component is fully written in TypeScript with comprehensive type definitions.</p>
 
-<h2 id="google-places-api--billing">Google Places API &amp; Billing</h2>
+<h3 id="available-imports">Available Imports</h3>
+
+<p><strong>Component:</strong></p>
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="nx">PlaceAutocomplete</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">places-autocomplete-svelte</span><span class="dl">'</span><span class="p">;</span>
+</code></pre></div></div>
+
+<p><strong>Types and Interfaces:</strong></p>
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="kd">type</span> <span class="p">{</span> 
+    <span class="nx">PlaceResult</span><span class="p">,</span>       <span class="c1">// Place data returned from API</span>
+    <span class="nx">ComponentOptions</span><span class="p">,</span>  <span class="c1">// UI and behavior configuration</span>
+    <span class="nx">RequestParams</span><span class="p">,</span>     <span class="c1">// Autocomplete request parameters</span>
+    <span class="nx">FormattedAddress</span><span class="p">,</span>  <span class="c1">// Standardised address structure</span>
+    <span class="nx">ComponentClasses</span><span class="p">,</span>  <span class="c1">// CSS class overrides</span>
+    <span class="nx">Props</span>              <span class="c1">// Component props</span>
+<span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">places-autocomplete-svelte/interfaces</span><span class="dl">'</span><span class="p">;</span>
+</code></pre></div></div>
+
+<p><strong>Google Maps Loader Helpers:</strong></p>
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="p">{</span> 
+    <span class="nx">setGMapsContext</span><span class="p">,</span>           <span class="c1">// Create shared context</span>
+    <span class="nx">getGMapsContext</span><span class="p">,</span>           <span class="c1">// Retrieve context</span>
+    <span class="nx">hasGMapsContext</span><span class="p">,</span>           <span class="c1">// Check if context exists</span>
+    <span class="nx">initialiseGMaps</span><span class="p">,</span>           <span class="c1">// Initialise with context</span>
+    <span class="nx">initialiseGMapsNoContext</span><span class="p">,</span>  <span class="c1">// Initialise standalone</span>
+    <span class="nx">importLibrary</span><span class="p">,</span>             <span class="c1">// Load Google Maps libraries</span>
+    <span class="kd">type</span> <span class="nx">GMapsContext</span><span class="p">,</span>         <span class="c1">// Context type</span>
+    <span class="kd">type</span> <span class="nx">APIOptions</span>            <span class="c1">// Loader options type</span>
+<span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">places-autocomplete-svelte/gmaps</span><span class="dl">'</span><span class="p">;</span>
+</code></pre></div></div>
+
+<h2 id="security-1">Security</h2>
 
 <ul>
-  <li>This component uses the Google Maps JavaScript API (specifically the Places library). Usage is subject to Google’s terms and pricing.</li>
-  <li>An API key enabled for the “Places API” is required.</li>
-  <li>The component uses <strong>Session Tokens</strong> automatically to group Autocomplete requests, which can lead to significant cost savings compared to per-request billing. See <a href="https://developers.google.com/maps/documentation/places/web-service/usage-and-billing#session-pricing">Google’s Session Token Pricing</a>.</li>
-  <li>Place Details requests (made via <code class="language-plaintext highlighter-rouge">fetchFields</code> when a suggestion is selected) are billed separately. Carefully select only the <code class="language-plaintext highlighter-rouge">fetchFields</code> you need to manage costs. See <a href="https://developers.google.com/maps/documentation/javascript/usage-and-billing#data-pricing">Place Data Fields Pricing</a>.</li>
+  <li>This component uses the Google Maps JavaScript API (Places library). Usage is subject to Google’s terms and pricing.</li>
+  <li><strong>Session Tokens</strong> are used automatically to group Autocomplete requests, which can reduce costs.</li>
+  <li>Place Details requests (via <code class="language-plaintext highlighter-rouge">fetchFields</code>) are billed separately. <strong>Only request the fields you need</strong> to manage costs effectively.</li>
+  <li>For detailed pricing information, see <a href="https://developers.google.com/maps/documentation/javascript/usage-and-billing">Google Maps Platform Pricing</a>.</li>
 </ul>
+
+<h2 id="standalone-javascript-library">Standalone JavaScript Library</h2>
+
+<p>Need this functionality for a non-Svelte project? Check out our companion vanilla JavaScript library:</p>
+
+<p><strong><a href="https://github.com/alexpechkarev/places-autocomplete-js">places-autocomplete-js</a></strong> - Same core Google Places (New) Autocomplete features, framework-agnostic implementation.</p>
 
 <h2 id="contributing">Contributing</h2>
 
-<p>Contributions are welcome! Please feel free to open an issue or submit a pull request.</p>
+<p>Contributions are welcome! We appreciate bug reports, feature requests, and pull requests.</p>
+
+<p><strong>How to contribute:</strong></p>
+<ol>
+  <li>Fork the repository</li>
+  <li>Create a feature branch (<code class="language-plaintext highlighter-rouge">git checkout -b feature/amazing-feature</code>)</li>
+  <li>Commit your changes (<code class="language-plaintext highlighter-rouge">git commit -m 'Add amazing feature'</code>)</li>
+  <li>Push to the branch (<code class="language-plaintext highlighter-rouge">git push origin feature/amazing-feature</code>)</li>
+  <li>Open a Pull Request</li>
+</ol>
+
+<p>Please ensure your code follows the existing style and includes appropriate tests.</p>
+
+<h2 id="author">Author</h2>
+
+<p><strong>Alexander Pechkarev</strong></p>
+<ul>
+  <li>GitHub: <a href="https://github.com/alexpechkarev">@alexpechkarev</a></li>
+  <li>Email: alexpechkarev@gmail.com</li>
+</ul>
 
 <h2 id="license">License</h2>
 
-<p><a href="/places-autocomplete-svelte/LICENSE">MIT</a></p>
+<p>This project is licensed under the MIT License - see the <a href="/places-autocomplete-svelte/LICENSE">LICENSE</a> file for details.</p>
+
+<hr />
+
+<p align="center">
+  <sub>Built with ❤️ using Svelte 5 and Google Maps Platform</sub>
+</p>
 
 
       <footer class="site-footer">
