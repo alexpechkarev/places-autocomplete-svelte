@@ -1,7 +1,5 @@
-import { getContext, setContext } from 'svelte';
-import { writable, type Writable, get } from 'svelte/store';
-import { setOptions, importLibrary, type APIOptions } from "@googlemaps/js-api-loader";
-
+import { type Writable } from 'svelte/store';
+import { importLibrary, type APIOptions } from "@googlemaps/js-api-loader";
 /**
  * Context object for managing Google Maps API initialisation state across components.
  * Provides reactive stores for initialisation status and error handling, plus a shared promise
@@ -11,27 +9,16 @@ import { setOptions, importLibrary, type APIOptions } from "@googlemaps/js-api-l
 interface GMapsContext {
     /** Reactive store tracking whether the Google Maps API has been successfully initialised. */
     isInitialised: Writable<boolean>;
-    
     /** Reactive store containing any error that occurred during API initialisation. */
     error: Writable<Error | null>;
-    
     /** Shared promise for API initialisation, ensuring only one load attempt occurs across all components. */
     initialisationPromise: Promise<void> | null;
 }
-
 /**
  * Re-exported types for external use.
  * @public
  */
 export type { GMapsContext, APIOptions };
-
-/**
- * Unique symbol key for storing the Google Maps context in Svelte's context API.
- * Using a Symbol ensures the key cannot be accidentally overwritten by other components.
- * @private
- */
-const LOADER_CONTEXT_KEY = Symbol('gmaps-loader');
-
 /**
  * Creates and initialises the Google Maps context with reactive stores.
  * This function should be called once in a top-level parent component (e.g., +layout.svelte)
@@ -42,21 +29,11 @@ const LOADER_CONTEXT_KEY = Symbol('gmaps-loader');
  * @example
  * // In +layout.svelte
  * <script>
- *   import { setGMapsContext } from '$lib/gmaps';
+ *   import { setGMapsContext } from './gmaps';
  *   setGMapsContext();
  * </script>
  */
-export function setGMapsContext(): void {
-    // Only set the context if it doesn't already exist.
-    if (getContext(LOADER_CONTEXT_KEY)) return;
-
-    setContext<GMapsContext>(LOADER_CONTEXT_KEY, {
-        isInitialised: writable(false),
-        error: writable(null),
-        initialisationPromise: null, // Will be set by the loader function
-    });
-}
-
+export declare function setGMapsContext(): void;
 /**
  * Retrieves the shared Google Maps context from Svelte's context API.
  * Must be called after setGMapsContext() has been invoked in a parent component.
@@ -64,25 +41,14 @@ export function setGMapsContext(): void {
  * @returns {GMapsContext} The context object containing initialisation stores and promise.
  * @throws {Error} If the context has not been set by a parent component.
  */
-export function getGMapsContext(): GMapsContext {
-    const context = getContext<GMapsContext>(LOADER_CONTEXT_KEY);
-    if (!context) {
-        throw new Error('Google Maps context not found. Call setGMapsContext in a parent component.');
-    }
-    return context;
-}
-
+export declare function getGMapsContext(): GMapsContext;
 /**
  * Checks whether the Google Maps context has been set in the component tree.
  * Use this to conditionally handle scenarios where context may or may not be available.
  * @public
  * @returns {boolean} True if the context exists, false otherwise.
  */
-export function hasGMapsContext(): boolean {
-    const context = getContext<GMapsContext>(LOADER_CONTEXT_KEY);
-    return !!context;
-}
-
+export declare function hasGMapsContext(): boolean;
 /**
  * Asynchronously initialises the Google Maps JavaScript API using the shared context.
  * This function is idempotent and safe to call multiple times - subsequent calls will
@@ -94,39 +60,7 @@ export function hasGMapsContext(): boolean {
  * @example
  * await initialiseGMaps({ key: 'YOUR_API_KEY', v: 'weekly' });
  */
-export async function initialiseGMaps(options: APIOptions): Promise<void> {
-
-  // Get the context internally
-  const context:GMapsContext = getGMapsContext();
-
-    // If initialisation is already in progress or completed, return the existing promise
-    if (context.initialisationPromise) {
-        return context.initialisationPromise;
-    }
-    
-    // If already initialised (e.g., from browser navigation or hot reload), resolve immediately
-    if (get(context.isInitialised)) {
-        return Promise.resolve();
-    }
-
-    // Create a new initialisation promise and store it in the context to prevent duplicate loads
-    context.initialisationPromise = new Promise((resolve, reject) => {
-        try {
-            setOptions(options); // Configure the Google Maps API loader with provided options
-            context.isInitialised.set(true);
-            resolve();
-        } catch (e: unknown) {
-            const error = e instanceof Error ? e : new Error(String(e));
-            context.error.set(error);
-            console.error("Failed to set Google Maps API options.", error);
-            reject(error);
-        }
-    });
-
-    return context.initialisationPromise;
-}
-
-
+export declare function initialiseGMaps(options: APIOptions): Promise<void>;
 /**
  * Initialises the Google Maps JavaScript API without using the Svelte context system.
  * Use this when you need standalone initialisation without sharing state across components,
@@ -138,19 +72,7 @@ export async function initialiseGMaps(options: APIOptions): Promise<void> {
  * @example
  * await initialiseGMapsNoContext({ key: 'YOUR_API_KEY', v: 'weekly' });
  */
-export function initialiseGMapsNoContext(options: APIOptions): Promise<void> {
-    return new Promise((resolve, reject) => {
-        try {
-            setOptions(options);
-            resolve();
-        } catch (e: unknown) {
-            const error = e instanceof Error ? e : new Error(String(e));
-            console.error("Failed to set Google Maps API options.", error);
-            reject(error);
-        }
-    });
-}
-
+export declare function initialiseGMapsNoContext(options: APIOptions): Promise<void>;
 /**
  * Re-exported from @googlemaps/js-api-loader for convenient access.
  * Dynamically imports a specific Google Maps library (e.g., 'places', 'maps', 'marker').

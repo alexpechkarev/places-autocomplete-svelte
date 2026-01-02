@@ -2,46 +2,86 @@
 
 [![npm version](https://badge.fury.io/js/places-autocomplete-svelte.svg)](https://badge.fury.io/js/places-autocomplete-svelte)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Google Maps Platform Awards 2025](https://img.shields.io/badge/Google%20Maps%20Platform-Awards%202025%20Winner-4285F4?style=flat&logo=google-maps&logoColor=white)](https://developers.google.com/maps)
 
-A flexible, accessible, and secure [Svelte](https://kit.svelte.dev) component leveraging the [Google Maps Places Autocomplete API (New)](https://developers.google.com/maps/documentation/javascript/place-autocomplete-overview).
+A flexible, accessible, and secure [Svelte](https://kit.svelte.dev) component leveraging the [Google Maps Places Autocomplete API (New)](https://developers.google.com/maps/documentation/javascript/place-autocomplete-overview). **Winner of the Google Maps Platform Awards 2025**, recognising excellence in Google Maps Platform development.
 
 The component handles API loading, session tokens, debounced fetching, and accessibility, allowing you to focus on building your application. It intelligently manages the Google Maps API loader, creating a shared instance via Svelte's context that prevents conflicts with other map components on the same page.
 
 **Two initialisation patterns:**
 - **Simple/Automatic**: Pass your API key directly to the component for basic use cases
-- **Advanced/Manual**: Initialise the loader once in a parent component when using multiple Google Maps libraries or components 
+- **Advanced/Manual**: Initialise the loader once in a parent component when using multiple Google Maps libraries or components
 
-## Available: Standalone JavaScript Library
+## Table of Contents
 
-Need this functionality for a non-Svelte project? Check out our companion vanilla JavaScript library, `places-autocomplete-js`, which offers the same core Google Places (New) Autocomplete features.
-[View `places-autocomplete-js` on GitHub](https://github.com/alexpechkarev/places-autocomplete-js)
+- [Features](#features)
+- [Demo](#demo)
+- [Recognition](#recognition)
+- [Requirements](#requirements)
+- [Installation](#installation)
+- [Usage](#usage)
+  - [Basic Usage](#basic-usage-automatic-initialisation)
+  - [Advanced Usage](#advanced-usage-manual-initialisation)
+- [Props](#props)
+- [Component Methods](#component-methods-imperative-api)
+- [Options](#options)
+- [Styling](#styling)
+- [Events](#events)
+- [TypeScript](#typescript)
+- [Security](#security)
+- [Accessibility](#accessibility)
+- [Google Places API & Billing](#google-places-api--billing)
+- [Standalone JavaScript Library](#standalone-javascript-library)
+- [Contributing](#contributing)
+- [License](#license)
 
 ## Features
 
-*   Integrates with the modern **Google Maps Places Autocomplete API (New)**.
-*   **Automatic Shared Loader:** Intelligently creates a single Google Maps loader instance and shares it via Svelte's context.
-*   **Highly Accessible:** Follows WAI-ARIA patterns for comboboxes, with full keyboard navigation and screen reader support.
-*   **Secure:** Safely renders suggestions to protect against XSS attacks.
-*   Automatically handles **session tokens** for cost management.
-*   **Debounced Input:** Limits API calls while the user is typing (configurable).
-*   **Suggestion Highlighting:** Automatically highlights the portion of text matching the user's input.
-*   **Imperative API:** Exposes `clear()`, `focus()`, and `getRequestParams()` methods for direct control.
-*   **Customisable Styling:** Easily override default styles using the `options.classes` prop.
-*   **TypeScript Support:** Fully written in TypeScript with included type definitions.
-*   **Event Handling:** Provides `onResponse` and `onError` callbacks.
+### Core Functionality
+*   🗺️ Integrates with the modern **Google Maps Places Autocomplete API (New)**
+*   🔄 **Automatic Shared Loader:** Intelligently creates a single Google Maps loader instance and shares it via Svelte's context
+*   💰 Automatically handles **session tokens** for optimal cost management
+*   ⚡ **Debounced Input:** Configurable delay to minimise API calls while typing
+*   ✨ **Suggestion Highlighting:** Automatically highlights matched text in suggestions
+
+### Accessibility & User Experience
+*   ♿ **WCAG Compliant:** Follows WAI-ARIA patterns for comboboxes
+*   ⌨️ **Full Keyboard Navigation:** Arrow keys, Enter, and Escape support
+*   📢 **Screen Reader Support:** Proper ARIA attributes for assistive technologies
+
+### Developer Experience
+*   🎨 **Customisable Styling:** Override default styles via `options.classes` prop
+*   🔧 **Imperative API:** Direct control with `clear()`, `focus()`, `getRequestParams()`, `setRequestParams()`, `setFetchFields()`, and `getFetchFields()` methods
+*   📘 **TypeScript Support:** Fully typed with comprehensive type definitions
+*   🔐 **Secure:** XSS protection with safe rendering of suggestions
+*   🎯 **Event Handling:** `onResponse` and `onError` callbacks for complete control
 
 ## Demo
 
-See a live demo of the component in action: [Basic Example](https://places-autocomplete-demo.pages.dev/)
+Explore live examples showcasing different features and use cases:
 
-[Reactive parameters](https://places-autocomplete-demo.pages.dev/examples/reactive-parameters) - change the search criteria based on user input, like filtering by country or change results language.
+**[🚀 Basic Example](https://places-autocomplete-demo.pages.dev/)** - Get started with the simplest implementation
 
-[Customise request parameters](https://places-autocomplete-demo.pages.dev/examples/customise-request-parameters) - construct a `requestParams` object and control various aspects of the search, including language, region, and more.
+**[🔄 Reactive Parameters](https://places-autocomplete-demo.pages.dev/examples/reactive-parameters)** - Dynamically change search criteria based on user input, such as filtering by country or switching languages
 
-[Retain Input Value After Selection](https://places-autocomplete-demo.pages.dev/examples/retain-input-value) -
-This example demonstrates how to configure the component to keep the selected address visible in the input field after a suggestion is chosen.
+**[⚙️ Custom Request Parameters](https://places-autocomplete-demo.pages.dev/examples/customise-request-parameters)** - Configure advanced search options including language, region, location bias, and place types
+
+**[📝 Retain Input Value](https://places-autocomplete-demo.pages.dev/examples/retain-input-value)** - Keep the selected address visible in the input field after selection
 
 <img src="places-autocomplete-svelte.gif" alt="A video demonstrating the Places Autocomplete Svelte component in action, showing address suggestions and selection.">
+
+## Recognition
+
+### 🏆 Google Maps Platform Awards 2025 Winner
+<p align="left">
+  <a href="https://developers.google.com/maps">
+    <img src="badge.svg" alt="Google Maps Platform Awards 2025 Winner" width="200">
+  </a>
+</p>
+
+This component has been recognised as a winner of the **Google Maps Platform Awards 2025** by the Google Developer Program. This award celebrates outstanding projects that demonstrate exceptional use of Google Maps Platform APIs, innovation, and contribution to the developer community.
+
+[Learn more about the Google Maps Platform Awards](https://developers.google.com/maps)
 
 ## Requirements
 
@@ -88,18 +128,19 @@ For simple use cases, just pass your API key to the component. It will automatic
 
 ### Advanced Usage (Manual Initialisation)
 
-For applications that need multiple Google Maps libraries (e.g., `places`, `maps`, `marker`) or multiple map components, initialise the loader once in a parent component. This approach:
+For applications using multiple Google Maps libraries (e.g., `places`, `maps`, `marker`) or multiple map components, initialise the loader once in a parent component.
 
-- Loads all required libraries in a single API call (more efficient)
-- Prevents "Loader must not be called again" errors
-- Shares the loader instance across all child components via Svelte context
-- Works seamlessly with SvelteKit's SSR (only initialises in the browser)
+**Benefits:**
+- ✅ Loads all required libraries in a single API call (more efficient)
+- ✅ Prevents "Loader must not be called again" errors
+- ✅ Shares the loader instance across all child components via Svelte context
+- ✅ Works seamlessly with SvelteKit's SSR (only initialises in the browser)
 
 **When to use manual initialisation:**
-- Using multiple Google Maps components on the same page
-- Need to load multiple libraries (`maps`, `marker`, `geometry`, etc.)
-- Building a layout that shares map functionality across routes
-- Want centralised error handling for the loader
+- Multiple Google Maps components on the same page
+- Multiple libraries needed (`maps`, `marker`, `geometry`, etc.)
+- Shared map functionality across routes
+- Centralised error handling for the loader
 
 ```javascript
 // In +layout.svelte or +page.svelte
@@ -108,6 +149,7 @@ For applications that need multiple Google Maps libraries (e.g., `places`, `maps
     import { PlaceAutocomplete } from 'places-autocomplete-svelte';
     import { setGMapsContext, initialiseGMaps, importLibrary } from 'places-autocomplete-svelte/gmaps';
     import { onMount } from 'svelte';
+    import type { PlaceResult } from 'places-autocomplete-svelte/interfaces';
 
     // 1. Set the context at the top level (must be synchronous)
     setGMapsContext();
@@ -127,8 +169,6 @@ For applications that need multiple Google Maps libraries (e.g., `places`, `maps
     
     onMount(async () => {
         const { Map } = await importLibrary('maps');
-        const { AdvancedMarkerElement } = await importLibrary('marker');
-        
         const mapElement = document.getElementById('map');
         if (mapElement) {
             map = new Map(mapElement, {
@@ -142,7 +182,6 @@ For applications that need multiple Google Maps libraries (e.g., `places`, `maps
     // 4. Handle autocomplete responses
     const handleResponse = (response: PlaceResult) => {
         console.log('Selected:', response.formattedAddress);
-        // Update map with selected location
         if (response.location && map) {
             map.setCenter(response.location);
             map.setZoom(15);
@@ -225,6 +264,9 @@ Get a reference to the component instance using `bind:this` to call its methods 
 
 <button onclick={() => autocompleteComponent?.clear()}>Clear</button>
 <button onclick={() => autocompleteComponent?.focus()}>Focus</button>
+<button onclick={() => autocompleteComponent?.setRequestParams({ region: 'FR', language: 'fr' })}>
+    Switch to French
+</button>
 ```
 
 | Method | Signature | Description |
@@ -232,6 +274,9 @@ Get a reference to the component instance using `bind:this` to call its methods 
 | `clear()` | `() => void` | Clears the input, removes suggestions, and resets the session token. |
 | `focus()` | `() => void` | Sets focus on the text input field. |
 | `getRequestParams()` | `() => RequestParams` | Returns the current internal `requestParams` object. |
+| `setRequestParams(params)` | `(params: Partial<RequestParams>) => void` | Dynamically updates request parameters. Useful for changing search criteria (region, language, location bias, etc.). Parameters are merged with existing ones. |
+| `setFetchFields(fields)` | `(fields: string[]) => void` | Dynamically updates the Place Data Fields to fetch when a place is selected. |
+| `getFetchFields()` | `() => string[]` | Returns the current array of Place Data Fields that will be requested. |
 
 ## Options
 
@@ -247,41 +292,82 @@ Get a reference to the component instance using `bind:this` to call its methods 
 | `classes` | `Partial<ComponentClasses>` | `{}` | Object to override default CSS classes. See Styling section. |
 | `clear_input` | `boolean` | `true` | If `false`, retains the `formattedAddress` in the input after selection. |
 
-## Styling (`options.classes`)
+## Styling
 
-Customise the component by providing your own CSS classes via `options.classes`.
+### Default Styles
+
+The component includes built-in styles with `.pac-` prefixed CSS classes, providing a complete, accessible UI out of the box. These styles are:
+
+*   **Framework-agnostic**: Pure CSS with no dependencies on Tailwind or other frameworks
+*   **Modern design**: Clean, professional appearance with proper spacing, shadows, and hover effects
+*   **Fully functional**: Includes keyboard navigation indicators, loading states, and responsive behavior
+*   **Customisable**: All styles can be overridden via the `options.classes` prop
+
+The default styles include:
+- Rounded input with shadow and focus states
+- Dropdown list with scroll behavior and dividers
+- Keyboard navigation hints (Esc, ↑, ↓)
+- Highlighted current selection with color transitions
+- Distance display for location-based results
+- Icon support with proper alignment
+- Responsive layout for mobile and desktop
+
+### Customisation (`options.classes`)
+
+Override any default styling by providing your own CSS classes via `options.classes`. Your custom classes will replace the default `.pac-` classes for the specified elements.
 
 **Available Class Keys:**
 
-*   `section`: The main container `section`.
-*   `container`: The `div` containing the input and suggestions list.
-*   `label`: The `label` element.
-*   `input`: The main text `input` element.
-*   `icon_container`: Container for the optional icon.
-*   `icon`: SVG string for the icon.
-*   `ul`: The `<ul>` element for the suggestions list.
-*   `li`: Each `<li>` suggestion item.
-*   `li_current`: Class added to the currently highlighted `<li>`.
-*   `li_div_container`: Container `div` within each list item.
-*   `li_div_one`: First inner `div` (contains the main text).
-*   `li_div_one_p`: The `<p>` tag containing the main suggestion text.
-*   `li_div_two`: Second inner `div` (contains the distance).
-*   `li_div_two_p`: The `<p>` tag containing the distance text.
-*   `kbd_container`: Container for the keyboard hint keys.
-*   `kbd_escape`: The `<kbd>` tag for the 'Esc' hint.
-*   `kbd_up`: The `<kbd>` tag for the 'Up Arrow' hint.
-*   `kbd_down`: The `<kbd>` tag for the 'Down Arrow' hint.
-*   `highlight`: The class applied to the `<span>` wrapping the matched text. Defaults to `'font-bold'`.
+*   `section`: The main container `section` (default: `.pac-section`)
+*   `container`: The `div` containing the input and suggestions list (default: `.pac-container`)
+*   `label`: The `label` element
+*   `input`: The main text `input` element (default: `.pac-input`)
+*   `icon_container`: Container for the optional icon (default: `.pac-icon-container`)
+*   `icon`: SVG string for the icon
+*   `ul`: The `<ul>` element for the suggestions list (default: `.pac-ul`)
+*   `li`: Each `<li>` suggestion item (default: `.pac-li`)
+*   `li_current`: Class added to the currently highlighted `<li>` (default: `.pac-li-current`)
+*   `li_button`: The `<button>` within each list item (default: `.pac-li-button`)
+*   `li_button_current`: Class added to the currently highlighted button (default: `.pac-li-button-current`)
+*   `li_div_container`: Container `div` within each list item (default: `.pac-li-div-container`)
+*   `li_div_one`: First inner `div` containing the main text (default: `.pac-li-div-one`)
+*   `li_div_one_p`: The `<p>` tag containing the main suggestion text (default: `.pac-li-div-one-p`)
+*   `li_div_one_p_secondaryText`: The `<p>` tag for secondary text (default: `.pac-li-div-one-p-secondaryText`)
+*   `li_div_p_container`: Container for paragraphs (default: `.pac-li-div-p-container`)
+*   `li_div_two`: Second inner `div` containing the distance (default: `.pac-li-div-two`)
+*   `li_div_two_p`: The `<p>` tag containing the distance text (default: `.pac-li-div-two-p`)
+*   `kbd_container`: Container for the keyboard hint keys (default: `.pac-kbd-container`)
+*   `kbd_escape`: The `<kbd>` tag for the 'Esc' hint (default: `.pac-kbd-escape`)
+*   `kbd_up`: The `<kbd>` tag for the 'Up Arrow' hint (default: `.pac-kbd-up`)
+*   `kbd_down`: The `<kbd>` tag for the 'Down Arrow' hint (default: `.pac-kbd-down`)
+*   `kbd_active`: Class applied to active keyboard hints (default: `.pac-kbd-active`)
+*   `map_pin_icon`: SVG string for the map pin icon
+*   `highlight`: The class applied to the `<span>` wrapping the matched text (default: `.pac-highlight`)
 
-**Example:**
+**Example - Using with Tailwind CSS:**
 
 ```javascript
 const options = {
   classes: {
-    input: 'form-input w-full rounded-md shadow-sm',
-    ul: 'absolute bg-white shadow-lg rounded-md mt-1 w-full z-10',
+    input: 'w-full px-4 py-2.5 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500',
+    ul: 'absolute mt-1 w-full bg-white shadow-lg rounded-md border border-gray-200 max-h-60 overflow-auto',
+    li: 'px-4 py-2 hover:bg-blue-500 hover:text-white cursor-pointer',
     li_current: 'bg-blue-500 text-white',
-    highlight: 'text-blue-700 font-semibold'
+    highlight: 'font-semibold text-blue-700'
+  }
+};
+```
+
+**Example - Using with Custom CSS:**
+
+```javascript
+const options = {
+  classes: {
+    section: 'autocomplete-wrapper',
+    input: 'search-input',
+    ul: 'suggestions-list',
+    li: 'suggestion-item',
+    li_current: 'suggestion-item--active'
   }
 };
 ```
@@ -295,47 +381,79 @@ const options = {
 
 ## TypeScript
 
-This component is written in TypeScript with full type definitions included.
+This component is fully written in TypeScript with comprehensive type definitions.
 
-**Available imports:**
+### Available Imports
 
+**Component:**
 ```typescript
-// Component
-import { PlaceAutocomplete } from 'places-autocomplete-svelte';
+import PlaceAutocomplete from 'places-autocomplete-svelte';
+```
 
-// Types and interfaces
+**Types and Interfaces:**
+```typescript
 import type { 
-    PlaceResult,
-    ComponentOptions,
-    RequestParams,
-    FormattedAddress,
-    ComponentClasses,
-    Props
+    PlaceResult,       // Place data returned from API
+    ComponentOptions,  // UI and behavior configuration
+    RequestParams,     // Autocomplete request parameters
+    FormattedAddress,  // Standardised address structure
+    ComponentClasses,  // CSS class overrides
+    Props              // Component props
 } from 'places-autocomplete-svelte/interfaces';
+```
 
-// Google Maps loader helpers
+**Google Maps Loader Helpers:**
+```typescript
 import { 
-    setGMapsContext,
-    getGMapsContext,
-    hasGMapsContext,
-    initialiseGMaps,
-    initialiseGMapsNoContext,
-    importLibrary,
-    type GMapsContext,
-    type APIOptions
+    setGMapsContext,           // Create shared context
+    getGMapsContext,           // Retrieve context
+    hasGMapsContext,           // Check if context exists
+    initialiseGMaps,           // Initialise with context
+    initialiseGMapsNoContext,  // Initialise standalone
+    importLibrary,             // Load Google Maps libraries
+    type GMapsContext,         // Context type
+    type APIOptions            // Loader options type
 } from 'places-autocomplete-svelte/gmaps';
 ```
 
-## Google Places API & Billing
+## Security
 
 *   This component uses the Google Maps JavaScript API (Places library). Usage is subject to Google's terms and pricing.
-*   It uses **Session Tokens** automatically to group Autocomplete requests, which can reduce costs.
-*   Place Details requests (via `fetchFields`) are billed separately. Only request the fields you need to manage costs.
+*   **Session Tokens** are used automatically to group Autocomplete requests, which can reduce costs.
+*   Place Details requests (via `fetchFields`) are billed separately. **Only request the fields you need** to manage costs effectively.
+*   For detailed pricing information, see [Google Maps Platform Pricing](https://developers.google.com/maps/documentation/javascript/usage-and-billing).
+
+## Standalone JavaScript Library
+
+Need this functionality for a non-Svelte project? Check out our companion vanilla JavaScript library:
+
+**[places-autocomplete-js](https://github.com/alexpechkarev/places-autocomplete-js)** - Same core Google Places (New) Autocomplete features, framework-agnostic implementation.
 
 ## Contributing
 
-Contributions are welcome! Please feel free to open an issue or submit a pull request.
+Contributions are welcome! We appreciate bug reports, feature requests, and pull requests.
+
+**How to contribute:**
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+Please ensure your code follows the existing style and includes appropriate tests.
+
+## Author
+
+**Alexander Pechkarev**
+- GitHub: [@alexpechkarev](https://github.com/alexpechkarev)
+- Email: alexpechkarev@gmail.com
 
 ## License
 
-[MIT](LICENSE)
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+---
+
+<p align="center">
+  <sub>Built with ❤️ using Svelte 5 and Google Maps Platform</sub>
+</p>

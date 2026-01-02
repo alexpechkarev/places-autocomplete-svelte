@@ -617,7 +617,7 @@
 <style>
 	/* Component styles */
 	@layer properties {
-		@supports (((-webkit-hyphens: none)) and (not (margin-trim: inline))) or
+		@supports ((-webkit-hyphens: none) and (not (margin-trim: inline))) or
 			((-moz-orient: inline) and (not (color: rgb(from red r g b)))) {
 			*,
 			:before,
@@ -657,7 +657,9 @@
 			ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New',
 			monospace;
 		-webkit-text-size-adjust: 100%;
-		tab-size: 4;
+		-moz-tab-size: 4;
+		  -o-tab-size: 4;
+		     tab-size: 4;
 		line-height: 1.5;
 		font-family: var(
 			--default-font-family,
@@ -961,7 +963,8 @@
 		padding-block: calc(var(--spacing, 0.25rem) * 2);
 		color: var(--color-gray-900, oklch(21% 0.034 264.665));
 		-webkit-user-select: none;
-		user-select: none;
+		-moz-user-select: none;
+		     user-select: none;
 	}
 	@media (hover: hover) {
 		.pac-li:hover {
@@ -1000,7 +1003,8 @@
 	.pac-li-div-one {
 		min-width: calc(var(--spacing, 0.25rem) * 0);
 		align-items: center;
-		column-gap: calc(var(--spacing, 0.25rem) * 3);
+		-moz-column-gap: calc(var(--spacing, 0.25rem) * 3);
+		     column-gap: calc(var(--spacing, 0.25rem) * 3);
 		flex: auto;
 		display: flex;
 	}
