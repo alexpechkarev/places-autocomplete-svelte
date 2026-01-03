@@ -2,7 +2,7 @@
 
 [![npm version](https://badge.fury.io/js/places-autocomplete-svelte.svg)](https://badge.fury.io/js/places-autocomplete-svelte)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Google Maps Platform Awards 2025](https://img.shields.io/badge/Google%20Maps%20Platform-Awards%202025%20Winner-4285F4?style=flat&logo=google-maps&logoColor=white)](https://developers.google.com/maps)
+[![Google Maps Platform Awards 2025](https://img.shields.io/badge/Google%20Maps%20Platform-Awards%202025%20Winner-4285F4?style=flat&logo=google-maps&logoColor=white)](https://mapsplatform.google.com/awards/)
 
 A flexible, accessible, and secure [Svelte](https://kit.svelte.dev) component leveraging the [Google Maps Places Autocomplete API (New)](https://developers.google.com/maps/documentation/javascript/place-autocomplete-overview). **Winner of the Google Maps Platform Awards 2025**, recognising excellence in Google Maps Platform development.
 
@@ -74,7 +74,7 @@ Explore live examples showcasing different features and use cases:
 
 ### 🏆 Google Maps Platform Awards 2025 Winner
 <p align="left">
-  <a href="https://developers.google.com/maps">
+  <a href="https://mapsplatform.google.com/awards/">
     <img src="badge.svg" alt="Google Maps Platform Awards 2025 Winner" width="200">
   </a>
 </p>
@@ -267,6 +267,9 @@ Get a reference to the component instance using `bind:this` to call its methods 
 <button onclick={() => autocompleteComponent?.setRequestParams({ region: 'FR', language: 'fr' })}>
     Switch to French
 </button>
+<button onclick={() => autocompleteComponent?.setOptions({ placeholder: 'Search locations...', debounce: 300 })}>
+    Update Options
+</button>
 ```
 
 | Method | Signature | Description |
@@ -277,6 +280,8 @@ Get a reference to the component instance using `bind:this` to call its methods 
 | `setRequestParams(params)` | `(params: Partial<RequestParams>) => void` | Dynamically updates request parameters. Useful for changing search criteria (region, language, location bias, etc.). Parameters are merged with existing ones. |
 | `setFetchFields(fields)` | `(fields: string[]) => void` | Dynamically updates the Place Data Fields to fetch when a place is selected. |
 | `getFetchFields()` | `() => string[]` | Returns the current array of Place Data Fields that will be requested. |
+| `setOptions(options)` | `(options: Partial<ComponentOptions>) => void` | Dynamically updates the component's configuration options. Merges the provided options with existing settings. |
+| `getOptions()` | `() => ComponentOptions` | Returns the current validated options used by the component. Useful for inspecting configuration settings. |
 
 ## Options
 
@@ -387,7 +392,7 @@ This component is fully written in TypeScript with comprehensive type definition
 
 **Component:**
 ```typescript
-import PlaceAutocomplete from 'places-autocomplete-svelte';
+import { PlaceAutocomplete } from 'places-autocomplete-svelte';
 ```
 
 **Types and Interfaces:**

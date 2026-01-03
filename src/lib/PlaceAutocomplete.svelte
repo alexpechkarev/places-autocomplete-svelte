@@ -73,9 +73,9 @@
 	/**
 	 * Create validated derived values that react to prop changes
 	 */
-	const validatedOptions = $derived(validateOptions(options));
-	const validatedFetchFields = $derived(validateFetchFields(fetchFields));
-	const validatedRequestParams = $derived(validateRequestParams(requestParams));
+	let validatedOptions = $derived(validateOptions(options));
+	let validatedFetchFields = $derived(validateFetchFields(fetchFields));
+	let validatedRequestParams = $derived(validateRequestParams(requestParams));
 
 	/**
 	 * Local variables
@@ -164,7 +164,7 @@
 	 * @returns {RequestParams} The current request parameters object.
 	 */
 	export function getRequestParams() {
-		return request;
+		return validatedRequestParams;
 	}
 
 	/**
@@ -187,7 +187,7 @@
 	 * });
 	 */
 	export function setRequestParams(params: Partial<typeof requestParams>) {
-		requestParams = { ...requestParams, ...params };
+		validatedRequestParams = validateRequestParams({ ...requestParams, ...params });
 	}
 
 	/**
@@ -200,7 +200,7 @@
 	 * autocompleteComponent.setFetchFields(['displayName', 'types', 'location']);
 	 */
 	export function setFetchFields(fields: string[]) {
-		fetchFields = fields;
+		validatedFetchFields = validateFetchFields(fields);
 	}
 
 	/**
@@ -212,8 +212,39 @@
 	 * console.log('Current fields:', fields);
 	 */
 	export function getFetchFields(): string[] {
-		return fetchFields;
+		return validatedFetchFields;
 	}
+
+	/**
+	 * Dynamically updates the component's configuration options.
+	 * Merges the provided options with existing settings.
+	 * @public
+	 * @param options - Partial options object to update component behavior and appearance.
+	 * @example
+	 * // Update options to change placeholder and enable distance display
+	 * autocompleteComponent.setOptions({
+	 *   placeholder: 'Enter a location',
+	 *   showDistance: true
+	 * });
+	 */
+	export function setOptions(options: typeof validatedOptions){
+		validatedOptions = validateOptions(options);
+	}	
+
+
+	/**
+	 * Returns the current validated options used by the component.
+	 * Useful for inspecting configuration settings.
+	 * @public
+	 * @returns {typeof validatedOptions} The current validated options object.
+	 * @example
+	 * const options = autocompleteComponent.getOptions();
+	 * console.log('Current options:', options);
+	 */
+	export function getOptions(): typeof validatedOptions {
+		return validatedOptions;
+	}
+
 
 	/**
 	 * Extracts a specific address component from the place response.
@@ -317,10 +348,10 @@
 
 	/**
 	 * Debounced version of makeAcRequest that delays API calls to reduce request frequency.
-	 * The debounce delay is reactive and updates when the options.debounce value changes.
+	 * The debounce delay is reactive and updates when the validatedOptions.debounce value changes.
 	 * @private
 	 */
-	const debouncedMakeAcRequest = $derived(debounce(makeAcRequest, options?.debounce ?? 100));
+	const debouncedMakeAcRequest = $derived(debounce(makeAcRequest, validatedOptions?.debounce ?? 100));
 
 	/**
 	 * Handles the selection of an autocomplete suggestion.
@@ -388,7 +419,7 @@
 			// If the parent has already finished, this resolves immediately.
 			// If the parent is still loading, this will wait.
 			if (typeof gmaps !== 'undefined' && gmaps) {
-				await gmaps?.initializationPromise;
+				await gmaps?.initialisationPromise;
 			} else {
 				// Check if the API key is provided
 				if (PUBLIC_GOOGLE_MAPS_API_KEY === '' || !PUBLIC_GOOGLE_MAPS_API_KEY) {

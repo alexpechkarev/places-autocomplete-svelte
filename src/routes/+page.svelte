@@ -352,6 +352,19 @@
 		Clear
 	</button>		
 
+	<button
+		onclick={() => autocompleteComponent?.setOptions({placeholder: 'New placeholder from method', distance: false})}
+		class="ml-4 mb-10 rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+	>
+		Set Options
+	</button>	
+	<button
+		onclick={() => console.log(JSON.stringify(autocompleteComponent?.getOptions(), null, 2))}
+		class="ml-4 mb-10 rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+	>
+		Get Options
+	</button>		
+
 	{#if Object.values(formattedAddressObj).filter((value) => value).length > 0}
 		<h1 class="text-base font-semibold leading-6 text-gray-900 mt-10">Response</h1>
 		<!-- Tabs -->
