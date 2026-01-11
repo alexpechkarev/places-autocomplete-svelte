@@ -76,7 +76,7 @@ export interface ComponentClasses {
  * Controls browser autofill behavior for the input field.
  * @type {"on" | "off"}
  */
-export type AutoFill = "on" | "off";
+export type AutoFill = "on" | "off" | string;
 
 /**
  * Distance measurement units for displaying place distances.
