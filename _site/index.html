@@ -9,8 +9,8 @@
 <meta property="og:title" content="Places (New) Autocomplete Svelte" />
 <meta name="author" content="Alexander Pechkarev" />
 <meta property="og:locale" content="en_US" />
-<meta name="description" content="This Svelte component leverages the Google Maps Places Autocomplete API to provide a user-friendly way to search for and retrieve detailed address information within your SvelteKit applications." />
-<meta property="og:description" content="This Svelte component leverages the Google Maps Places Autocomplete API to provide a user-friendly way to search for and retrieve detailed address information within your SvelteKit applications." />
+<meta name="description" content="A flexible, accessible, and secure Svelte 5 component leveraging the Google Maps Places Autocomplete API (New). Winner of the Google Maps Platform Awards 2025, recognising excellence in Google Maps Platform development." />
+<meta property="og:description" content="A flexible, accessible, and secure Svelte 5 component leveraging the Google Maps Places Autocomplete API (New). Winner of the Google Maps Platform Awards 2025, recognising excellence in Google Maps Platform development." />
 <link rel="canonical" href="http://localhost:4000/places-autocomplete-svelte/" />
 <meta property="og:url" content="http://localhost:4000/places-autocomplete-svelte/" />
 <meta property="og:site_name" content="Places Autocomplete Svelte" />
@@ -18,7 +18,7 @@
 <meta name="twitter:card" content="summary" />
 <meta property="twitter:title" content="Places (New) Autocomplete Svelte" />
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"WebSite","author":{"@type":"Person","name":"Alexander Pechkarev"},"description":"This Svelte component leverages the Google Maps Places Autocomplete API to provide a user-friendly way to search for and retrieve detailed address information within your SvelteKit applications.","headline":"Places (New) Autocomplete Svelte","name":"Places Autocomplete Svelte","url":"http://localhost:4000/places-autocomplete-svelte/"}</script>
+{"@context":"https://schema.org","@type":"WebSite","author":{"@type":"Person","name":"Alexander Pechkarev"},"description":"A flexible, accessible, and secure Svelte 5 component leveraging the Google Maps Places Autocomplete API (New). Winner of the Google Maps Platform Awards 2025, recognising excellence in Google Maps Platform development.","headline":"Places (New) Autocomplete Svelte","name":"Places Autocomplete Svelte","url":"http://localhost:4000/places-autocomplete-svelte/"}</script>
 <!-- End Jekyll SEO tag -->
 
     <link rel="preconnect" href="https://fonts.gstatic.com">
@@ -26,7 +26,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#157878">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <link rel="stylesheet" href="/places-autocomplete-svelte/assets/css/style.css?v=b6b595570c1acb5a78d93d4d18c4110207eb83cf">
+    <link rel="stylesheet" href="/places-autocomplete-svelte/assets/css/style.css?v=4e218607987cab483929aac2964cb8cc5f04004b">
     <meta name="google-site-verification" content="ZBPJY6t8GM1Cuu4udri69DMYVoM0M1ePgvRp9q8IFfs" />
 <link rel="icon" href="/places-autocomplete-svelte/favicon.svg" type="image/svg+xml">
   </head>
@@ -35,7 +35,7 @@
 
     <header class="page-header" role="banner">
       <h1 class="project-name">Places (New) Autocomplete Svelte</h1>
-      <h2 class="project-tagline">This Svelte component leverages the Google Maps Places Autocomplete API to provide a user-friendly way to search for and retrieve detailed address information within your SvelteKit applications.</h2>
+      <h2 class="project-tagline">A flexible, accessible, and secure Svelte 5 component leveraging the Google Maps Places Autocomplete API (New). Winner of the Google Maps Platform Awards 2025, recognising excellence in Google Maps Platform development.</h2>
       
         <a href="https://github.com/alexpechkarev/places-autocomplete-svelte" class="btn">View on GitHub</a>
       
@@ -49,10 +49,11 @@
       <h1 id="places-new-autocomplete-svelte">Places (New) Autocomplete Svelte</h1>
 
 <p><a href="https://badge.fury.io/js/places-autocomplete-svelte"><img src="https://badge.fury.io/js/places-autocomplete-svelte.svg" alt="npm version" /></a>
+<a href="https://www.npmjs.com/package/places-autocomplete-svelte"><img src="https://img.shields.io/npm/dm/places-autocomplete-svelte.svg" alt="npm downloads" /></a>
 <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT" /></a>
-<a href="https://developers.google.com/maps"><img src="https://img.shields.io/badge/Google%20Maps%20Platform-Awards%202025%20Winner-4285F4?style=flat&amp;logo=google-maps&amp;logoColor=white" alt="Google Maps Platform Awards 2025" /></a></p>
+<a href="https://mapsplatform.google.com/awards/"><img src="https://img.shields.io/badge/Google%20Maps%20Platform-Awards%202025%20Winner-4285F4?style=flat&amp;logo=google-maps&amp;logoColor=white" alt="Google Maps Platform Awards 2025" /></a></p>
 
-<p>A flexible, accessible, and secure <a href="https://kit.svelte.dev">Svelte</a> component leveraging the <a href="https://developers.google.com/maps/documentation/javascript/place-autocomplete-overview">Google Maps Places Autocomplete API (New)</a>. <strong>Winner of the Google Maps Platform Awards 2025</strong>, recognising excellence in Google Maps Platform development.</p>
+<p>A flexible, accessible, and secure <a href="https://svelte.dev">Svelte 5</a> component leveraging the <a href="https://developers.google.com/maps/documentation/javascript/place-autocomplete-overview">Google Maps Places Autocomplete API (New)</a>. <strong>Winner of the Google Maps Platform Awards 2025</strong>, recognising excellence in Google Maps Platform development.</p>
 
 <p>The component handles API loading, session tokens, debounced fetching, and accessibility, allowing you to focus on building your application. It intelligently manages the Google Maps API loader, creating a shared instance via Svelte’s context that prevents conflicts with other map components on the same page.</p>
 
@@ -76,17 +77,29 @@
       <li><a href="#advanced-usage-manual-initialisation">Advanced Usage</a></li>
     </ul>
   </li>
-  <li><a href="#props">Props</a></li>
-  <li><a href="#component-methods-imperative-api">Component Methods</a></li>
-  <li><a href="#options">Options</a></li>
+  <li><a href="#api-reference">API Reference</a>
+    <ul>
+      <li><a href="#props">Props</a></li>
+      <li><a href="#component-methods-imperative-api">Component Methods</a></li>
+      <li><a href="#options">Options</a></li>
+      <li><a href="#events">Events</a></li>
+    </ul>
+  </li>
   <li><a href="#styling">Styling</a></li>
-  <li><a href="#events">Events</a></li>
   <li><a href="#typescript">TypeScript</a></li>
-  <li><a href="#security">Security</a></li>
+  <li><a href="#security">Security</a>
+    <ul>
+      <li><a href="#api-key-security">API Key Security</a></li>
+      <li><a href="#xss-protection">XSS Protection</a></li>
+    </ul>
+  </li>
   <li><a href="#accessibility">Accessibility</a></li>
   <li><a href="#google-places-api--billing">Google Places API &amp; Billing</a></li>
+  <li><a href="#browser-compatibility">Browser Compatibility</a></li>
+  <li><a href="#troubleshooting">Troubleshooting</a></li>
   <li><a href="#standalone-javascript-library">Standalone JavaScript Library</a></li>
   <li><a href="#contributing">Contributing</a></li>
+  <li><a href="#author">Author</a></li>
   <li><a href="#license">License</a></li>
 </ul>
 
@@ -121,32 +134,35 @@
 
 <p>Explore live examples showcasing different features and use cases:</p>
 
-<p><strong><a href="https://places-autocomplete-demo.pages.dev/">🚀 Basic Example</a></strong> - Get started with the simplest implementation</p>
+<p><strong><a href="https://places-autocomplete-svelte.uk/examples/basic">🚀 Basic Example</a></strong> - Get started with the simplest implementation</p>
 
-<p><strong><a href="https://places-autocomplete-demo.pages.dev/examples/reactive-parameters">🔄 Reactive Parameters</a></strong> - Dynamically change search criteria based on user input, such as filtering by country or switching languages</p>
+<p><strong><a href="https://places-autocomplete-svelte.uk/examples/reactive-parameters">🔄 Reactive Parameters</a></strong> - Dynamically change search criteria based on user input, such as filtering by country or switching languages</p>
 
-<p><strong><a href="https://places-autocomplete-demo.pages.dev/examples/customise-request-parameters">⚙️ Custom Request Parameters</a></strong> - Configure advanced search options including language, region, location bias, and place types</p>
+<p><strong><a href="https://places-autocomplete-svelte.uk/examples/checkout-form">⚙️ Checkout Form</a></strong> - Capture the detailed address data from a user’s selection and use it to automatically populate the fields of a checkout form.</p>
 
-<p><strong><a href="https://places-autocomplete-demo.pages.dev/examples/retain-input-value">📝 Retain Input Value</a></strong> - Keep the selected address visible in the input field after selection</p>
+<p><strong><a href="https://places-autocomplete-svelte.uk/examples/proximity-filter">📝 Distance &amp; Proximity Filter</a></strong> - Restrict or bias search results to a specific area.</p>
 
 <p><img src="places-autocomplete-svelte.gif" alt="A video demonstrating the Places Autocomplete Svelte component in action, showing address suggestions and selection." /></p>
 
 <h2 id="recognition">Recognition</h2>
 
 <h3 id="-google-maps-platform-awards-2025-winner">🏆 Google Maps Platform Awards 2025 Winner</h3>
+
 <p align="left">
-  <a href="https://developers.google.com/maps">
+  <a href="https://mapsplatform.google.com/awards/">
     <img src="badge.svg" alt="Google Maps Platform Awards 2025 Winner" width="200" />
   </a>
 </p>
 
 <p>This component has been recognised as a winner of the <strong>Google Maps Platform Awards 2025</strong> by the Google Developer Program. This award celebrates outstanding projects that demonstrate exceptional use of Google Maps Platform APIs, innovation, and contribution to the developer community.</p>
 
-<p><a href="https://developers.google.com/maps">Learn more about the Google Maps Platform Awards</a></p>
+<p><a href="https://mapsplatform.google.com/awards/">Learn more about the Google Maps Platform Awards →</a></p>
 
 <h2 id="requirements">Requirements</h2>
 
 <ul>
+  <li><strong>Svelte 5+</strong> - This component requires Svelte 5.0.0 or higher and uses Svelte 5 features including runes (<code class="language-plaintext highlighter-rouge">$state</code>, <code class="language-plaintext highlighter-rouge">$derived</code>, etc.)</li>
+  <li><strong>Node.js 18+</strong> - Required for development and building</li>
   <li><strong>Google Maps API Key</strong> with the “Places API” enabled. Refer to <a href="https://developers.google.com/maps/documentation/javascript/get-api-key">Use API Keys</a> for detailed instructions.</li>
 </ul>
 
@@ -155,6 +171,8 @@
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>npm <span class="nb">install </span>places-autocomplete-svelte
 <span class="c"># or</span>
 yarn add places-autocomplete-svelte
+<span class="c"># or</span>
+pnpm add places-autocomplete-svelte
 </code></pre></div></div>
 
 <h2 id="usage">Usage</h2>
@@ -277,6 +295,10 @@ yarn add places-autocomplete-svelte
   <li><code class="language-plaintext highlighter-rouge">importLibrary(library)</code> - Dynamically imports Google Maps libraries</li>
 </ul>
 
+<h2 id="api-reference">API Reference</h2>
+
+<p>The following sections detail the component’s props, methods, options, and events.</p>
+
 <h2 id="security">Security</h2>
 
 <h3 id="api-key-security">API Key Security</h3>
@@ -368,10 +390,11 @@ yarn add places-autocomplete-svelte
 
 <p>Get a reference to the component instance using <code class="language-plaintext highlighter-rouge">bind:this</code> to call its methods directly.</p>
 
-<p><strong>Example:</strong></p>
+<p><strong>Example (Svelte 5 syntax):</strong></p>
 
 <div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">&lt;</span><span class="nx">script</span> <span class="nx">lang</span><span class="o">=</span><span class="dl">"</span><span class="s2">ts</span><span class="dl">"</span><span class="o">&gt;</span>
     <span class="k">import</span> <span class="nx">PlaceAutocomplete</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">places-autocomplete-svelte</span><span class="dl">'</span><span class="p">;</span>
+    <span class="c1">// Note: Using Svelte 5 $state rune</span>
     <span class="kd">let</span> <span class="nx">autocompleteComponent</span><span class="p">:</span> <span class="nx">PlaceAutocomplete</span> <span class="o">|</span> <span class="kc">undefined</span> <span class="o">=</span> <span class="nx">$state</span><span class="p">(</span><span class="kc">undefined</span><span class="p">);</span>
 <span class="o">&lt;</span><span class="sr">/script</span><span class="err">&gt;
 </span>
@@ -381,6 +404,9 @@ yarn add places-autocomplete-svelte
 </span><span class="o">&lt;</span><span class="nx">button</span> <span class="nx">onclick</span><span class="o">=</span><span class="p">{()</span> <span class="o">=&gt;</span> <span class="nx">autocompleteComponent</span><span class="p">?.</span><span class="nx">focus</span><span class="p">()}</span><span class="o">&gt;</span><span class="nx">Focus</span><span class="o">&lt;</span><span class="sr">/button</span><span class="err">&gt;
 </span><span class="o">&lt;</span><span class="nx">button</span> <span class="nx">onclick</span><span class="o">=</span><span class="p">{()</span> <span class="o">=&gt;</span> <span class="nx">autocompleteComponent</span><span class="p">?.</span><span class="nx">setRequestParams</span><span class="p">({</span> <span class="na">region</span><span class="p">:</span> <span class="dl">'</span><span class="s1">FR</span><span class="dl">'</span><span class="p">,</span> <span class="na">language</span><span class="p">:</span> <span class="dl">'</span><span class="s1">fr</span><span class="dl">'</span> <span class="p">})}</span><span class="o">&gt;</span>
     <span class="nx">Switch</span> <span class="nx">to</span> <span class="nx">French</span>
+<span class="o">&lt;</span><span class="sr">/button</span><span class="err">&gt;
+</span><span class="o">&lt;</span><span class="nx">button</span> <span class="nx">onclick</span><span class="o">=</span><span class="p">{()</span> <span class="o">=&gt;</span> <span class="nx">autocompleteComponent</span><span class="p">?.</span><span class="nx">setOptions</span><span class="p">({</span> <span class="na">placeholder</span><span class="p">:</span> <span class="dl">'</span><span class="s1">Search locations...</span><span class="dl">'</span><span class="p">,</span> <span class="na">debounce</span><span class="p">:</span> <span class="mi">300</span> <span class="p">})}</span><span class="o">&gt;</span>
+    <span class="nx">Update</span> <span class="nx">Options</span>
 <span class="o">&lt;</span><span class="sr">/button</span><span class="err">&gt;
 </span></code></pre></div></div>
 
@@ -422,6 +448,16 @@ yarn add places-autocomplete-svelte
       <td style="text-align: left"><code class="language-plaintext highlighter-rouge">getFetchFields()</code></td>
       <td style="text-align: left"><code class="language-plaintext highlighter-rouge">() =&gt; string[]</code></td>
       <td style="text-align: left">Returns the current array of Place Data Fields that will be requested.</td>
+    </tr>
+    <tr>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">setOptions(options)</code></td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">(options: Partial&lt;ComponentOptions&gt;) =&gt; void</code></td>
+      <td style="text-align: left">Dynamically updates the component’s configuration options. Merges the provided options with existing settings.</td>
+    </tr>
+    <tr>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">getOptions()</code></td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">() =&gt; ComponentOptions</code></td>
+      <td style="text-align: left">Returns the current validated options used by the component. Useful for inspecting configuration settings.</td>
     </tr>
   </tbody>
 </table>
@@ -601,7 +637,7 @@ yarn add places-autocomplete-svelte
 <h3 id="available-imports">Available Imports</h3>
 
 <p><strong>Component:</strong></p>
-<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="nx">PlaceAutocomplete</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">places-autocomplete-svelte</span><span class="dl">'</span><span class="p">;</span>
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="p">{</span> <span class="nx">PlaceAutocomplete</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">places-autocomplete-svelte</span><span class="dl">'</span><span class="p">;</span>
 </code></pre></div></div>
 
 <p><strong>Types and Interfaces:</strong></p>
@@ -628,7 +664,7 @@ yarn add places-autocomplete-svelte
 <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">places-autocomplete-svelte/gmaps</span><span class="dl">'</span><span class="p">;</span>
 </code></pre></div></div>
 
-<h2 id="security-1">Security</h2>
+<h2 id="google-places-api--billing">Google Places API &amp; Billing</h2>
 
 <ul>
   <li>This component uses the Google Maps JavaScript API (Places library). Usage is subject to Google’s terms and pricing.</li>

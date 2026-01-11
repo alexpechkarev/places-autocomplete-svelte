@@ -1,10 +1,11 @@
 # Places (New) Autocomplete Svelte
 
 [![npm version](https://badge.fury.io/js/places-autocomplete-svelte.svg)](https://badge.fury.io/js/places-autocomplete-svelte)
+[![npm downloads](https://img.shields.io/npm/dm/places-autocomplete-svelte.svg)](https://www.npmjs.com/package/places-autocomplete-svelte)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Google Maps Platform Awards 2025](https://img.shields.io/badge/Google%20Maps%20Platform-Awards%202025%20Winner-4285F4?style=flat&logo=google-maps&logoColor=white)](https://developers.google.com/maps)
+[![Google Maps Platform Awards 2025](https://img.shields.io/badge/Google%20Maps%20Platform-Awards%202025%20Winner-4285F4?style=flat&logo=google-maps&logoColor=white)](https://mapsplatform.google.com/awards/)
 
-A flexible, accessible, and secure [Svelte](https://kit.svelte.dev) component leveraging the [Google Maps Places Autocomplete API (New)](https://developers.google.com/maps/documentation/javascript/place-autocomplete-overview). **Winner of the Google Maps Platform Awards 2025**, recognising excellence in Google Maps Platform development.
+A flexible, accessible, and secure [Svelte 5](https://svelte.dev) component leveraging the [Google Maps Places Autocomplete API (New)](https://developers.google.com/maps/documentation/javascript/place-autocomplete-overview). **Winner of the Google Maps Platform Awards 2025**, recognising excellence in Google Maps Platform development.
 
 The component handles API loading, session tokens, debounced fetching, and accessibility, allowing you to focus on building your application. It intelligently manages the Google Maps API loader, creating a shared instance via Svelte's context that prevents conflicts with other map components on the same page.
 
@@ -22,17 +23,23 @@ The component handles API loading, session tokens, debounced fetching, and acces
 - [Usage](#usage)
   - [Basic Usage](#basic-usage-automatic-initialisation)
   - [Advanced Usage](#advanced-usage-manual-initialisation)
-- [Props](#props)
-- [Component Methods](#component-methods-imperative-api)
-- [Options](#options)
+- [API Reference](#api-reference)
+  - [Props](#props)
+  - [Component Methods](#component-methods-imperative-api)
+  - [Options](#options)
+  - [Events](#events)
 - [Styling](#styling)
-- [Events](#events)
 - [TypeScript](#typescript)
 - [Security](#security)
+  - [API Key Security](#api-key-security)
+  - [XSS Protection](#xss-protection)
 - [Accessibility](#accessibility)
 - [Google Places API & Billing](#google-places-api--billing)
+- [Browser Compatibility](#browser-compatibility)
+- [Troubleshooting](#troubleshooting)
 - [Standalone JavaScript Library](#standalone-javascript-library)
 - [Contributing](#contributing)
+- [Author](#author)
 - [License](#license)
 
 ## Features
@@ -60,31 +67,34 @@ The component handles API loading, session tokens, debounced fetching, and acces
 
 Explore live examples showcasing different features and use cases:
 
-**[🚀 Basic Example](https://places-autocomplete-demo.pages.dev/)** - Get started with the simplest implementation
+**[🚀 Basic Example](https://places-autocomplete-svelte.uk/examples/basic)** - Get started with the simplest implementation
 
-**[🔄 Reactive Parameters](https://places-autocomplete-demo.pages.dev/examples/reactive-parameters)** - Dynamically change search criteria based on user input, such as filtering by country or switching languages
+**[🔄 Reactive Parameters](https://places-autocomplete-svelte.uk/examples/reactive-parameters)** - Dynamically change search criteria based on user input, such as filtering by country or switching languages
 
-**[⚙️ Custom Request Parameters](https://places-autocomplete-demo.pages.dev/examples/customise-request-parameters)** - Configure advanced search options including language, region, location bias, and place types
+**[⚙️ Checkout Form](https://places-autocomplete-svelte.uk/examples/checkout-form)** - Capture the detailed address data from a user's selection and use it to automatically populate the fields of a checkout form.
 
-**[📝 Retain Input Value](https://places-autocomplete-demo.pages.dev/examples/retain-input-value)** - Keep the selected address visible in the input field after selection
+**[📝 Distance & Proximity Filter](https://places-autocomplete-svelte.uk/examples/proximity-filter)** - Restrict or bias search results to a specific area.
 
 <img src="places-autocomplete-svelte.gif" alt="A video demonstrating the Places Autocomplete Svelte component in action, showing address suggestions and selection.">
 
 ## Recognition
 
 ### 🏆 Google Maps Platform Awards 2025 Winner
+
 <p align="left">
-  <a href="https://developers.google.com/maps">
+  <a href="https://mapsplatform.google.com/awards/">
     <img src="badge.svg" alt="Google Maps Platform Awards 2025 Winner" width="200">
   </a>
 </p>
 
 This component has been recognised as a winner of the **Google Maps Platform Awards 2025** by the Google Developer Program. This award celebrates outstanding projects that demonstrate exceptional use of Google Maps Platform APIs, innovation, and contribution to the developer community.
 
-[Learn more about the Google Maps Platform Awards](https://developers.google.com/maps)
+[Learn more about the Google Maps Platform Awards →](https://mapsplatform.google.com/awards/)
 
 ## Requirements
 
+*   **Svelte 5+** - This component requires Svelte 5.0.0 or higher and uses Svelte 5 features including runes (`$state`, `$derived`, etc.)
+*   **Node.js 18+** - Required for development and building
 *   **Google Maps API Key** with the "Places API" enabled. Refer to [Use API Keys](https://developers.google.com/maps/documentation/javascript/get-api-key) for detailed instructions.
 
 ## Installation
@@ -93,6 +103,8 @@ This component has been recognised as a winner of the **Google Maps Platform Awa
 npm install places-autocomplete-svelte
 # or
 yarn add places-autocomplete-svelte
+# or
+pnpm add places-autocomplete-svelte
 ```
 
 ## Usage
@@ -212,6 +224,10 @@ For applications using multiple Google Maps libraries (e.g., `places`, `maps`, `
 - `initialiseGMapsNoContext(options)` - Initialises without context (for edge cases)
 - `importLibrary(library)` - Dynamically imports Google Maps libraries
 
+## API Reference
+
+The following sections detail the component's props, methods, options, and events.
+
 ## Security
 
 ### API Key Security
@@ -252,11 +268,12 @@ This component is built to be accessible and follows the [WAI-ARIA Authoring Pra
 
 Get a reference to the component instance using `bind:this` to call its methods directly.
 
-**Example:**
+**Example (Svelte 5 syntax):**
 
 ```javascript
 <script lang="ts">
     import PlaceAutocomplete from 'places-autocomplete-svelte';
+    // Note: Using Svelte 5 $state rune
     let autocompleteComponent: PlaceAutocomplete | undefined = $state(undefined);
 </script>
 
@@ -266,6 +283,9 @@ Get a reference to the component instance using `bind:this` to call its methods 
 <button onclick={() => autocompleteComponent?.focus()}>Focus</button>
 <button onclick={() => autocompleteComponent?.setRequestParams({ region: 'FR', language: 'fr' })}>
     Switch to French
+</button>
+<button onclick={() => autocompleteComponent?.setOptions({ placeholder: 'Search locations...', debounce: 300 })}>
+    Update Options
 </button>
 ```
 
@@ -277,6 +297,8 @@ Get a reference to the component instance using `bind:this` to call its methods 
 | `setRequestParams(params)` | `(params: Partial<RequestParams>) => void` | Dynamically updates request parameters. Useful for changing search criteria (region, language, location bias, etc.). Parameters are merged with existing ones. |
 | `setFetchFields(fields)` | `(fields: string[]) => void` | Dynamically updates the Place Data Fields to fetch when a place is selected. |
 | `getFetchFields()` | `() => string[]` | Returns the current array of Place Data Fields that will be requested. |
+| `setOptions(options)` | `(options: Partial<ComponentOptions>) => void` | Dynamically updates the component's configuration options. Merges the provided options with existing settings. |
+| `getOptions()` | `() => ComponentOptions` | Returns the current validated options used by the component. Useful for inspecting configuration settings. |
 
 ## Options
 
@@ -387,7 +409,7 @@ This component is fully written in TypeScript with comprehensive type definition
 
 **Component:**
 ```typescript
-import PlaceAutocomplete from 'places-autocomplete-svelte';
+import { PlaceAutocomplete } from 'places-autocomplete-svelte';
 ```
 
 **Types and Interfaces:**
@@ -416,7 +438,7 @@ import {
 } from 'places-autocomplete-svelte/gmaps';
 ```
 
-## Security
+## Google Places API & Billing
 
 *   This component uses the Google Maps JavaScript API (Places library). Usage is subject to Google's terms and pricing.
 *   **Session Tokens** are used automatically to group Autocomplete requests, which can reduce costs.
