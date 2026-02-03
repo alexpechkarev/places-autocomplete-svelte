@@ -64,7 +64,7 @@ export interface ComponentClasses {
  * Controls browser autofill behavior for the input field.
  * @type {"on" | "off"}
  */
-export type AutoFill = "on" | "off";
+export type AutoFill = "on" | "off" | "new-password";
 /**
  * Distance measurement units for displaying place distances.
  * @type {"km" | "miles"}
@@ -93,6 +93,28 @@ export interface ComponentOptions {
     debounce?: number;
     /** Clear the input field after selecting a place. @default true */
     clear_input?: boolean;
+    /** Format of the place data returned in onResponse callback. @default "json" */
+    response_type?: 'json' | 'object';
+    /** Show the place type in the autocomplete suggestions. @default false */
+    show_place_type?: boolean;
+}
+/**
+ * Photo Class
+ */
+export interface Photo {
+    authorAttributions?: {
+        displayName?: string;
+        uri?: string;
+        photoURI?: string;
+    }[];
+    flagContentURI?: string;
+    googleMapsURI?: string;
+    heightPx?: number;
+    widthPx?: number;
+    getURI(options?: {
+        maxHeight?: number;
+        maxWidth?: number;
+    }): string;
 }
 /**
  * Detailed information about a selected place returned by the Google Places API.
@@ -121,6 +143,17 @@ export interface PlaceResult {
         lat: number;
         lng: number;
     };
+    photos?: Photo[];
+    /**
+     * Returns the URL of the photo with the specified options.
+     * @param options - Options for the photo URL.
+     * @returns The URL of the photo.
+     */
+    getURI(options?: {
+        maxHeight?: number;
+        maxWidth?: number;
+    }): string;
+    toJSON(): PlaceResult;
     /** Additional place data fields as requested via fetchFields prop (e.g., displayName, types, photos). */
     [key: string]: unknown;
 }

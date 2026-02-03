@@ -50,6 +50,7 @@ The component handles API loading, session tokens, debounced fetching, and acces
 *   💰 Automatically handles **session tokens** for optimal cost management
 *   ⚡ **Debounced Input:** Configurable delay to minimise API calls while typing
 *   ✨ **Suggestion Highlighting:** Automatically highlights matched text in suggestions
+*   🌍 **Internationally Neutral:** No default regional restrictions - works globally out of the box
 
 ### Accessibility & User Experience
 *   ♿ **WCAG Compliant:** Follows WAI-ARIA patterns for comboboxes
@@ -58,7 +59,7 @@ The component handles API loading, session tokens, debounced fetching, and acces
 
 ### Developer Experience
 *   🎨 **Customisable Styling:** Override default styles via `options.classes` prop
-*   🔧 **Imperative API:** Direct control with `clear()`, `focus()`, `getRequestParams()`, `setRequestParams()`, `setFetchFields()`, and `getFetchFields()` methods
+*   🔧 **Imperative API:** Direct control with `clear()`, `focus()`, `getRequestParams()`, `setRequestParams()`, `setFetchFields()`, `getFetchFields()`, and `setInputValue()` methods
 *   📘 **TypeScript Support:** Fully typed with comprehensive type definitions
 *   🔐 **Secure:** XSS protection with safe rendering of suggestions
 *   🎯 **Event Handling:** `onResponse` and `onError` callbacks for complete control
@@ -94,7 +95,6 @@ This component has been recognised as a winner of the **Google Maps Platform Awa
 ## Requirements
 
 *   **Svelte 5+** - This component requires Svelte 5.0.0 or higher and uses Svelte 5 features including runes (`$state`, `$derived`, etc.)
-*   **Node.js 18+** - Required for development and building
 *   **Google Maps API Key** with the "Places API" enabled. Refer to [Use API Keys](https://developers.google.com/maps/documentation/javascript/get-api-key) for detailed instructions.
 
 ## Installation
@@ -122,6 +122,21 @@ For simple use cases, just pass your API key to the component. It will automatic
     // Get API Key securely (e.g., from environment variables)
     const PUBLIC_GOOGLE_MAPS_API_KEY = import.meta.env.VITE_PUBLIC_GOOGLE_MAPS_API_KEY;
 
+    // Optional: Set regional preferences (component works globally by default)
+    const requestParams = {
+        language: 'en-US',      // Set language preference
+        region: 'US',           // Set regional bias
+        // includedRegionCodes: ['US', 'CA'] // Restrict to specific regions
+    };
+
+    // Optional: Configure UI and behaviour
+    const options = {
+        show_place_type: true,     // Show place type icons
+        distance: true,            // Show distance (if origin provided)
+        response_type: 'json',     // Return JSON object (default)
+        placeholder: 'Search for places...'
+    };
+
     const handleResponse = (response: PlaceResult) => {
         console.log('Selected:', response.formattedAddress);
     };
@@ -133,6 +148,8 @@ For simple use cases, just pass your API key to the component. It will automatic
 
 <PlaceAutocomplete 
     {PUBLIC_GOOGLE_MAPS_API_KEY}
+    {requestParams}
+    {options}
     onResponse={handleResponse} 
     onError={handleError} 
 />
@@ -259,8 +276,8 @@ This component is built to be accessible and follows the [WAI-ARIA Authoring Pra
 | `onResponse` | `(response: PlaceResult) => void` | Yes | - | Callback triggered when a user selects a place. Receives the full place details object. |
 | `onError` | `(error: string) => void` | Yes | - | Callback triggered when an error occurs (API loading, network issues, etc.). |
 | `fetchFields` | `string[]` | No | `['formattedAddress', 'addressComponents']` | Place Data Fields to request from the API. See [Place Data Fields](https://developers.google.com/maps/documentation/javascript/place-data-fields). **Affects API billing.** |
-| `requestParams` | `Partial<RequestParams>` | No | `{ inputOffset: 3 }` | Parameters for the Autocomplete API request (language, region, location bias, etc.). See RequestParams interface. |
-| `options` | `Partial<ComponentOptions>` | No | `{ debounce: 100 }` | UI and behavior options (placeholder, debounce delay, distance display, custom classes, etc.). See ComponentOptions interface. |
+| `requestParams` | `Partial<RequestParams>` | No | `{ inputOffset: 0 }` | Parameters for the Autocomplete API request. By default, the component is internationally neutral (no default `language` or `region`), allowing the Google Maps API to use browser settings and IP-based location detection. You can specify parameters like `language`, `region` (for biasing results), or `includedRegionCodes` (for filtering results) to customize behaviour. See the RequestParams interface for all options. |
+| `options` | `Partial<ComponentOptions>` | No | `{ debounce: 100 }` | UI and behaviour options (placeholder, debounce delay, distance display, custom classes, etc.). See ComponentOptions interface. |
 
 *Either `PUBLIC_GOOGLE_MAPS_API_KEY` prop OR manual initialisation with `initialiseGMaps()` is required.
 
@@ -287,6 +304,9 @@ Get a reference to the component instance using `bind:this` to call its methods 
 <button onclick={() => autocompleteComponent?.setOptions({ placeholder: 'Search locations...', debounce: 300 })}>
     Update Options
 </button>
+<button onclick={() => autocompleteComponent?.setInputValue(48.8584, 2.2945)}>
+    Set to Eiffel Tower
+</button>
 ```
 
 | Method | Signature | Description |
@@ -299,6 +319,94 @@ Get a reference to the component instance using `bind:this` to call its methods 
 | `getFetchFields()` | `() => string[]` | Returns the current array of Place Data Fields that will be requested. |
 | `setOptions(options)` | `(options: Partial<ComponentOptions>) => void` | Dynamically updates the component's configuration options. Merges the provided options with existing settings. |
 | `getOptions()` | `() => ComponentOptions` | Returns the current validated options used by the component. Useful for inspecting configuration settings. |
+| `setInputValue(latitude, longitude)` | `(latitude: number, longitude: number) => Promise<void>` | Sets the input by finding and selecting a place for the given coordinates. Performs reverse geocoding to convert lat/lng to a place, then triggers `onResponse`. **Requires Geocoding API to be enabled.** |
+
+### Reverse Geocoding with `setInputValue`
+
+The `setInputValue` method allows you to programmatically set a location by coordinates, useful for integrating with geolocation APIs or map click events:
+
+```javascript
+// Example: Set location from user's current position
+navigator.geolocation.getCurrentPosition(async (position) => {
+    try {
+        await autocompleteComponent.setInputValue(
+            position.coords.latitude,
+            position.coords.longitude
+        );
+        console.log('Location set successfully');
+    } catch (error) {
+        console.error('Failed to set location:', error);
+    }
+});
+
+// Example: Set specific landmark (Eiffel Tower)
+await autocompleteComponent.setInputValue(48.8584, 2.2945);
+```
+
+**Important:** This method requires the **Geocoding API** to be enabled in your Google Cloud Console project. The method:
+1. Performs reverse geocoding to convert coordinates to a place
+2. Fetches place details using your configured `fetchFields`
+3. Triggers the `onResponse` callback with the place data
+4. Updates the input field (respects `clear_input` option)
+
+## Advanced Response Handling
+
+### Response Types
+
+Control the format of data returned by the `onResponse` callback using the `response_type` option:
+
+**JSON Format (Default):**
+```javascript
+const options = {
+    response_type: 'json' // Default
+};
+
+const handleResponse = (response: PlaceResult) => {
+    console.log(response.formattedAddress);      // "123 Main St, City, Country"
+    console.log(response.location);              // { lat: 40.7128, lng: -74.0060 }
+    console.log(response.addressComponents);     // Array of address components
+};
+```
+
+**Google Maps Place Instance:**
+```javascript
+const options = {
+    response_type: 'place'
+};
+
+const handleResponse = (place: google.maps.places.Place) => {
+    // Access to full Place API methods
+    console.log(place.formattedAddress);
+    console.log(place.location);
+    
+    // Access photos (if fetchFields includes 'photos')
+    const photos = place.photos;
+    if (photos && photos.length > 0) {
+        const photoUrl = photos[0].getURI({ maxHeight: 1200 });
+        console.log('Photo URL:', photoUrl);
+    }
+    
+    // Convert to JSON when needed
+    const jsonData = place.toJSON();
+    console.log('JSON format:', jsonData);
+};
+```
+
+### Place Type Icons
+
+Enable visual categorisation of suggestions with place type icons:
+
+```javascript
+const options = {
+    show_place_type: true,
+    distance: false,  // Must be false when using place type icons
+    fetchFields: ['formattedAddress', 'primaryType'] // Ensure primaryType is included
+};
+```
+
+**Important:** `show_place_type` and `distance` are mutually exclusive - only one can be enabled at a time. When `show_place_type` is `true`, the distance display is automatically disabled.
+
+This displays categorized icons (🏪 Shopping, 🍽️ Dining, 🏨 Lodging, etc.) on the right side of each suggestion, helping users quickly identify the type of place.
 
 ## Options
 
@@ -306,13 +414,15 @@ Get a reference to the component instance using `bind:this` to call its methods 
 | :--- | :--- | :--- | :--- |
 | `placeholder` | `string` | `''` | Placeholder text for the input field. |
 | `debounce` | `number` | `100` | Delay in ms before firing API request. Set to `0` to disable. |
-| `distance` | `boolean` | `true` | Show distance from `requestParams.origin` (if provided). |
+| `distance` | `boolean` | `false` | Show distance from `requestParams.origin` (if provided). **Mutually exclusive with `show_place_type`.** |
 | `distance_units` | `'km' \| 'miles'` | `'km'` | Units for displaying distance. |
 | `label` | `string` | `''` | Optional label text displayed above the input. |
 | `autofocus` | `boolean` | `false` | Automatically focus the input on mount. |
 | `autocomplete` | `string` | `'off'` | The `autocomplete` attribute for the input field. |
 | `classes` | `Partial<ComponentClasses>` | `{}` | Object to override default CSS classes. See Styling section. |
 | `clear_input` | `boolean` | `true` | If `false`, retains the `formattedAddress` in the input after selection. |
+| `response_type` | `'json' \| 'place'` | `'json'` | Return format: `'json'` for JSON object (`.toJSON()`), `'place'` for Google Maps Place instance with access to methods like `.getPhotos()`. |
+| `show_place_type` | `boolean` | `false` | Display place type icons (shopping, dining, etc.) on the right side of suggestion items. **Mutually exclusive with `distance`.** |
 
 ## Styling
 
@@ -322,14 +432,14 @@ The component includes built-in styles with `.pac-` prefixed CSS classes, provid
 
 *   **Framework-agnostic**: Pure CSS with no dependencies on Tailwind or other frameworks
 *   **Modern design**: Clean, professional appearance with proper spacing, shadows, and hover effects
-*   **Fully functional**: Includes keyboard navigation indicators, loading states, and responsive behavior
+*   **Fully functional**: Includes keyboard navigation indicators, loading states, and responsive behaviour
 *   **Customisable**: All styles can be overridden via the `options.classes` prop
 
 The default styles include:
 - Rounded input with shadow and focus states
-- Dropdown list with scroll behavior and dividers
+- Dropdown list with scroll behaviour and dividers
 - Keyboard navigation hints (Esc, ↑, ↓)
-- Highlighted current selection with color transitions
+- Highlighted current selection with colour transitions
 - Distance display for location-based results
 - Icon support with proper alignment
 - Responsive layout for mobile and desktop
@@ -358,7 +468,10 @@ Override any default styling by providing your own CSS classes via `options.clas
 *   `li_div_p_container`: Container for paragraphs (default: `.pac-li-div-p-container`)
 *   `li_div_two`: Second inner `div` containing the distance (default: `.pac-li-div-two`)
 *   `li_div_two_p`: The `<p>` tag containing the distance text (default: `.pac-li-div-two-p`)
-*   `kbd_container`: Container for the keyboard hint keys (default: `.pac-kbd-container`)
+*   `li_div_two_p_place_type`: Container for place type display (default: `.pac-li-div-two-p-place_type`)
+*   `li_div_two_p_place_type_icon`: The place type icon element (default: `.pac-li-div-two-p-place_type-icon`)
+*   `li_div_two_p_place_type_label`: The place type label text (default: `.pac-li-div-two-p-place_type-label`)
+*   `kbd_container`: Container for the keyboard hint keys (default: `.pac-kbd-container`))
 *   `kbd_escape`: The `<kbd>` tag for the 'Esc' hint (default: `.pac-kbd-escape`)
 *   `kbd_up`: The `<kbd>` tag for the 'Up Arrow' hint (default: `.pac-kbd-up`)
 *   `kbd_down`: The `<kbd>` tag for the 'Down Arrow' hint (default: `.pac-kbd-down`)
@@ -375,7 +488,11 @@ const options = {
     ul: 'absolute mt-1 w-full bg-white shadow-lg rounded-md border border-gray-200 max-h-60 overflow-auto',
     li: 'px-4 py-2 hover:bg-blue-500 hover:text-white cursor-pointer',
     li_current: 'bg-blue-500 text-white',
-    highlight: 'font-semibold text-blue-700'
+    highlight: 'font-semibold text-blue-700',
+    // Place type styling
+    li_div_two_p_place_type: 'flex items-center gap-1 text-gray-500',
+    li_div_two_p_place_type_icon: 'w-4 h-4',
+    li_div_two_p_place_type_label: 'text-xs font-medium'
   }
 };
 ```
@@ -416,7 +533,7 @@ import { PlaceAutocomplete } from 'places-autocomplete-svelte';
 ```typescript
 import type { 
     PlaceResult,       // Place data returned from API
-    ComponentOptions,  // UI and behavior configuration
+    ComponentOptions,  // UI and behaviour configuration
     RequestParams,     // Autocomplete request parameters
     FormattedAddress,  // Standardised address structure
     ComponentClasses,  // CSS class overrides
@@ -444,6 +561,34 @@ import {
 *   **Session Tokens** are used automatically to group Autocomplete requests, which can reduce costs.
 *   Place Details requests (via `fetchFields`) are billed separately. **Only request the fields you need** to manage costs effectively.
 *   For detailed pricing information, see [Google Maps Platform Pricing](https://developers.google.com/maps/documentation/javascript/usage-and-billing).
+
+## Troubleshooting
+
+Common issues and how to resolve them:
+
+### No Suggestions Appear / "This API project is not authorised..."
+
+This is typically an issue with your Google Maps API key.
+
+*   **Check API Key Restrictions:** Ensure your key is correctly restricted. For web use, you should have an **HTTP referrer** restriction matching your website's domain (e.g., `yourdomain.com/*`). For local development, you might need to add `localhost:*` or your specific local server address.
+*   **Enable APIs:** In the Google Cloud Console, make sure you have enabled both the **Places API** and the **Maps JavaScript API** for your project. The `setInputValue()` method also requires the **Geocoding API**.
+*   **Enable Billing:** Your Google Cloud project must have a valid billing account attached.
+*   **Check for Errors:** Open your browser's developer console and check for any error messages from the Google Maps script.
+
+### "Loader must not be called again" Error
+
+This error occurs when you have multiple Google Maps components on the same page (or across different routes in a SvelteKit app) and each one tries to initialize the Google Maps loader independently.
+
+**Solution:** Use the **Advanced Usage (Manual Initialisation)** pattern.
+1.  Call `setGMapsContext()` once in a shared parent component (like `+layout.svelte`).
+2.  Call `initialiseGMaps()` once in the same parent component, inside a `if (browser)` block.
+3.  The `PlaceAutocomplete` component (and any other Google Maps components) will then automatically use the shared loader instance, preventing the error.
+
+### Component or Styles Not Loading Correctly
+
+*   **Check Installation:** Make sure the `places-autocomplete-svelte` package is correctly installed in your `node_modules`.
+*   **SvelteKit / Vite Config:** Ensure your bundler is correctly processing Svelte components from `node_modules`. This is usually handled automatically.
+*   **CSS Conflicts:** If the styling looks broken, you may have global styles that are conflicting with the component's default `.pac-` classes. You can either debug the conflicting styles or use the `options.classes` prop to replace the default classes with your own (e.g., Tailwind CSS classes), giving you full control over styling.
 
 ## Standalone JavaScript Library
 

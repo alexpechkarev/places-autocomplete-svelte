@@ -1,26 +1,14 @@
 <script lang="ts">
 	import { importLibrary } from '@googlemaps/js-api-loader';
-	import type { ComponentOptions, FormattedAddress, PlaceResult } from '$lib/interfaces.js';
+	import type {
+		ComponentOptions,
+		FormattedAddress,
+		PlaceResult,
+		RequestParams
+	} from '$lib/interfaces.js';
 	import PlaceAutocomplete from '$lib/PlaceAutocomplete.svelte';
-	import { browser } from '$app/environment';
-	import { initialiseGMaps, setGMapsContext } from '$lib/gmaps.js';
 	import { onMount } from 'svelte';
 	let autocompleteComponent: PlaceAutocomplete | undefined = $state(undefined); // This will hold the component instance
-
-	setGMapsContext();
-	 // 2. If we are in the browser, trigger the asynchronous loading process.
-    // This will update the stores that all components are subscribed to.
-    if (browser) {
-        initialiseGMaps({
-			key: import.meta.env.VITE_PUBLIC_GOOGLE_MAPS_API_KEY,
-			v: 'weekly'
-		}).catch((error: any) => {
-			// Error is already logged and set in the store by initialiseGMaps
-			// You can add additional global error handling here if needed.
-			console.error('Error initializing Google Maps in +page.svelte:', error);
-        });
-    }
-
 
 	let unique = $state({}); // every {} is unique, {} === {} evaluates to false
 	let handleChange = (e: Event | null) => {
@@ -30,18 +18,18 @@
 	};
 
 	// Request parameters
-	const requestParams = {
+	const requestParams: RequestParams = {
 		// The language in which to return results. Will default to the browser's language preference.
-		language: 'en-GB',
+		//language: 'en-GB',
 		// The region code, specified as a CLDR two-character region code. This affects address formatting, result ranking, and may influence what results are returned. This does not restrict results to the specified region.
-		region: 'GB',
+		//region: 'GB',
 		// The location around which to retrieve place information. This will bias results to the specified area, but will not restrict results to this area.
-		includedRegionCodes: ['GB'],
+		//includedRegionCodes: ['GB'],
 		//includedPrimaryTypes: ['restaurant', 'food'],
-		"origin": {
-			"lat": 53.75651836830397,
-			"lng": -3.0215336287433003
-		}
+		// "origin": {
+		// 	"lat": 53.75651836830397,
+		// 	"lng": -3.0215336287433003
+		// }
 	};
 	//  geometry, icon, name, permanentlyClosed, photo, placeId, url, utcOffset, vicinity, openingHours, icon, name
 
@@ -51,11 +39,12 @@
 	// Options
 	const options: ComponentOptions = {
 		placeholder: 'Start typing your address',
-		distance: true,
+		distance: false,
 		distance_units: 'km',
 		clear_input: false,
 		debounce: 100,
-		autocomplete: "new-password"
+		autocomplete: 'new-password',
+		show_place_type: true
 		//  label: 'Address',
 		// classes:{
 		// 	icon: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-right-from-line-icon lucide-arrow-right-from-line"><path d="M3 5v14"/><path d="M21 12H7"/><path d="m15 18 6-6-6-6"/></svg>',
@@ -80,8 +69,6 @@
 	let fullResponse: PlaceResult | null = $state(null);
 	// Google Maps API key
 	const PUBLIC_GOOGLE_MAPS_API_KEY = import.meta.env.VITE_PUBLIC_GOOGLE_MAPS_API_KEY;
-
-
 
 	// Countries - optional, if not provided defaults to GB
 	let countries = $state([
@@ -195,10 +182,44 @@
 	let marker: google.maps.marker.AdvancedMarkerElement;
 	let loadedLibs: LoadedLibraries = {};
 
+	const useMyLocation = () => {
+		if (navigator.geolocation) {
+			navigator.geolocation.getCurrentPosition(
+				(position) => {
+					autocompleteComponent?.setInputValue(position.coords.latitude, position.coords.longitude);
+
+					const userLocation = {
+						lat: position.coords.latitude,
+						lng: position.coords.longitude
+					};
+
+					map.setCenter(userLocation);
+					map.setZoom(15);
+					if (marker) {
+						marker.position = userLocation;
+					} else if (loadedLibs?.AdvancedMarkerElement) {
+						marker = new loadedLibs.AdvancedMarkerElement({
+							position: userLocation,
+							map: map
+						});
+					} else {
+						console.warn('AdvancedMarkerElement not available yet');
+					}
+				},
+				() => {
+					onError('Error: The Geolocation service failed.');
+				}
+			);
+		} else {
+			// Browser doesn't support Geolocation
+			onError("Error: Your browser doesn't support geolocation.");
+		}
+	};
+
 	onMount(async () => {
 		try {
 			// Initialize the loader once for all child components.
-    		//initializeGMaps({ key: PUBLIC_GOOGLE_MAPS_API_KEY, v: 'weekly' });
+			//initializeGMaps({ key: PUBLIC_GOOGLE_MAPS_API_KEY, v: 'weekly' });
 			const { Map } = await importLibrary('maps');
 			const { AdvancedMarkerElement } = await importLibrary('marker');
 			loadedLibs = { Map, AdvancedMarkerElement };
@@ -253,7 +274,12 @@
 					class="border-2 block w-full p-2 rounded-md"
 				></textarea>
 			</div>
-			<div class={[countries.length && 'lg:col-span-4', !countries.length && 'lg:col-span-6']}>
+			<div
+				class={[
+					countries.length && 'lg:col-span-4 col-span-6 mt-10 lg:mt-10',
+					!countries.length && 'lg:col-span-6'
+				]}
+			>
 				<label class="mt-1 text-sm leading-6 text-gray-600" for="search"
 					>Start typing your address</label
 				>
@@ -272,7 +298,10 @@
 
 			<!-- Country selector -->
 			<div
-				class={[countries.length && 'lg:col-span-2 mt-10 lg:mt-0', !countries.length && 'hidden']}
+				class={[
+					countries.length && 'lg:col-span-2 mt-10 lg:mt-10 col-span-6',
+					!countries.length && 'hidden'
+				]}
 			>
 				<label class="mt-1 text-sm leading-6 text-gray-600" for="search">Address country</label>
 				<div class="flex items-center mt-4">
@@ -320,51 +349,74 @@
 	</button>
 
 	<button
-		onclick={() => autocompleteComponent?.setRequestParams({region: 'FR', language: 'fr',includedRegionCodes: ['FR']})}
+		onclick={() =>
+			autocompleteComponent?.setRequestParams({
+				region: 'FR',
+				language: 'fr',
+				includedRegionCodes: ['FR']
+			})}
 		class="ml-4 mb-10 rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
 	>
 		Set Request Param to France
 	</button>
 
 	<button
-		onclick={() => autocompleteComponent?.setFetchFields(['formattedAddress', 'addressComponents', 'displayName', 'location', 'businessStatus'])}
+		onclick={() =>
+			autocompleteComponent?.setFetchFields([
+				'formattedAddress',
+				'addressComponents',
+				'displayName',
+				'location',
+				'businessStatus'
+			])}
 		class="ml-4 mb-10 rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
 	>
 		Set Fetch Fields
-	</button>	
+	</button>
 	<button
 		onclick={() => console.log(JSON.stringify(autocompleteComponent?.getFetchFields(), null, 2))}
 		class="ml-4 mb-10 rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
 	>
 		Get Fetch Fields
-	</button>	
+	</button>
 
 	<button
 		onclick={() => autocompleteComponent?.focus()}
 		class="ml-4 mb-10 rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
 	>
 		Focus
-	</button>	
+	</button>
 
 	<button
 		onclick={() => autocompleteComponent?.clear()}
 		class="ml-4 mb-10 rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
 	>
 		Clear
-	</button>		
+	</button>
 
 	<button
-		onclick={() => autocompleteComponent?.setOptions({placeholder: 'New placeholder from method', distance: false})}
+		onclick={() =>
+			autocompleteComponent?.setOptions({
+				placeholder: 'New placeholder from method',
+				distance: false
+			})}
 		class="ml-4 mb-10 rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
 	>
 		Set Options
-	</button>	
+	</button>
 	<button
 		onclick={() => console.log(JSON.stringify(autocompleteComponent?.getOptions(), null, 2))}
 		class="ml-4 mb-10 rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
 	>
 		Get Options
-	</button>		
+	</button>
+
+	<button
+		onclick={() => useMyLocation()}
+		class="ml-4 mb-10 rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+	>
+		Use My Location
+	</button>
 
 	{#if Object.values(formattedAddressObj).filter((value) => value).length > 0}
 		<h1 class="text-base font-semibold leading-6 text-gray-900 mt-10">Response</h1>

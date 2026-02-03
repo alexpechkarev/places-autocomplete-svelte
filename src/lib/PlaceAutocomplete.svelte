@@ -5,10 +5,10 @@
 	 * @see https://github.com/alexpechkarev/places-autocomplete-svelte
 	 * @version 1.0.0
 	 * @license MIT
-	 * 
+	 *
 	 * A production-ready, accessible autocomplete component for Google Places API (New).
 	 * Built with Svelte 5 runes for optimal reactivity and performance.
-	 * 
+	 *
 	 * @features
 	 * - Full keyboard navigation (ArrowUp, ArrowDown, Enter, Escape)
 	 * - Session token management for billing optimization
@@ -18,8 +18,8 @@
 	 * - Text highlighting in suggestions
 	 * - ARIA-compliant accessibility
 	 * - Imperative API for programmatic control
-	 * 
-	 * 
+	 *
+	 *
 	 * @publicMethods
 	 * - `clear()` - Clears input and resets session
 	 * - `focus()` - Focuses the input field
@@ -27,7 +27,8 @@
 	 * - `setRequestParams(params)` - Updates request parameters dynamically
 	 * - `setFetchFields(fields)` - Updates Place Data Fields to fetch
 	 * - `getFetchFields()` - Returns current fetch fields
-	 * 
+	 * - `setInputValue(latitude, longitude)` - Finds and selects a place by coordinates
+	 *
 	 */
 
 	import { onMount, untrack } from 'svelte';
@@ -45,7 +46,9 @@
 		formatDistance,
 		validateFetchFields,
 		createHighlightedSegments,
-		debounce
+		debounce,
+		ITINERARY_CATEGORIES,
+		ITINERARY_SVG_ICONS
 	} from './helpers.js';
 
 	let gmaps: GMapsContext | undefined;
@@ -116,7 +119,7 @@
 	 * @param {PlaceResult} [placeData] - Optional place data to populate the input field with.
 	 * @private
 	 */
-	const reset = (placeData?: PlaceResult) => {
+	export const reset = (placeData?: PlaceResult) => {
 		currentSuggestion = -1;
 		if (validatedOptions?.clear_input == false) {
 			if (placeData && placeData.formattedAddress) {
@@ -227,10 +230,9 @@
 	 *   showDistance: true
 	 * });
 	 */
-	export function setOptions(options: typeof validatedOptions){
+	export function setOptions(options: typeof validatedOptions) {
 		validatedOptions = validateOptions(options);
-	}	
-
+	}
 
 	/**
 	 * Returns the current validated options used by the component.
@@ -245,6 +247,71 @@
 		return validatedOptions;
 	}
 
+	/**
+	 * Sets the input value by finding and selecting a place for the given coordinates.
+	 * Performs reverse geocoding to convert latitude/longitude to a place, then fetches
+	 * place details and triggers the onResponse callback.
+	 * @public
+	 * @param {number} latitude - The latitude coordinate of the location.
+	 * @param {number} longitude - The longitude coordinate of the location.
+	 * @returns {Promise<void>} A promise that resolves when the place has been found and selected.
+	 * @throws {Error} If the geocoding fails or no place is found for the coordinates.
+	 * @example
+	 * // Set input to a specific location (e.g., Eiffel Tower)
+	 * await autocompleteComponent.setInputValue(48.8584, 2.2945);
+	 */
+	export async function setInputValue(latitude: number, longitude: number): Promise<void> {
+		try {
+			// Ensure placesApi is loaded
+			if (!placesApi.AutocompleteSuggestion) {
+				throw new Error('Places API not loaded yet. Please wait for component initialisation.');
+			}
+
+			// Import the geocoding library
+			const { Geocoder } = await importLibrary('geocoding');
+			const geocoder = new Geocoder();
+
+			// Perform reverse geocoding
+			const response = await geocoder.geocode({
+				location: { lat: latitude, lng: longitude }
+			});
+
+			if (!response.results || response.results.length === 0) {
+				throw new Error('No place found for the given coordinates.');
+			}
+
+			// Get the first result (most specific)
+			const geocodeResult = response.results[0];
+
+			// Import the Place class to create a Place object from the place ID
+			const { Place } = await importLibrary('places');
+			const place = new Place({
+				id: geocodeResult.place_id
+			});
+
+			// Fetch the place details with the configured fields
+			await place.fetchFields({
+				fields: validatedFetchFields
+			});
+
+			// Convert to JSON format
+			const placeData = place.toJSON() as PlaceResult;
+
+			// Reset search input and results
+			reset(placeData);
+
+			// Trigger the onResponse callback
+			onResponse(placeData);
+		} catch (e: any) {
+			// Handle errors
+			onError(
+				(e.name || 'An error occurred') +
+					' - ' +
+					(e.message || 'error setting input value from coordinates')
+			);
+			throw e;
+		}
+	}
 
 	/**
 	 * Extracts a specific address component from the place response.
@@ -329,7 +396,35 @@
 
 				// Create highlighted segments
 				highlightedText = createHighlightedSegments(originalText, matches);
+				//console.log(suggestion.placePrediction.types);
 
+				// Extract the types array for cleaner code
+				const types = suggestion.placePrediction.types;
+				let placeType = {
+					icon: '',
+					label: ''
+				};
+
+				if (validatedOptions.show_place_type) {
+					if (Array.isArray(types) && types.length > 0) {
+						// Look through the array until we find a type we actually recognize
+						const matchedType = types.find(
+							(type: string) => typeof type === 'string' && type in ITINERARY_CATEGORIES
+						);
+
+						// If we found a match, get its label; otherwise, use 'Default'
+						const categoryLabel = matchedType
+							? ITINERARY_CATEGORIES[matchedType as keyof typeof ITINERARY_CATEGORIES]
+							: 'Default';
+
+						placeType = {
+							icon: ITINERARY_SVG_ICONS[categoryLabel as keyof typeof ITINERARY_SVG_ICONS] || '',
+							label: categoryLabel
+						};
+					}
+				}
+
+				// const category = ITINERARY_CATEGORIES[suggestion.placePrediction.placeType] || 'Default';
 				results.push({
 					place: place,
 					mainText: highlightedText,
@@ -337,7 +432,8 @@
 					distance: formatDistance(
 						suggestion.placePrediction.distanceMeters,
 						validatedOptions.distance_units ?? 'km'
-					)
+					),
+					placeType: placeType
 				});
 			}
 			//console.log('Autocomplete suggestions:', results);
@@ -351,7 +447,9 @@
 	 * The debounce delay is reactive and updates when the validatedOptions.debounce value changes.
 	 * @private
 	 */
-	const debouncedMakeAcRequest = $derived(debounce(makeAcRequest, validatedOptions?.debounce ?? 100));
+	const debouncedMakeAcRequest = $derived(
+		debounce(makeAcRequest, validatedOptions?.debounce ?? 100)
+	);
 
 	/**
 	 * Handles the selection of an autocomplete suggestion.
@@ -366,12 +464,11 @@
 		toJSON: () => any;
 	}): Promise<void> => {
 		try {
-			// console.log(place);
-			// console.log(validatedFetchFields);
 			await place.fetchFields({
 				fields: validatedFetchFields
 			});
-			let placeData = place.toJSON();
+			// return place as json or full place class instance
+			let placeData = validatedOptions.response_type === 'json' ? place.toJSON() : place;
 			// reset search input and results
 			reset(placeData);
 			onResponse(placeData);
@@ -406,7 +503,7 @@
 	onMount(async (): Promise<void> => {
 		if (isDefaultOnResponse) {
 			console.warn(
-				'PlaceAutocomplete: The `onResponse` callback has not been provided. Selected place data will not be handled. See documentation for usage.'
+				'[PlaceAutocomplete] No onResponse callback provided. Place selection events will not be handled. Please provide an onResponse function to handle place selections. See: https://places-autocomplete-svelte.uk/docs'
 			);
 		}
 		if (validatedOptions.autofocus) {
@@ -593,7 +690,7 @@
 											stroke-width="2"
 											stroke-linecap="round"
 											stroke-linejoin="round"
-											class="size-5">{@html validatedOptions.classes.map_pin_icon}</svg
+											class="size-5 shrink-0">{@html validatedOptions.classes.map_pin_icon}</svg
 										>
 									{/if}
 
@@ -625,7 +722,7 @@
 									</div>
 								</div>
 							</div>
-							{#if validatedOptions.distance && p.distance}
+							{#if validatedOptions.distance && p.distance && !validatedOptions.show_place_type}
 								<div class={[validatedOptions.classes?.li_div_two]}>
 									<p
 										class={[
@@ -635,6 +732,33 @@
 									>
 										{p.distance}
 									</p>
+								</div>
+							{/if}
+							{#if validatedOptions.show_place_type && p.placeType && !validatedOptions.distance}
+								<div class={[validatedOptions.classes?.li_div_two]}>
+									<div
+										class={[
+											i === currentSuggestion && validatedOptions.classes?.li_current,
+											validatedOptions.classes?.li_div_two_p_place_type
+										]}
+									>
+										<div
+											class={[
+												i === currentSuggestion && validatedOptions.classes?.li_current,
+												validatedOptions.classes?.li_div_two_p_place_type_icon
+											]}
+										>
+											{@html p.placeType.icon}
+										</div>
+										<div
+											class={[
+												i === currentSuggestion && validatedOptions.classes?.li_current,
+												validatedOptions.classes?.li_div_two_p_place_type_label
+											]}
+										>
+											{p.placeType.label}
+										</div>
+									</div>
 								</div>
 							{/if}
 						</button>
@@ -648,7 +772,7 @@
 <style>
 	/* Component styles */
 	@layer properties {
-		@supports (((-webkit-hyphens: none)) and (not (margin-trim: inline))) or
+		@supports ((-webkit-hyphens: none) and (not (margin-trim: inline))) or
 			((-moz-orient: inline) and (not (color: rgb(from red r g b)))) {
 			*,
 			:before,
@@ -688,6 +812,8 @@
 			ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New',
 			monospace;
 		-webkit-text-size-adjust: 100%;
+		-moz-tab-size: 4;
+		-o-tab-size: 4;
 		tab-size: 4;
 		line-height: 1.5;
 		font-family: var(
@@ -803,6 +929,13 @@
 		--default-mono-font-family: var(--font-mono);
 		--color-primary-500: #fe795d;
 	}
+	.size-5 {
+		width: 20px;
+		height: 20px;
+	}
+	.shrink-0 {
+		flex-shrink: 0;
+	}
 	.pac-section {
 		width: 100%;
 	}
@@ -865,6 +998,11 @@
 		padding-right: calc(var(--spacing, 0.25rem) * 1.5);
 		display: flex;
 		position: absolute;
+		/* max-height: 40px; */
+		align-content: center;
+		align-items: center;
+		flex-wrap: wrap;
+		flex-direction: row;
 	}
 	.pac-kbd-escape {
 		margin-right: calc(var(--spacing, 0.25rem) * 1);
@@ -992,6 +1130,7 @@
 		padding-block: calc(var(--spacing, 0.25rem) * 2);
 		color: var(--color-gray-900, oklch(21% 0.034 264.665));
 		-webkit-user-select: none;
+		-moz-user-select: none;
 		user-select: none;
 	}
 	@media (hover: hover) {
@@ -1031,6 +1170,7 @@
 	.pac-li-div-one {
 		min-width: calc(var(--spacing, 0.25rem) * 0);
 		align-items: center;
+		-moz-column-gap: calc(var(--spacing, 0.25rem) * 3);
 		column-gap: calc(var(--spacing, 0.25rem) * 3);
 		flex: auto;
 		display: flex;
@@ -1054,6 +1194,7 @@
 	.pac-li-div-one-p-secondaryText {
 		font-size: var(--text-xs, 0.75rem);
 		line-height: calc(var(--spacing, 0.25rem) * 4);
+		text-align: left;
 	}
 	.pac-li-current {
 		background-color: var(--color-indigo-500, oklch(58.5% 0.233 277.117));
@@ -1074,6 +1215,43 @@
 	.pac-li-div-two-p {
 		font-size: var(--text-xs, 0.75rem);
 		line-height: var(--tw-leading, var(--text-xs--line-height, calc(1 / 0.75)));
+	}
+	.pac-li-div-two-p-place_type {
+		font-size: var(--text-xs, 0.75rem);
+		line-height: var(--tw-leading, var(--text-xs--line-height, calc(1 / 0.75)));
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+		/* justify-content: space-between; */
+		justify-content: flex-end;
+		width: 100%;
+		/* min-width: 120px; */
+		gap: 0.5rem;
+	}
+	.pac-li-div-two-p-place_type-icon {
+		flex-shrink: 0;
+	}
+	.pac-li-div-two-p-place_type-label {
+		/* text-wrap: left; */
+		display: none;
+	}
+
+	@media (min-width: 48rem) {
+		.pac-li-div-two-p-place_type {
+			font-size: var(--text-xs, 0.75rem);
+			line-height: var(--tw-leading, var(--text-xs--line-height, calc(1 / 0.75)));
+			display: flex;
+			flex-direction: row;
+			align-items: center;
+			justify-content: flex-start;
+			width: 100%;
+			min-width: 120px;
+			gap: 0.5rem;
+		}
+		.pac-li-div-two-p-place_type-label {
+			/* text-wrap: left; */
+			display: inline;
+		}
 	}
 	.pac-highlight {
 		--tw-font-weight: var(--font-weight-bold, 700);
