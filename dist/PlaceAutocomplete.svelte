@@ -325,23 +325,6 @@
 			?.longText || '';
 
 	/**
-	 * Constructs the secondary text for autocomplete suggestions from address components.
-	 * Combines locality, administrative area, country, and postal code into a formatted string.
-	 * @private
-	 * @param {Object} place - The place object containing address components.
-	 * @returns {string} Formatted secondary text (e.g., "Paris, Île-de-France, France, 75001").
-	 */
-	const getSecondaryText = (place: { addressComponents: any[] }) => {
-		const locality = getAddressComponent(place, 'locality');
-		const adminArea = getAddressComponent(place, 'administrative_area_level_1');
-		const postalCode = getAddressComponent(place, 'postal_code');
-		const country = getAddressComponent(place, 'country');
-
-		let components = [locality, adminArea, country, postalCode].filter(Boolean);
-		return components.join(', ');
-	};
-
-	/**
 	 * Fetches autocomplete suggestions from the Google Places API based on user input.
 	 * @private
 	 * @param {string} inputValue - The user's input text to search for.
@@ -377,12 +360,12 @@
 			// Iterate over suggestions and add results to an array
 			for (const suggestion of suggestions) {
 				// get prediction text
-				//console.log(suggestion.placePrediction.toPlace());
+				//console.log(suggestion.placePrediction.secondaryText);
 				let place = suggestion.placePrediction.toPlace();
-				await place.fetchFields({ fields: ['addressComponents'] });
 
 				const predictionText = suggestion.placePrediction.mainText;
 				const originalText = predictionText.text;
+				const secondaryText = suggestion.placePrediction?.secondaryText?.text ?? '';
 				// Extract match positions (array of objects with startOffset, endOffset)
 				const matches = predictionText.matches;
 
@@ -424,11 +407,10 @@
 					}
 				}
 
-				// const category = ITINERARY_CATEGORIES[suggestion.placePrediction.placeType] || 'Default';
 				results.push({
 					place: place,
 					mainText: highlightedText,
-					secondaryText: getSecondaryText(place),
+					secondaryText: secondaryText,
 					distance: formatDistance(
 						suggestion.placePrediction.distanceMeters,
 						validatedOptions.distance_units ?? 'km'
