@@ -20,16 +20,16 @@
 	// Request parameters
 	const requestParams: RequestParams = {
 		// The language in which to return results. Will default to the browser's language preference.
-		//language: 'en-GB',
+		language: 'en-GB',
 		// The region code, specified as a CLDR two-character region code. This affects address formatting, result ranking, and may influence what results are returned. This does not restrict results to the specified region.
-		//region: 'GB',
+		region: 'GB',
 		// The location around which to retrieve place information. This will bias results to the specified area, but will not restrict results to this area.
-		//includedRegionCodes: ['GB'],
-		//includedPrimaryTypes: ['restaurant', 'food'],
-		// "origin": {
-		// 	"lat": 53.75651836830397,
-		// 	"lng": -3.0215336287433003
-		// }
+		includedRegionCodes: ['GB'],
+		//includedPrimaryTypes: ['establishment', 'street_address'],
+		"origin": {
+			"lat": 53.75651836830397,
+			"lng": -3.0215336287433003
+		}
 	};
 	//  geometry, icon, name, permanentlyClosed, photo, placeId, url, utcOffset, vicinity, openingHours, icon, name
 
@@ -151,7 +151,7 @@
 			map.setZoom(15);
 			if (marker) {
 				marker.position = response.location;
-			} else {
+			} else if (loadedLibs.AdvancedMarkerElement) {
 				marker = new loadedLibs.AdvancedMarkerElement({
 					position: response.location,
 					map: map

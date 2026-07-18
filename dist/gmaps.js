@@ -1,6 +1,6 @@
 import { getContext, setContext } from 'svelte';
 import { writable, get } from 'svelte/store';
-import { setOptions, importLibrary } from "@googlemaps/js-api-loader";
+import { setOptions, importLibrary } from '@googlemaps/js-api-loader';
 /**
  * Unique symbol key for storing the Google Maps context in Svelte's context API.
  * Using a Symbol ensures the key cannot be accidentally overwritten by other components.
@@ -28,7 +28,7 @@ export function setGMapsContext() {
     setContext(LOADER_CONTEXT_KEY, {
         isInitialised: writable(false),
         error: writable(null),
-        initialisationPromise: null, // Will be set by the loader function
+        initialisationPromise: null // Will be set by the loader function
     });
 }
 /**
@@ -87,7 +87,7 @@ export async function initialiseGMaps(options) {
         catch (e) {
             const error = e instanceof Error ? e : new Error(String(e));
             context.error.set(error);
-            console.error("Failed to set Google Maps API options.", error);
+            console.error('Failed to set Google Maps API options.', error);
             reject(error);
         }
     });
@@ -112,7 +112,7 @@ export function initialiseGMapsNoContext(options) {
         }
         catch (e) {
             const error = e instanceof Error ? e : new Error(String(e));
-            console.error("Failed to set Google Maps API options.", error);
+            console.error('Failed to set Google Maps API options.', error);
             reject(error);
         }
     });

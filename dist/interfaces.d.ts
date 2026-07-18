@@ -64,12 +64,12 @@ export interface ComponentClasses {
  * Controls browser autofill behavior for the input field.
  * @type {"on" | "off"}
  */
-export type AutoFill = "on" | "off" | "new-password";
+export type AutoFill = 'on' | 'off' | 'new-password';
 /**
  * Distance measurement units for displaying place distances.
  * @type {"km" | "miles"}
  */
-export type DistanceUnits = "km" | "miles";
+export type DistanceUnits = 'km' | 'miles';
 /**
  * Configuration options for customizing the PlaceAutocomplete component behavior and appearance.
  * @interface ComponentOptions

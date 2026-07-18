@@ -1,5 +1,5 @@
 import { type Writable } from 'svelte/store';
-import { importLibrary, type APIOptions } from "@googlemaps/js-api-loader";
+import { importLibrary, type APIOptions } from '@googlemaps/js-api-loader';
 /**
  * Context object for managing Google Maps API initialisation state across components.
  * Provides reactive stores for initialisation status and error handling, plus a shared promise

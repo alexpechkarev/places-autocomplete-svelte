@@ -158,7 +158,7 @@ export declare const ITINERARY_CATEGORIES: {
 export declare const ITINERARY_SVG_ICONS: {
     Automotive: string;
     Transport: string;
-    "Food and Drink": string;
+    'Food and Drink': string;
     Lodging: string;
     Sightseeing: string;
     Recreation: string;
@@ -170,7 +170,7 @@ export declare const ITINERARY_SVG_ICONS: {
     City: string;
     District: string;
     Airport: string;
-    "Subway Station": string;
-    "Train Station": string;
+    'Subway Station': string;
+    'Train Station': string;
     Default: string;
 };
